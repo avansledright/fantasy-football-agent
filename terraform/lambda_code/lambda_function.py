@@ -20,7 +20,7 @@ bedrock_model = BedrockModel(
 agent = Agent(
     model=bedrock_model,
     system_prompt=DRAFT_PROMPT,
-    tools=[get_best_available_player],
+    tools=[get_best_available_player]
 )
 
 def lambda_handler(event, context):
