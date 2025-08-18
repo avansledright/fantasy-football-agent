@@ -337,7 +337,7 @@ class FantasyDraftCLI:
             "scoring_format": self.session.scoring_format if self.session else "ppr",
             "league_size": self.session.league_size if self.session else 12
         }
-        print(f"Payload: {payload}")
+        #print(f"Payload: {payload}")
         try:
             response = requests.post(API_ENDPOINT, json=payload, timeout=30)
             response.raise_for_status()
@@ -482,7 +482,6 @@ class FantasyDraftCLI:
             return
         team_needs = self.calculate_team_needs()
         all_drafted_players = board.get_all_drafted_player_ids()
-        print(f"All drafted players = {all_drafted_players}")
         current_pick = board.current_pick
         round_num, pick_in_round = board.get_round_and_position(current_pick)
         print(f"🤖 Getting recommendation for YOUR pick #{current_pick} (Round {round_num}.{pick_in_round})...")

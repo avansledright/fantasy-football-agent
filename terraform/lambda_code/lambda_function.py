@@ -12,6 +12,7 @@ bedrock_model = BedrockModel(
     model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-haiku-20240620-v1:0"),
     max_tokens=4000,
     temperature=0.0,
+    stream=False
 )
 
 agent = Agent(

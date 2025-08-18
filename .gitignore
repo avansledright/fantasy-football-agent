@@ -1,0 +1,94 @@
+# -----------------------------
+# Python
+# -----------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+*.hypothesis/
+.pytest_cache/
+.pyre/
+.mypy_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# Terraform
+# -----------------------------
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Exclude override files as they are usually local
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# -----------------------------
+# Other
+# -----------------------------
+
+# Local environment variables
+*.env
+*.local
+
+# Mac / Windows system files
+.DS_Store
+Thumbs.db
+*.zip
