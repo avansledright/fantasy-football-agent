@@ -1,0 +1,261 @@
+[
+  {
+    "Player": "Brandon Aubrey",
+    "FG": 33.5,
+    "FGA": 37.3,
+    "XPT": 41.2,
+    "FPTS": 141.6
+  },
+  {
+    "Player": "Matt Gay",
+    "FG": 29.9,
+    "FGA": 35.3,
+    "XPT": 47.3,
+    "FPTS": 137.1
+  },
+  {
+    "Player": "Chase McLaughlin",
+    "FG": 30.1,
+    "FGA": 32.9,
+    "XPT": 46.1,
+    "FPTS": 136.4
+  },
+  {
+    "Player": "Jake Elliott",
+    "FG": 29.3,
+    "FGA": 34.2,
+    "XPT": 46.2,
+    "FPTS": 134.1
+  },
+  {
+    "Player": "Jason Sanders",
+    "FG": 31.0,
+    "FGA": 35.0,
+    "XPT": 40.3,
+    "FPTS": 133.4
+  },
+  {
+    "Player": "Tyler Bass",
+    "FG": 27.0,
+    "FGA": 32.5,
+    "XPT": 51.1,
+    "FPTS": 132.2
+  },
+  {
+    "Player": "Cameron Dicker",
+    "FG": 31.2,
+    "FGA": 34.3,
+    "XPT": 37.6,
+    "FPTS": 131.2
+  },
+  {
+    "Player": "Tyler Loop",
+    "FG": 27.4,
+    "FGA": 32.5,
+    "XPT": 47.5,
+    "FPTS": 129.6
+  },
+  {
+    "Player": "Evan McPherson",
+    "FG": 27.4,
+    "FGA": 33.6,
+    "XPT": 47.2,
+    "FPTS": 129.5
+  },
+  {
+    "Player": "Ka'imi Fairbairn",
+    "FG": 31.0,
+    "FGA": 34.7,
+    "XPT": 36.5,
+    "FPTS": 129.4
+  },
+  {
+    "Player": "Jake Bates",
+    "FG": 26.9,
+    "FGA": 30.3,
+    "XPT": 48.4,
+    "FPTS": 129.0
+  },
+  {
+    "Player": "Harrison Butker",
+    "FG": 28.7,
+    "FGA": 33.3,
+    "XPT": 42.3,
+    "FPTS": 128.3
+  },
+  {
+    "Player": "Brandon McManus",
+    "FG": 27.7,
+    "FGA": 32.3,
+    "XPT": 44.3,
+    "FPTS": 127.3
+  },
+  {
+    "Player": "Younghoe Koo",
+    "FG": 28.0,
+    "FGA": 34.4,
+    "XPT": 42.2,
+    "FPTS": 126.2
+  },
+  {
+    "Player": "Chris Boswell",
+    "FG": 30.2,
+    "FGA": 33.7,
+    "XPT": 35.4,
+    "FPTS": 126.0
+  },
+  {
+    "Player": "Wil Lutz",
+    "FG": 28.4,
+    "FGA": 32.3,
+    "XPT": 39.6,
+    "FPTS": 124.7
+  },
+  {
+    "Player": "Joshua Karty",
+    "FG": 28.7,
+    "FGA": 33.6,
+    "XPT": 38.6,
+    "FPTS": 124.6
+  },
+  {
+    "Player": "Will Reichard",
+    "FG": 28.0,
+    "FGA": 33.4,
+    "XPT": 40.5,
+    "FPTS": 124.5
+  },
+  {
+    "Player": "Jake Moody",
+    "FG": 27.7,
+    "FGA": 34.7,
+    "XPT": 40.3,
+    "FPTS": 123.5
+  },
+  {
+    "Player": "Chad Ryland",
+    "FG": 28.1,
+    "FGA": 33.3,
+    "XPT": 38.9,
+    "FPTS": 123.1
+  },
+  {
+    "Player": "Daniel Carlson",
+    "FG": 29.6,
+    "FGA": 34.1,
+    "XPT": 32.6,
+    "FPTS": 121.3
+  },
+  {
+    "Player": "Cam Little",
+    "FG": 27.3,
+    "FGA": 30.7,
+    "XPT": 36.3,
+    "FPTS": 118.4
+  },
+  {
+    "Player": "Jason Myers",
+    "FG": 27.4,
+    "FGA": 31.1,
+    "XPT": 34.1,
+    "FPTS": 116.2
+  },
+  {
+    "Player": "Cairo Santos",
+    "FG": 26.3,
+    "FGA": 30.7,
+    "XPT": 36.9,
+    "FPTS": 116.0
+  },
+  {
+    "Player": "Ryan Fitzgerald",
+    "FG": 27.6,
+    "FGA": 33.2,
+    "XPT": 32.8,
+    "FPTS": 115.5
+  },
+  {
+    "Player": "Spencer Shrader",
+    "FG": 26.1,
+    "FGA": 31.1,
+    "XPT": 35.5,
+    "FPTS": 113.9
+  },
+  {
+    "Player": "Nick Folk",
+    "FG": 26.2,
+    "FGA": 29.5,
+    "XPT": 33.1,
+    "FPTS": 111.8
+  },
+  {
+    "Player": "Blake Grupe",
+    "FG": 26.8,
+    "FGA": 31.5,
+    "XPT": 31.0,
+    "FPTS": 111.5
+  },
+  {
+    "Player": "Joey Slye",
+    "FG": 25.8,
+    "FGA": 31.8,
+    "XPT": 31.8,
+    "FPTS": 109.3
+  },
+  {
+    "Player": "Andy Borregales",
+    "FG": 24.5,
+    "FGA": 29.1,
+    "XPT": 31.6,
+    "FPTS": 105.1
+  },
+  {
+    "Player": "Graham Gano",
+    "FG": 24.3,
+    "FGA": 28.8,
+    "XPT": 30.5,
+    "FPTS": 103.5
+  },
+  {
+    "Player": "Dustin Hopkins",
+    "FG": 22.9,
+    "FGA": 29.2,
+    "XPT": 24.6,
+    "FPTS": 93.2
+  },
+  {
+    "Player": "Matthew Wright",
+    "FG": 15.3,
+    "FGA": 17.7,
+    "XPT": 19.5,
+    "FPTS": 65.5
+  },
+  {
+    "Player": "Harrison Mevis",
+    "FG": 0.0,
+    "FGA": 0.0,
+    "XPT": 0.0,
+    "FPTS": 0.0
+  },
+  {
+    "Player": "Parker Romo",
+    "FG": 0.0,
+    "FGA": 0.0,
+    "XPT": 0.0,
+    "FPTS": 0.0
+  },
+  {
+    "Player": "Jude McAtamney",
+    "FG": 0.0,
+    "FGA": 0.0,
+    "XPT": 0.0,
+    "FPTS": 0.0
+  },
+  {
+    "Player": "Caden Davis",
+    "FG": 0.0,
+    "FGA": 0.0,
+    "XPT": 0.0,
+    "FPTS": 0.0
+  }
+]

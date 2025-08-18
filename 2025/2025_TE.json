@@ -1,0 +1,1250 @@
+[
+  {
+    "Player": "Brock Bowers",
+    "RECEIVING_REC": 106.0,
+    "RECEIVING_YDS": 1131.5,
+    "RECEIVING_TDS": 6.1,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 149.7
+  },
+  {
+    "Player": "George Kittle",
+    "RECEIVING_REC": 76.0,
+    "RECEIVING_YDS": 1036.9,
+    "RECEIVING_TDS": 7.5,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 147.6
+  },
+  {
+    "Player": "Trey McBride",
+    "RECEIVING_REC": 104.4,
+    "RECEIVING_YDS": 1053.1,
+    "RECEIVING_TDS": 5.8,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 139.4
+  },
+  {
+    "Player": "Mark Andrews",
+    "RECEIVING_REC": 59.9,
+    "RECEIVING_YDS": 721.0,
+    "RECEIVING_TDS": 7.8,
+    "MISC_FL": 0.8,
+    "MISC_FPTS": 117.5
+  },
+  {
+    "Player": "Sam LaPorta",
+    "RECEIVING_REC": 67.9,
+    "RECEIVING_YDS": 763.7,
+    "RECEIVING_TDS": 6.8,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 116.3
+  },
+  {
+    "Player": "Travis Kelce",
+    "RECEIVING_REC": 80.8,
+    "RECEIVING_YDS": 767.3,
+    "RECEIVING_TDS": 5.3,
+    "MISC_FL": 0.9,
+    "MISC_FPTS": 106.7
+  },
+  {
+    "Player": "T.J. Hockenson",
+    "RECEIVING_REC": 76.4,
+    "RECEIVING_YDS": 797.3,
+    "RECEIVING_TDS": 4.6,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 106.4
+  },
+  {
+    "Player": "David Njoku",
+    "RECEIVING_REC": 76.7,
+    "RECEIVING_YDS": 735.1,
+    "RECEIVING_TDS": 4.8,
+    "MISC_FL": 0.8,
+    "MISC_FPTS": 100.9
+  },
+  {
+    "Player": "Tucker Kraft",
+    "RECEIVING_REC": 55.2,
+    "RECEIVING_YDS": 652.8,
+    "RECEIVING_TDS": 4.8,
+    "MISC_FL": 0.8,
+    "MISC_FPTS": 92.5
+  },
+  {
+    "Player": "Tyler Warren",
+    "RECEIVING_REC": 58.7,
+    "RECEIVING_YDS": 655.3,
+    "RECEIVING_TDS": 4.3,
+    "MISC_FL": 1.1,
+    "MISC_FPTS": 89.4
+  },
+  {
+    "Player": "Dallas Goedert",
+    "RECEIVING_REC": 57.1,
+    "RECEIVING_YDS": 633.2,
+    "RECEIVING_TDS": 3.9,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 85.8
+  },
+  {
+    "Player": "Zach Ertz",
+    "RECEIVING_REC": 58.1,
+    "RECEIVING_YDS": 539.3,
+    "RECEIVING_TDS": 5.1,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 84.2
+  },
+  {
+    "Player": "Dalton Kincaid",
+    "RECEIVING_REC": 57.1,
+    "RECEIVING_YDS": 602.9,
+    "RECEIVING_TDS": 4.0,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 83.6
+  },
+  {
+    "Player": "Evan Engram",
+    "RECEIVING_REC": 69.1,
+    "RECEIVING_YDS": 614.3,
+    "RECEIVING_TDS": 4.0,
+    "MISC_FL": 0.9,
+    "MISC_FPTS": 83.4
+  },
+  {
+    "Player": "Kyle Pitts Sr.",
+    "RECEIVING_REC": 47.5,
+    "RECEIVING_YDS": 599.5,
+    "RECEIVING_TDS": 3.9,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 83.3
+  },
+  {
+    "Player": "Jake Ferguson",
+    "RECEIVING_REC": 67.8,
+    "RECEIVING_YDS": 621.9,
+    "RECEIVING_TDS": 3.8,
+    "MISC_FL": 1.2,
+    "MISC_FPTS": 82.6
+  },
+  {
+    "Player": "Hunter Henry",
+    "RECEIVING_REC": 54.9,
+    "RECEIVING_YDS": 572.4,
+    "RECEIVING_TDS": 3.6,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 78.3
+  },
+  {
+    "Player": "Darren Waller",
+    "RECEIVING_REC": 52.5,
+    "RECEIVING_YDS": 579.2,
+    "RECEIVING_TDS": 3.4,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 77.9
+  },
+  {
+    "Player": "Isaiah Likely",
+    "RECEIVING_REC": 41.4,
+    "RECEIVING_YDS": 495.5,
+    "RECEIVING_TDS": 4.8,
+    "MISC_FL": 0.7,
+    "MISC_FPTS": 77.1
+  },
+  {
+    "Player": "Jonnu Smith",
+    "RECEIVING_REC": 52.2,
+    "RECEIVING_YDS": 544.4,
+    "RECEIVING_TDS": 4.0,
+    "MISC_FL": 0.9,
+    "MISC_FPTS": 76.7
+  },
+  {
+    "Player": "Colston Loveland",
+    "RECEIVING_REC": 52.8,
+    "RECEIVING_YDS": 554.1,
+    "RECEIVING_TDS": 3.8,
+    "MISC_FL": 0.8,
+    "MISC_FPTS": 76.5
+  },
+  {
+    "Player": "Cade Otton",
+    "RECEIVING_REC": 52.0,
+    "RECEIVING_YDS": 529.1,
+    "RECEIVING_TDS": 3.9,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 75.5
+  },
+  {
+    "Player": "Brenton Strange",
+    "RECEIVING_REC": 55.3,
+    "RECEIVING_YDS": 548.8,
+    "RECEIVING_TDS": 3.3,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 73.6
+  },
+  {
+    "Player": "Mike Gesicki",
+    "RECEIVING_REC": 52.8,
+    "RECEIVING_YDS": 518.2,
+    "RECEIVING_TDS": 3.6,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 72.6
+  },
+  {
+    "Player": "Chig Okonkwo",
+    "RECEIVING_REC": 53.8,
+    "RECEIVING_YDS": 537.2,
+    "RECEIVING_TDS": 2.9,
+    "MISC_FL": 0.8,
+    "MISC_FPTS": 69.9
+  },
+  {
+    "Player": "Juwan Johnson",
+    "RECEIVING_REC": 48.8,
+    "RECEIVING_YDS": 501.1,
+    "RECEIVING_TDS": 3.3,
+    "MISC_FL": 0.2,
+    "MISC_FPTS": 69.5
+  },
+  {
+    "Player": "Dalton Schultz",
+    "RECEIVING_REC": 49.9,
+    "RECEIVING_YDS": 509.7,
+    "RECEIVING_TDS": 3.1,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 68.9
+  },
+  {
+    "Player": "Pat Freiermuth",
+    "RECEIVING_REC": 51.1,
+    "RECEIVING_YDS": 493.4,
+    "RECEIVING_TDS": 3.5,
+    "MISC_FL": 0.9,
+    "MISC_FPTS": 68.7
+  },
+  {
+    "Player": "Tyler Higbee",
+    "RECEIVING_REC": 45.3,
+    "RECEIVING_YDS": 425.2,
+    "RECEIVING_TDS": 3.7,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 64.4
+  },
+  {
+    "Player": "Robbie Ouzts",
+    "RECEIVING_REC": 48.0,
+    "RECEIVING_YDS": 479.0,
+    "RECEIVING_TDS": 3.0,
+    "MISC_FL": 1.0,
+    "MISC_FPTS": 63.9
+  },
+  {
+    "Player": "Theo Johnson",
+    "RECEIVING_REC": 43.1,
+    "RECEIVING_YDS": 470.5,
+    "RECEIVING_TDS": 2.7,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 63.0
+  },
+  {
+    "Player": "Mason Taylor",
+    "RECEIVING_REC": 44.9,
+    "RECEIVING_YDS": 452.7,
+    "RECEIVING_TDS": 2.6,
+    "MISC_FL": 0.5,
+    "MISC_FPTS": 59.9
+  },
+  {
+    "Player": "Elijah Arroyo",
+    "RECEIVING_REC": 40.0,
+    "RECEIVING_YDS": 423.5,
+    "RECEIVING_TDS": 2.8,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 58.4
+  },
+  {
+    "Player": "Will Dissly",
+    "RECEIVING_REC": 38.6,
+    "RECEIVING_YDS": 378.5,
+    "RECEIVING_TDS": 2.5,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 53.0
+  },
+  {
+    "Player": "Noah Fant",
+    "RECEIVING_REC": 36.2,
+    "RECEIVING_YDS": 370.6,
+    "RECEIVING_TDS": 2.4,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 51.6
+  },
+  {
+    "Player": "Ja'Tavion Sanders",
+    "RECEIVING_REC": 38.5,
+    "RECEIVING_YDS": 388.3,
+    "RECEIVING_TDS": 2.1,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 51.0
+  },
+  {
+    "Player": "Tyler Conklin",
+    "RECEIVING_REC": 33.7,
+    "RECEIVING_YDS": 326.2,
+    "RECEIVING_TDS": 2.3,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 46.2
+  },
+  {
+    "Player": "AJ Barner",
+    "RECEIVING_REC": 33.0,
+    "RECEIVING_YDS": 309.1,
+    "RECEIVING_TDS": 2.4,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 45.2
+  },
+  {
+    "Player": "Noah Gray",
+    "RECEIVING_REC": 28.2,
+    "RECEIVING_YDS": 285.4,
+    "RECEIVING_TDS": 2.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 43.9
+  },
+  {
+    "Player": "Cole Kmet",
+    "RECEIVING_REC": 30.0,
+    "RECEIVING_YDS": 288.6,
+    "RECEIVING_TDS": 2.3,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 41.7
+  },
+  {
+    "Player": "Foster Moreau",
+    "RECEIVING_REC": 23.0,
+    "RECEIVING_YDS": 259.9,
+    "RECEIVING_TDS": 1.9,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 37.2
+  },
+  {
+    "Player": "Austin Hooper",
+    "RECEIVING_REC": 26.5,
+    "RECEIVING_YDS": 263.1,
+    "RECEIVING_TDS": 1.7,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 35.6
+  },
+  {
+    "Player": "Michael Mayer",
+    "RECEIVING_REC": 27.7,
+    "RECEIVING_YDS": 257.4,
+    "RECEIVING_TDS": 1.6,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 35.2
+  },
+  {
+    "Player": "Dawson Knox",
+    "RECEIVING_REC": 21.9,
+    "RECEIVING_YDS": 238.0,
+    "RECEIVING_TDS": 1.9,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 35.2
+  },
+  {
+    "Player": "Terrance Ferguson",
+    "RECEIVING_REC": 23.0,
+    "RECEIVING_YDS": 235.5,
+    "RECEIVING_TDS": 1.9,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 34.1
+  },
+  {
+    "Player": "Josh Oliver",
+    "RECEIVING_REC": 20.0,
+    "RECEIVING_YDS": 208.6,
+    "RECEIVING_TDS": 1.7,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 30.8
+  },
+  {
+    "Player": "Harold Fannin Jr.",
+    "RECEIVING_REC": 23.7,
+    "RECEIVING_YDS": 235.6,
+    "RECEIVING_TDS": 1.2,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 30.1
+  },
+  {
+    "Player": "Oronde Gadsden II",
+    "RECEIVING_REC": 19.1,
+    "RECEIVING_YDS": 195.5,
+    "RECEIVING_TDS": 1.6,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 28.8
+  },
+  {
+    "Player": "Tommy Tremble",
+    "RECEIVING_REC": 19.2,
+    "RECEIVING_YDS": 183.4,
+    "RECEIVING_TDS": 1.7,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 27.7
+  },
+  {
+    "Player": "Luke Musgrave",
+    "RECEIVING_REC": 19.1,
+    "RECEIVING_YDS": 186.4,
+    "RECEIVING_TDS": 1.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 27.1
+  },
+  {
+    "Player": "Brock Wright",
+    "RECEIVING_REC": 15.0,
+    "RECEIVING_YDS": 134.8,
+    "RECEIVING_TDS": 2.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 26.4
+  },
+  {
+    "Player": "Ben Sinnott",
+    "RECEIVING_REC": 18.0,
+    "RECEIVING_YDS": 177.0,
+    "RECEIVING_TDS": 1.5,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 26.4
+  },
+  {
+    "Player": "Cade Stover",
+    "RECEIVING_REC": 18.5,
+    "RECEIVING_YDS": 180.1,
+    "RECEIVING_TDS": 1.3,
+    "MISC_FL": 0.1,
+    "MISC_FPTS": 25.6
+  },
+  {
+    "Player": "Taysom Hill",
+    "RECEIVING_REC": 12.3,
+    "RECEIVING_YDS": 104.7,
+    "RECEIVING_TDS": 0.7,
+    "MISC_FL": 0.3,
+    "MISC_FPTS": 24.8
+  },
+  {
+    "Player": "Gunnar Helm",
+    "RECEIVING_REC": 18.3,
+    "RECEIVING_YDS": 182.3,
+    "RECEIVING_TDS": 1.0,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 23.5
+  },
+  {
+    "Player": "Jeremy Ruckert",
+    "RECEIVING_REC": 18.7,
+    "RECEIVING_YDS": 161.5,
+    "RECEIVING_TDS": 1.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 23.4
+  },
+  {
+    "Player": "Adam Trautman",
+    "RECEIVING_REC": 12.6,
+    "RECEIVING_YDS": 136.8,
+    "RECEIVING_TDS": 1.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 21.8
+  },
+  {
+    "Player": "Luke Schoonmaker",
+    "RECEIVING_REC": 14.9,
+    "RECEIVING_YDS": 132.3,
+    "RECEIVING_TDS": 1.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 20.1
+  },
+  {
+    "Player": "Charlie Woerner",
+    "RECEIVING_REC": 14.1,
+    "RECEIVING_YDS": 131.6,
+    "RECEIVING_TDS": 1.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 19.2
+  },
+  {
+    "Player": "Daniel Bellinger",
+    "RECEIVING_REC": 14.9,
+    "RECEIVING_YDS": 139.8,
+    "RECEIVING_TDS": 0.8,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 18.9
+  },
+  {
+    "Player": "Julian Hill",
+    "RECEIVING_REC": 14.7,
+    "RECEIVING_YDS": 133.4,
+    "RECEIVING_TDS": 0.9,
+    "MISC_FL": 0.4,
+    "MISC_FPTS": 18.2
+  },
+  {
+    "Player": "Jake Briningstool",
+    "RECEIVING_REC": 12.0,
+    "RECEIVING_YDS": 121.0,
+    "RECEIVING_TDS": 1.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 18.1
+  },
+  {
+    "Player": "Jelani Woods",
+    "RECEIVING_REC": 7.0,
+    "RECEIVING_YDS": 117.0,
+    "RECEIVING_TDS": 1.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 17.7
+  },
+  {
+    "Player": "Payne Durham",
+    "RECEIVING_REC": 10.8,
+    "RECEIVING_YDS": 104.6,
+    "RECEIVING_TDS": 1.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 17.6
+  },
+  {
+    "Player": "Josh Whyle",
+    "RECEIVING_REC": 15.3,
+    "RECEIVING_YDS": 139.2,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 17.6
+  },
+  {
+    "Player": "Elijah Higgins",
+    "RECEIVING_REC": 11.4,
+    "RECEIVING_YDS": 110.3,
+    "RECEIVING_TDS": 1.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 17.4
+  },
+  {
+    "Player": "Darnell Washington",
+    "RECEIVING_REC": 12.3,
+    "RECEIVING_YDS": 123.3,
+    "RECEIVING_TDS": 0.7,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 16.6
+  },
+  {
+    "Player": "Johnny Mundt",
+    "RECEIVING_REC": 13.4,
+    "RECEIVING_YDS": 115.6,
+    "RECEIVING_TDS": 0.8,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 16.6
+  },
+  {
+    "Player": "Nate Adkins",
+    "RECEIVING_REC": 8.5,
+    "RECEIVING_YDS": 69.8,
+    "RECEIVING_TDS": 1.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 16.5
+  },
+  {
+    "Player": "Grant Calcaterra",
+    "RECEIVING_REC": 10.4,
+    "RECEIVING_YDS": 109.2,
+    "RECEIVING_TDS": 0.9,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 16.0
+  },
+  {
+    "Player": "Colby Parkinson",
+    "RECEIVING_REC": 10.6,
+    "RECEIVING_YDS": 106.9,
+    "RECEIVING_TDS": 0.9,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 15.8
+  },
+  {
+    "Player": "Connor Heyward",
+    "RECEIVING_REC": 10.1,
+    "RECEIVING_YDS": 87.6,
+    "RECEIVING_TDS": 1.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 15.7
+  },
+  {
+    "Player": "Drew Ogletree",
+    "RECEIVING_REC": 6.9,
+    "RECEIVING_YDS": 86.9,
+    "RECEIVING_TDS": 0.8,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 13.6
+  },
+  {
+    "Player": "Drew Sample",
+    "RECEIVING_REC": 10.4,
+    "RECEIVING_YDS": 82.5,
+    "RECEIVING_TDS": 0.8,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 12.8
+  },
+  {
+    "Player": "Pharaoh Brown",
+    "RECEIVING_REC": 10.0,
+    "RECEIVING_YDS": 93.3,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 12.1
+  },
+  {
+    "Player": "Teagan Quitoriano",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 89.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 12.0
+  },
+  {
+    "Player": "Lawrence Cager",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 57.0,
+    "RECEIVING_TDS": 1.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 11.7
+  },
+  {
+    "Player": "Gavin Bartholomew",
+    "RECEIVING_REC": 7.0,
+    "RECEIVING_YDS": 75.0,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 11.0
+  },
+  {
+    "Player": "Brevyn Spann-Ford",
+    "RECEIVING_REC": 7.3,
+    "RECEIVING_YDS": 69.6,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 10.7
+  },
+  {
+    "Player": "Lucas Krull",
+    "RECEIVING_REC": 8.3,
+    "RECEIVING_YDS": 79.8,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 10.3
+  },
+  {
+    "Player": "Quintin Morris",
+    "RECEIVING_REC": 7.9,
+    "RECEIVING_YDS": 70.6,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 10.1
+  },
+  {
+    "Player": "Devin Culp",
+    "RECEIVING_REC": 6.1,
+    "RECEIVING_YDS": 65.6,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 10.1
+  },
+  {
+    "Player": "Charlie Kolar",
+    "RECEIVING_REC": 5.7,
+    "RECEIVING_YDS": 71.7,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.9
+  },
+  {
+    "Player": "Tanner McLachlan",
+    "RECEIVING_REC": 7.0,
+    "RECEIVING_YDS": 68.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.9
+  },
+  {
+    "Player": "Hunter Long",
+    "RECEIVING_REC": 8.4,
+    "RECEIVING_YDS": 76.2,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.8
+  },
+  {
+    "Player": "Giovanni Ricci",
+    "RECEIVING_REC": 8.0,
+    "RECEIVING_YDS": 96.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.6
+  },
+  {
+    "Player": "Luke Farrell",
+    "RECEIVING_REC": 7.1,
+    "RECEIVING_YDS": 68.6,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.5
+  },
+  {
+    "Player": "Jaheim Bell",
+    "RECEIVING_REC": 6.4,
+    "RECEIVING_YDS": 64.1,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.4
+  },
+  {
+    "Player": "John Bates",
+    "RECEIVING_REC": 5.9,
+    "RECEIVING_YDS": 54.9,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.3
+  },
+  {
+    "Player": "Blake Whiteheart",
+    "RECEIVING_REC": 6.5,
+    "RECEIVING_YDS": 58.8,
+    "RECEIVING_TDS": 0.6,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.2
+  },
+  {
+    "Player": "Kenny Yeboah",
+    "RECEIVING_REC": 6.0,
+    "RECEIVING_YDS": 61.4,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 9.1
+  },
+  {
+    "Player": "Eric Saubert",
+    "RECEIVING_REC": 6.9,
+    "RECEIVING_YDS": 60.8,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.8
+  },
+  {
+    "Player": "Luke Lachey",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 56.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.7
+  },
+  {
+    "Player": "Travis Vokolek",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 55.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.6
+  },
+  {
+    "Player": "Tip Reiman",
+    "RECEIVING_REC": 6.6,
+    "RECEIVING_YDS": 60.3,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.5
+  },
+  {
+    "Player": "Brayden Willis",
+    "RECEIVING_REC": 4.5,
+    "RECEIVING_YDS": 54.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.5
+  },
+  {
+    "Player": "Stone Smartt",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 66.7,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.3,
+    "MISC_FPTS": 8.2
+  },
+  {
+    "Player": "Caleb Lohner",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 51.0,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.1
+  },
+  {
+    "Player": "Moliki Matavao",
+    "RECEIVING_REC": 5.0,
+    "RECEIVING_YDS": 51.0,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.1
+  },
+  {
+    "Player": "Cam Grandy",
+    "RECEIVING_REC": 6.2,
+    "RECEIVING_YDS": 54.0,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.1
+  },
+  {
+    "Player": "Thomas Fidone II",
+    "RECEIVING_REC": 5.5,
+    "RECEIVING_YDS": 50.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.1
+  },
+  {
+    "Player": "Ben Sims",
+    "RECEIVING_REC": 5.0,
+    "RECEIVING_YDS": 50.5,
+    "RECEIVING_TDS": 0.5,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.1
+  },
+  {
+    "Player": "Jackson Hawes",
+    "RECEIVING_REC": 5.3,
+    "RECEIVING_YDS": 56.8,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 8.0
+  },
+  {
+    "Player": "Jared Wiley",
+    "RECEIVING_REC": 5.4,
+    "RECEIVING_YDS": 53.4,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 7.7
+  },
+  {
+    "Player": "Greg Dulcich",
+    "RECEIVING_REC": 5.0,
+    "RECEIVING_YDS": 52.5,
+    "RECEIVING_TDS": 0.3,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 7.3
+  },
+  {
+    "Player": "Chris Manhertz",
+    "RECEIVING_REC": 4.9,
+    "RECEIVING_YDS": 43.3,
+    "RECEIVING_TDS": 0.4,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 6.6
+  },
+  {
+    "Player": "Ian Thomas",
+    "RECEIVING_REC": 4.8,
+    "RECEIVING_YDS": 46.9,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 5.9
+  },
+  {
+    "Player": "Mo Alie-Cox",
+    "RECEIVING_REC": 3.1,
+    "RECEIVING_YDS": 37.0,
+    "RECEIVING_TDS": 0.3,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 5.2
+  },
+  {
+    "Player": "Tre' McKitty",
+    "RECEIVING_REC": 4.1,
+    "RECEIVING_YDS": 40.1,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 5.1
+  },
+  {
+    "Player": "Davis Allen",
+    "RECEIVING_REC": 4.1,
+    "RECEIVING_YDS": 38.3,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 5.1
+  },
+  {
+    "Player": "Irv Smith Jr.",
+    "RECEIVING_REC": 4.0,
+    "RECEIVING_YDS": 33.6,
+    "RECEIVING_TDS": 0.3,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 5.0
+  },
+  {
+    "Player": "Will Mallory",
+    "RECEIVING_REC": 2.9,
+    "RECEIVING_YDS": 31.3,
+    "RECEIVING_TDS": 0.3,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.9
+  },
+  {
+    "Player": "Dominique Dafney",
+    "RECEIVING_REC": 3.6,
+    "RECEIVING_YDS": 34.4,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.5
+  },
+  {
+    "Player": "Kylen Granson",
+    "RECEIVING_REC": 3.0,
+    "RECEIVING_YDS": 33.3,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.3
+  },
+  {
+    "Player": "Mitchell Evans",
+    "RECEIVING_REC": 4.0,
+    "RECEIVING_YDS": 39.7,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.3
+  },
+  {
+    "Player": "Tucker Fisk",
+    "RECEIVING_REC": 3.3,
+    "RECEIVING_YDS": 31.8,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.1
+  },
+  {
+    "Player": "Durham Smythe",
+    "RECEIVING_REC": 3.6,
+    "RECEIVING_YDS": 32.2,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 4.0
+  },
+  {
+    "Player": "Tanner Hudson",
+    "RECEIVING_REC": 3.0,
+    "RECEIVING_YDS": 26.3,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 3.6
+  },
+  {
+    "Player": "Erick All Jr.",
+    "RECEIVING_REC": 2.3,
+    "RECEIVING_YDS": 20.3,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 3.1
+  },
+  {
+    "Player": "Tanner Conner",
+    "RECEIVING_REC": 2.1,
+    "RECEIVING_YDS": 20.5,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.9
+  },
+  {
+    "Player": "Zach Davidson",
+    "RECEIVING_REC": 1.9,
+    "RECEIVING_YDS": 19.0,
+    "RECEIVING_TDS": 0.2,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.9
+  },
+  {
+    "Player": "Jack Stoll",
+    "RECEIVING_REC": 2.5,
+    "RECEIVING_YDS": 23.7,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.6
+  },
+  {
+    "Player": "David Martin-Robinson",
+    "RECEIVING_REC": 1.9,
+    "RECEIVING_YDS": 18.6,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.6
+  },
+  {
+    "Player": "Feleipe Franks",
+    "RECEIVING_REC": 1.8,
+    "RECEIVING_YDS": 17.7,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.5
+  },
+  {
+    "Player": "Brenden Bates",
+    "RECEIVING_REC": 2.0,
+    "RECEIVING_YDS": 19.3,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.5
+  },
+  {
+    "Player": "James Mitchell",
+    "RECEIVING_REC": 1.8,
+    "RECEIVING_YDS": 17.3,
+    "RECEIVING_TDS": 0.1,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 2.2
+  },
+  {
+    "Player": "Robert Tonyan",
+    "RECEIVING_REC": 1.0,
+    "RECEIVING_YDS": 10.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 1.0
+  },
+  {
+    "Player": "Nick Vannett",
+    "RECEIVING_REC": 1.0,
+    "RECEIVING_YDS": 10.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 1.0
+  },
+  {
+    "Player": "Harrison Bryant",
+    "RECEIVING_REC": 0.5,
+    "RECEIVING_YDS": 5.5,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.6
+  },
+  {
+    "Player": "Tyree Jackson",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Stephen Carlson",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Josiah Deguara",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Dalton Keene",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Albert Okwuegbunam Jr.",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Sean McKeon",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Shane Zylstra",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Tyler Mabry",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Ko Kieft",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Cole Turner",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "John FitzPatrick",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Nick Muse",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Jake Tonges",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Nikola Kalinic",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Cameron Latu",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Justin Shorter",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Zack Kuntz",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Princeton Fant",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Cole Fotheringham",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "John Stephens Jr.",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Colson Yankoff",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Thomas Odukoya",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "E.J. Jenkins",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Baylor Cupp",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Jack Westover",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Matt Sokol",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  },
+  {
+    "Player": "Mitchell Wilcox",
+    "RECEIVING_REC": 0.0,
+    "RECEIVING_YDS": 0.0,
+    "RECEIVING_TDS": 0.0,
+    "MISC_FL": 0.0,
+    "MISC_FPTS": 0.0
+  }
+]

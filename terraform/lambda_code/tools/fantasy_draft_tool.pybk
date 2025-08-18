@@ -1,0 +1,330 @@
+# tools/fantasy_draft_tool.py - Updated for hvpkod data structure
+import boto3
+from strands import tool
+from decimal import Decimal
+from typing import Dict, List, Optional
+
+dynamodb = boto3.resource("dynamodb", region_name="us-west-2")
+table = dynamodb.Table("2025-2026-fantasy-football-player-data")
+
+# Position scarcity and replacement values (12-team league)
+POSITION_SCARCITY = {
+    "QB": 0.85,   # Less scarce, streaming viable
+    "RB": 1.25,   # Most scarce position
+    "WR": 1.05,   # Moderately scarce
+    "TE": 1.15,   # Very scarce after top tier
+    "K": 0.60,    # Least important
+    "DEF": 0.65   # Streamable
+}
+
+REPLACEMENT_BASELINES = {
+    "QB": 250,    # QB12 in 12-team league
+    "RB": 150,    # RB24 
+    "WR": 140,    # WR24
+    "TE": 100,    # TE12
+    "K": 80,      # K12
+    "DEF": 75     # DEF12
+}
+
+def get_all_fantasy_players():
+    """Get all fantasy-relevant players from DynamoDB."""
+    try:
+        players = []
+        
+        # Scan with filter for fantasy-relevant players only
+        response = table.scan(
+            FilterExpression="fantasy_points_ppr > :min_points",
+            ExpressionAttributeValues={":min_points": Decimal("5")}  # Minimum fantasy relevance
+        )
+        
+        players.extend(response.get("Items", []))
+        
+        # Handle pagination
+        while "LastEvaluatedKey" in response:
+            response = table.scan(
+                FilterExpression="fantasy_points_ppr > :min_points",
+                ExpressionAttributeValues={":min_points": Decimal("5")},
+                ExclusiveStartKey=response["LastEvaluatedKey"]
+            )
+            players.extend(response.get("Items", []))
+        
+        print(f"DEBUG: Loaded {len(players)} fantasy-relevant players from DynamoDB")
+        return players
+        
+    except Exception as e:
+        print(f"DEBUG: Error loading players: {e}")
+        return []
+
+def calculate_player_value(player: Dict, team_needs: Dict, drafted_players: List[str]) -> float:
+    """Calculate comprehensive player draft value."""
+    
+    player_id = player["player_id"]
+    position = player["position"]
+    
+    # Skip already drafted
+    if player_id in drafted_players:
+        return -9999
+    
+    # Convert Decimal to float for calculations
+    def to_float(value):
+        if isinstance(value, Decimal):
+            return float(value)
+        return float(value or 0)
+    
+    # Base stats
+    ppr_points = to_float(player.get("fantasy_points_ppr", 0))
+    games_played = int(player.get("games_played", 1))
+    age = int(player.get("age", 25))
+    years_exp = int(player.get("years_exp", 1))
+    rank = int(player.get("rank", 999))
+    
+    # Skip players with insufficient production
+    if ppr_points < 10:
+        return -9999
+    
+    # 1. Value Over Replacement Player (VORP)
+    replacement = REPLACEMENT_BASELINES.get(position, 50)
+    vorp = ppr_points - replacement
+    
+    # 2. Durability Score (games played / 17)
+    durability = min(games_played / 17, 1.0) if games_played > 0 else 0.5
+    
+    # 3. Age Factor
+    if position == "QB":
+        # QBs peak later, last longer
+        age_factor = 1.0 if 26 <= age <= 34 else 0.95 if age <= 37 else 0.85
+    elif position in ["RB"]:
+        # RBs decline quickly after 28
+        age_factor = 1.0 if 22 <= age <= 27 else 0.90 if age <= 29 else 0.75
+    else:
+        # WR/TE peak 24-29
+        age_factor = 1.0 if 24 <= age <= 29 else 0.95 if age <= 31 else 0.85
+    
+    # 4. Experience Factor
+    if years_exp == 0:  # Rookie
+        exp_factor = 0.85  # Rookie discount
+    elif years_exp <= 2:  # Sophomore/3rd year
+        exp_factor = 0.95
+    else:
+        exp_factor = 1.0
+    
+    # 5. Injury/Status Factor (using rank as proxy for health/role)
+    if rank > 100:  # Deep bench players
+        injury_factor = 0.7
+    elif rank > 50:  # Backup/situational players
+        injury_factor = 0.9
+    else:
+        injury_factor = 1.0
+    
+    # 6. Depth Chart Factor (using rank)
+    depth_chart_pos = int(player.get("depth_chart_position", 1))
+    if depth_chart_pos == 1 and rank <= 30:
+        depth_factor = 1.0  # Clear starter
+    elif rank <= 50:
+        depth_factor = 0.9  # Solid player
+    else:
+        depth_factor = 0.7  # Backup/uncertain role
+    
+    # 7. Positional Scarcity
+    scarcity = POSITION_SCARCITY.get(position, 1.0)
+    
+    # 8. Team Needs Multiplier
+    position_need = team_needs.get(position, 0)
+    flex_need = team_needs.get("FLEX", 0)
+    
+    if position_need > 0:
+        need_multiplier = 1.5  # High priority for unfilled positions
+    elif position in ["RB", "WR", "TE"] and flex_need > 0:
+        need_multiplier = 1.2  # FLEX consideration
+    else:
+        need_multiplier = 0.8  # Lower priority if position filled
+    
+    # 9. Consistency Bonus (points per game)
+    ppg = ppr_points / max(games_played, 1)
+    consistency_bonus = min(ppg / 20, 0.1)  # Up to 10% bonus for high PPG
+    
+    # 10. Red Zone Usage (bonus for goal line work)
+    red_zone_touches = int(player.get("red_zone_touches", 0))
+    goal_to_go = int(player.get("goal_to_go", 0))
+    red_zone_bonus = min((red_zone_touches + goal_to_go * 2) / 20, 0.05)  # Up to 5% bonus
+    
+    # Calculate final composite score
+    final_score = (
+        vorp *                    # Base value
+        durability *              # Availability
+        age_factor *              # Age curve
+        exp_factor *              # Experience
+        injury_factor *           # Health/role security
+        depth_factor *            # Starting role
+        scarcity *                # Position scarcity
+        need_multiplier *         # Team fit
+        (1 + consistency_bonus + red_zone_bonus)  # Bonuses
+    )
+    
+    return final_score
+
+@tool
+def get_best_available_player(team_needs: dict, already_drafted: list, 
+                            top_n: int = 5, scoring_format: str = "ppr", 
+                            league_size: int = 12) -> dict:
+    """
+    Get the best available fantasy football players using DynamoDB data.
+    
+    Args:
+        team_needs (dict): Remaining roster needs {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "DEF": 1, "K": 1, "FLEX": 1}
+        already_drafted (list): List of player IDs already drafted
+        top_n (int): Number of recommendations to return
+        scoring_format (str): Scoring format ("ppr", "half_ppr", or "standard")
+        league_size (int): League size for replacement value calculations
+    
+    Returns:
+        dict: Detailed recommendations with analysis
+    """
+    
+    print(f"DEBUG: Starting fantasy recommendation...")
+    print(f"DEBUG: Team needs: {team_needs}")
+    print(f"DEBUG: Already drafted: {len(already_drafted)} players")
+    print(f"DEBUG: Already drafted list: {already_drafted}")
+    print(f"DEBUG: Scoring format: {scoring_format}")
+    print(f"DEBUG: League size: {league_size}")
+    
+    try:
+        # Load all fantasy-relevant players
+        all_players = get_all_fantasy_players()
+        
+        if not all_players:
+            return {"error": "No player data found in database"}
+        
+        # Score all available players
+        scored_players = []
+        
+        for player in all_players:
+            value_score = calculate_player_value(player, team_needs, already_drafted)
+            
+            if value_score > 0:  # Only include draftable players
+                # Convert Decimal fields for JSON serialization
+                def to_float(val):
+                    return float(val) if isinstance(val, Decimal) else (val or 0)
+                
+                # Get the appropriate scoring format points
+                if scoring_format == "standard":
+                    fantasy_points = to_float(player.get("fantasy_points", 0))
+                elif scoring_format == "half_ppr":
+                    fantasy_points = to_float(player.get("fantasy_points_half_ppr", 0))
+                else:  # ppr (default)
+                    fantasy_points = to_float(player.get("fantasy_points_ppr", 0))
+                
+                games = int(player.get("games_played", 1))
+                ppg = fantasy_points / max(games, 1)
+                
+                scored_players.append({
+                    "player_id": player["player_id"],
+                    "name": player.get("player_display_name", "Unknown"),
+                    "position": player["position"],
+                    "team": player.get("team", ""),
+                    "fantasy_points": fantasy_points,
+                    "games_played": games,
+                    "points_per_game": round(ppg, 1),
+                    "age": int(player.get("age", 0)),
+                    "years_exp": int(player.get("years_exp", 0)),
+                    "injury_status": player.get("injury_status", "Healthy"),
+                    "is_rookie": bool(player.get("is_rookie", False)),
+                    "value_score": round(value_score, 1),
+                    "rank": int(player.get("rank", 999)),
+                    "red_zone_touches": int(player.get("red_zone_touches", 0)),
+                    "rushing_yards": int(player.get("rushing_yards", 0)),
+                    "receiving_yards": int(player.get("receiving_yards", 0)),
+                    "rushing_tds": int(player.get("rushing_tds", 0)),
+                    "receiving_tds": int(player.get("receiving_tds", 0)),
+                    "receptions": int(player.get("receptions", 0))
+                })
+        
+        if not scored_players:
+            return {"error": "No available players found"}
+        
+        # Sort by value score
+        scored_players.sort(key=lambda x: x["value_score"], reverse=True)
+        
+        # Get top recommendations
+        top_players = scored_players[:top_n]
+        best_player = top_players[0]
+        
+        print(f"DEBUG: Top recommendation: {best_player['name']} ({best_player['position']}) - Score: {best_player['value_score']}")
+        
+        # Generate detailed reasoning
+        position = best_player["position"]
+        reasoning_parts = [
+            f"{best_player['fantasy_points']:.1f} {scoring_format.upper()} points in 2024",
+            f"{best_player['games_played']}/17 games ({best_player['points_per_game']} PPG)"
+        ]
+        
+        # Add position-specific context
+        if position == "RB":
+            reasoning_parts.append(f"{best_player['rushing_yards']} rush yds, {best_player['rushing_tds']} rush TDs")
+            if best_player['receptions'] > 20:
+                reasoning_parts.append(f"{best_player['receptions']} catches (receiving threat)")
+        elif position == "WR" or position == "TE":
+            reasoning_parts.append(f"{best_player['receiving_yards']} rec yds, {best_player['receiving_tds']} rec TDs")
+            reasoning_parts.append(f"{best_player['receptions']} catches")
+        
+        # Add age/experience context
+        if best_player["is_rookie"]:
+            reasoning_parts.append("ROOKIE")
+        elif best_player["years_exp"] <= 2:
+            reasoning_parts.append(f"{best_player['years_exp']} years exp")
+        
+        reasoning_parts.append(f"Age {best_player['age']}")
+        
+        # Add red zone context if significant
+        if best_player["red_zone_touches"] >= 5:
+            reasoning_parts.append(f"{best_player['red_zone_touches']} RZ touches")
+        
+        # Add team need context
+        if team_needs.get(position, 0) > 0:
+            reasoning_parts.append(f"Fills {position} need")
+        elif position in ["RB", "WR", "TE"] and team_needs.get("FLEX", 0) > 0:
+            reasoning_parts.append("FLEX eligible")
+        
+        return {
+            "primary_recommendation": {
+                "player_id": best_player["player_id"],
+                "name": best_player["name"],
+                "position": position,
+                "team": best_player["team"],
+                "value_score": best_player["value_score"],
+                "fantasy_points": best_player["fantasy_points"],
+                "points_per_game": best_player["points_per_game"],
+                "games_played": best_player["games_played"],
+                "age": best_player["age"],
+                "years_exp": best_player["years_exp"],
+                "injury_status": best_player["injury_status"],
+                "is_rookie": best_player["is_rookie"],
+                "rank": best_player["rank"],
+                "reasoning": " | ".join(reasoning_parts)
+            },
+            "alternatives": [
+                {
+                    "name": p["name"],
+                    "position": p["position"],
+                    "team": p["team"],
+                    "value_score": p["value_score"],
+                    "fantasy_points": p["fantasy_points"],
+                    "points_per_game": p["points_per_game"],
+                    "age": p["age"],
+                    "is_rookie": p["is_rookie"],
+                    "rank": p["rank"]
+                }
+                for p in top_players[1:]
+            ],
+            "team_needs": team_needs,
+            "total_available": len(scored_players),
+            "data_source": "hvpkod GitHub (2024 season)",
+            "scoring_format": scoring_format.upper()
+        }
+        
+    except Exception as e:
+        import traceback
+        error_msg = f"Tool execution failed: {str(e)}"
+        print(f"DEBUG: {error_msg}")
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
+        return {"error": error_msg}

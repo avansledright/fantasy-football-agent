@@ -1,0 +1,243 @@
+{
+  "roster": {
+    "qb": [],
+    "rb": [
+      {
+        "name": "Saquon Barkley",
+        "position": "RB",
+        "team": "",
+        "player_id": "Saquon Barkley#RB",
+        "fantasy_points": 0.0,
+        "age": 0,
+        "years_exp": 0,
+        "points_per_game": 0.0,
+        "rank": 999
+      }
+    ],
+    "wr": [],
+    "te": [],
+    "dst": [],
+    "k": [],
+    "flex": [],
+    "bench": []
+  },
+  "draft_board": {
+    "total_teams": 8,
+    "current_pick": 14,
+    "your_team_number": 3,
+    "picks": [
+      {
+        "pick_number": 1,
+        "team_number": 1,
+        "player": {
+          "name": "Lamar Jackson",
+          "position": "QB",
+          "team": "",
+          "player_id": "Lamar Jackson#QB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:24:34.610187"
+      },
+      {
+        "pick_number": 2,
+        "team_number": 2,
+        "player": {
+          "name": "Christian McCaffrey",
+          "position": "RB",
+          "team": "",
+          "player_id": "Christian McCaffrey#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:24:41.794011"
+      },
+      {
+        "pick_number": 3,
+        "team_number": 3,
+        "player": {
+          "name": "Saquon Barkley",
+          "position": "RB",
+          "team": "",
+          "player_id": "Saquon Barkley#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:33:38.125365"
+      },
+      {
+        "pick_number": 4,
+        "team_number": 4,
+        "player": {
+          "name": "Derrick Henry",
+          "position": "RB",
+          "team": "",
+          "player_id": "Derrick Henry#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:33:43.052619"
+      },
+      {
+        "pick_number": 5,
+        "team_number": 5,
+        "player": {
+          "name": "Bijan Robinson",
+          "position": "RB",
+          "team": "",
+          "player_id": "Bijan Robinson#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:33:45.199884"
+      },
+      {
+        "pick_number": 6,
+        "team_number": 6,
+        "player": {
+          "name": "Ja'Marr Chase",
+          "position": "WR",
+          "team": "",
+          "player_id": "Ja'Marr Chase#WR",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:05.057202"
+      },
+      {
+        "pick_number": 7,
+        "team_number": 7,
+        "player": {
+          "name": "Jahmyr Gibbs",
+          "position": "RB",
+          "team": "",
+          "player_id": "Jahmyr Gibbs#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:12.783288"
+      },
+      {
+        "pick_number": 8,
+        "team_number": 8,
+        "player": {
+          "name": "Justin Jefferson",
+          "position": "WR",
+          "team": "",
+          "player_id": "Justin Jefferson#WR",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:16.623518"
+      },
+      {
+        "pick_number": 9,
+        "team_number": 8,
+        "player": {
+          "name": "CeeDee Lamb",
+          "position": "WR",
+          "team": "",
+          "player_id": "CeeDee Lamb#WR",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:20.935503"
+      },
+      {
+        "pick_number": 10,
+        "team_number": 7,
+        "player": {
+          "name": "Amon-Ra St. Brown",
+          "position": "WR",
+          "team": "",
+          "player_id": "Amon-Ra St. Brown#WR",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:26.242578"
+      },
+      {
+        "pick_number": 11,
+        "team_number": 6,
+        "player": {
+          "name": "Christian McCaffrey",
+          "position": "RB",
+          "team": "",
+          "player_id": "Christian McCaffrey#RB",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:35.336894"
+      },
+      {
+        "pick_number": 12,
+        "team_number": 5,
+        "player": {
+          "name": "Puka Nacua",
+          "position": "WR",
+          "team": "",
+          "player_id": "Puka Nacua#WR",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:39.752726"
+      },
+      {
+        "pick_number": 13,
+        "team_number": 4,
+        "player": {
+          "name": "Brock Bowers",
+          "position": "TE",
+          "team": "",
+          "player_id": "Brock Bowers#TE",
+          "fantasy_points": 0.0,
+          "age": 0,
+          "years_exp": 0,
+          "points_per_game": 0.0,
+          "rank": 999
+        },
+        "timestamp": "2025-08-18T15:34:47.369091"
+      }
+    ],
+    "rounds": 17
+  },
+  "league_size": 8,
+  "scoring_format": "ppr",
+  "created_at": "2025-08-18T15:24:09.589280"
+}
