@@ -19,7 +19,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 
 # Configuration
-API_ENDPOINT = "https://pabzmwn3l5.execute-api.us-west-2.amazonaws.com/demo/agent"
+API_ENDPOINT = os.environ["API_ENDPOINT"]
 DRAFT_SESSION_FILE = "draft_session.json"
 
 @dataclass
