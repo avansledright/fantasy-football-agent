@@ -27,7 +27,7 @@ The agent helps you draft the **best available player** in real-time, considerin
 
 ### 1. Clone repository
 ```bash
-git clone https://github.com/your-org/fantasy-draft-assistant.git
+git clone https://github.com/avansledright/fantasy-draft-assistant.git
 cd fantasy-draft-assistant
 ```
 
@@ -64,53 +64,30 @@ This will provision:
 
 ### 5. Populate DynamoDB with player stats
 ```bash
-python scripts/populate-table.py
+python scripts/stat_loader.py
+python scripts/combine.py
+EXPORT DYNAMODB_TABLE=<YOUR TABLE NAME>
+EXPORT AWS_REGION=<AWS REGION>
+python3 scripts/dynamodb_loader.py
 ```
 
 ---
 
 ## 🖥 Usage
-
-### CLI
-```bash
-python cli.py
-```
-
-Available commands:
-- `draft next` → Suggest the best available player  
-- `draft taken "Patrick Mahomes"` → Mark a player as drafted  
-- `draft roster` → Show your current roster & bench  
-- `draft reset` → Reset the draft state  
-
-### Lambda (API Gateway)
-You can also call the deployed agent directly:
-
-```bash
-curl -X POST https://<api-id>.execute-api.us-west-2.amazonaws.com/demo/agent \
-  -H "Content-Type: application/json" \
-  -d '{
-    "team_needs": {"QB": 1, "RB": 2},
-    "already_drafted": ["Patrick Mahomes", "Justin Jefferson"]
-  }'
-```
+You can use this in a variety of ways. Check out the "application" folder for an example CLI drafting application.
 
 ---
 
 ## 🛠 Development
-
-- Code formatting: `black .`  
-- Linting: `flake8 .`  
-- Tests: `pytest`  
-
+### TO DO:
+1. Create week-to-week team management
+2. Add trading assistant
+3. Combine all data loading scripts into one
 ---
+
 
 ## 📚 References
 
-- [NFLVerse Data](https://github.com/nflverse/nflverse-data)  
+- [Fantasy Pros](https://www.fantasypros.com/)  
 - [Amazon Bedrock](https://aws.amazon.com/bedrock/)  
 - [Strands SDK](https://docs.strands.tools)  
-
----
-
-## 📝 License
-MIT License
