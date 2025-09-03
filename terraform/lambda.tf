@@ -57,7 +57,7 @@ resource "aws_lambda_layer_version" "python_dependencies" {
   }
 }
 
-resource "aws_lambda_function" "strands_demo" {
+resource "aws_lambda_function" "draft_agent" {
   s3_bucket         = aws_s3_bucket.lambda_artifacts.id
   s3_key            = aws_s3_object.lambda_package.key
   s3_object_version = aws_s3_object.lambda_package.version_id

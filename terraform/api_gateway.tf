@@ -4,7 +4,7 @@ resource "aws_api_gateway_account" "main" {
 }
 
 # API Gateway REST API
-resource "aws_api_gateway_rest_api" "strands_demo" {
+resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.agent_name}-api"
   description = "API for Strands Agent Demo"
 
@@ -15,14 +15,14 @@ resource "aws_api_gateway_rest_api" "strands_demo" {
 
 # API Gateway Resource
 resource "aws_api_gateway_resource" "agent" {
-  rest_api_id = aws_api_gateway_rest_api.strands_demo.id
-  parent_id   = aws_api_gateway_rest_api.strands_demo.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
   path_part   = "agent"
 }
 
 # API Gateway Method
 resource "aws_api_gateway_method" "agent_post" {
-  rest_api_id   = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id   = aws_api_gateway_rest_api.main.id
   resource_id   = aws_api_gateway_resource.agent.id
   http_method   = "POST"
   authorization = "NONE"
@@ -30,12 +30,12 @@ resource "aws_api_gateway_method" "agent_post" {
 
 # API Gateway Integration
 resource "aws_api_gateway_integration" "lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id             = aws_api_gateway_rest_api.main.id
   resource_id             = aws_api_gateway_resource.agent.id
   http_method             = aws_api_gateway_method.agent_post.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.strands_demo.invoke_arn
+  uri                     = aws_lambda_function.draft_agent.invoke_arn
   timeout_milliseconds    = 70000
 }
 
@@ -43,21 +43,21 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 resource "aws_lambda_permission" "api_gateway_invoke" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.strands_demo.function_name
+  function_name = aws_lambda_function.draft_agent.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.strands_demo.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*/*"
 }
 
 # CORS for API Gateway
 resource "aws_api_gateway_method" "agent_options" {
-  rest_api_id   = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id   = aws_api_gateway_rest_api.main.id
   resource_id   = aws_api_gateway_resource.agent.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "agent_options" {
-  rest_api_id = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id = aws_api_gateway_rest_api.main.id
   resource_id = aws_api_gateway_resource.agent.id
   http_method = aws_api_gateway_method.agent_options.http_method
   type        = "MOCK"
@@ -68,7 +68,7 @@ resource "aws_api_gateway_integration" "agent_options" {
 }
 
 resource "aws_api_gateway_method_response" "agent_options" {
-  rest_api_id = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id = aws_api_gateway_rest_api.main.id
   resource_id = aws_api_gateway_resource.agent.id
   http_method = aws_api_gateway_method.agent_options.http_method
   status_code = "200"
@@ -81,7 +81,7 @@ resource "aws_api_gateway_method_response" "agent_options" {
 }
 
 resource "aws_api_gateway_integration_response" "agent_options" {
-  rest_api_id = aws_api_gateway_rest_api.strands_demo.id
+  rest_api_id = aws_api_gateway_rest_api.main.id
   resource_id = aws_api_gateway_resource.agent.id
   http_method = aws_api_gateway_method.agent_options.http_method
   status_code = aws_api_gateway_method_response.agent_options.status_code
@@ -94,8 +94,8 @@ resource "aws_api_gateway_integration_response" "agent_options" {
 }
 
 # API Gateway Deployment
-resource "aws_api_gateway_deployment" "strands_demo" {
-  rest_api_id = aws_api_gateway_rest_api.strands_demo.id
+resource "aws_api_gateway_deployment" "main" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
 
   # Use triggers to force redeployment when API changes
   triggers = {
@@ -105,6 +105,9 @@ resource "aws_api_gateway_deployment" "strands_demo" {
       aws_api_gateway_integration.lambda_integration.id,
       aws_api_gateway_method.agent_options.id,
       aws_api_gateway_integration.agent_options.id,
+      aws_api_gateway_resource.coach.id,
+      aws_api_gateway_method.coach_get.id,
+      aws_api_gateway_integration.coach_get.id
     ]))
   }
 
@@ -115,8 +118,8 @@ resource "aws_api_gateway_deployment" "strands_demo" {
 
 # API Gateway Stage (replaces deprecated stage_name in deployment)
 resource "aws_api_gateway_stage" "demo" {
-  deployment_id = aws_api_gateway_deployment.strands_demo.id
-  rest_api_id   = aws_api_gateway_rest_api.strands_demo.id
+  deployment_id = aws_api_gateway_deployment.main.id
+  rest_api_id   = aws_api_gateway_rest_api.main.id
   stage_name    = "demo"
 
   # Optional: Add stage-level configuration
@@ -138,4 +141,26 @@ resource "aws_api_gateway_stage" "demo" {
       responseLength = "$context.responseLength"
     })
   }
+}
+
+resource "aws_api_gateway_resource" "coach" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
+  path_part   = "coach"
+}
+
+resource "aws_api_gateway_method" "coach_get" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.coach.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "coach_get" {
+  rest_api_id             = aws_api_gateway_rest_api.main.id
+  resource_id             = aws_api_gateway_resource.coach.id
+  http_method             = aws_api_gateway_method.coach_get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.coach.invoke_arn
 }

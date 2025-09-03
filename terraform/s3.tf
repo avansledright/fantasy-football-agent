@@ -25,3 +25,15 @@ resource "aws_s3_object" "lambda_package" {
     when    = create
   }
 }
+
+# Upload Lambda deployment package to S3
+resource "aws_s3_object" "coach_lambda_package" {
+  bucket = aws_s3_bucket.lambda_artifacts.id
+  key    = "coach_lambda_function.zip"
+  source = data.archive_file.coach_lambda_zip.output_path
+  etag   = filemd5(data.archive_file.coach_lambda_zip.output_path)
+  provisioner "local-exec" {
+    command = "rm -f ${path.module}/builds/coach_lambda-${local.lambda_code_hash}.zip"
+    when    = create
+  }
+}
