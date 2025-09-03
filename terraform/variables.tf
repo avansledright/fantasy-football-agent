@@ -36,3 +36,8 @@ variable "team_roster_table_name" {
   description = "Name of the team table"
   default = "fantasy-football-team-roster"
 }
+
+variable "stats_table" {
+  description = "Name of the stats table"
+  default = "fantasy-football-2024-stats"
+}

@@ -49,3 +49,52 @@ resource "aws_dynamodb_table" "fantasy_football_team_roster" {
     ManagedBy   = "terraform"
   }
 }
+
+resource "aws_dynamodb_table" "season_stats" {
+  name         = var.stats_table
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key  = "player_season"
+  range_key = "week"
+
+  attribute {
+    name = "player_season"
+    type = "S"
+  }
+
+  attribute {
+    name = "week"
+    type = "N"
+  }
+
+  attribute {
+    name = "position"
+    type = "S"
+  }
+
+  attribute {
+    name = "season"
+    type = "N"
+  }
+
+  global_secondary_index {
+    name     = "position-season-index"
+    hash_key = "position"
+    range_key = "season"
+    projection_type = "ALL"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  server_side_encryption {
+    enabled = true
+  }
+
+  tags = {
+    Project     = "fantasy-football"
+    Environment = "prod"
+    ManagedBy   = "terraform"
+  }
+}
