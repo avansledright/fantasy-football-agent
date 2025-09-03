@@ -31,3 +31,8 @@ variable "api_gateway_integration_timeout" {
   type = number
   default = 29000
 }
+
+variable "team_roster_table_name" {
+  description = "Name of the team table"
+  default = "fantasy-football-team-roster"
+}

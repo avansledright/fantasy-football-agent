@@ -1,0 +1,5600 @@
+{
+  "position": "TE",
+  "season": 2024,
+  "players": {
+    "A.J. Barner": [
+      {
+        "week": 3,
+        "opponent": "MIA",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 4,
+        "opponent": "DET",
+        "fantasy_points": 8.7
+      },
+      {
+        "week": 5,
+        "opponent": "NYG",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 6,
+        "opponent": "SF",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 7,
+        "opponent": "ATL",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "BUF",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 9,
+        "opponent": "LA",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 11,
+        "opponent": "SF",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 12,
+        "opponent": "ARI",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 13,
+        "opponent": "NYJ",
+        "fantasy_points": 7.4
+      },
+      {
+        "week": 14,
+        "opponent": "ARI",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 15,
+        "opponent": "GB",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 16,
+        "opponent": "MIN",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 18,
+        "opponent": "LA",
+        "fantasy_points": 9.4
+      }
+    ],
+    "Adam Trautman": [
+      {
+        "week": 1,
+        "opponent": "SEA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 3,
+        "opponent": "TB",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 5,
+        "opponent": "LV",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 7,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "CAR",
+        "fantasy_points": 14.5
+      },
+      {
+        "week": 9,
+        "opponent": "BAL",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 10,
+        "opponent": "KC",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 11,
+        "opponent": "ATL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 12,
+        "opponent": "LV",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 13,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "IND",
+        "fantasy_points": 8.0
+      },
+      {
+        "week": 16,
+        "opponent": "LAC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 17,
+        "opponent": "CIN",
+        "fantasy_points": 0.5
+      }
+    ],
+    "Andrew Ogletree": [
+      {
+        "week": 2,
+        "opponent": "GB",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 4,
+        "opponent": "PIT",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 5,
+        "opponent": "JAX",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "TEN",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 7,
+        "opponent": "MIA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "BUF",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 11,
+        "opponent": "NYJ",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 12,
+        "opponent": "DET",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "NE",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 16,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "JAX",
+        "fantasy_points": 2.1
+      }
+    ],
+    "Austin Hooper": [
+      {
+        "week": 1,
+        "opponent": "CIN",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 2,
+        "opponent": "SEA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 3,
+        "opponent": "NYJ",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 4,
+        "opponent": "SF",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 5,
+        "opponent": "MIA",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 6,
+        "opponent": "HOU",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 7,
+        "opponent": "JAX",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 8,
+        "opponent": "NYJ",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 9,
+        "opponent": "TEN",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 10,
+        "opponent": "CHI",
+        "fantasy_points": 6.4
+      },
+      {
+        "week": 11,
+        "opponent": "LA",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 12,
+        "opponent": "MIA",
+        "fantasy_points": 11.9
+      },
+      {
+        "week": 13,
+        "opponent": "IND",
+        "fantasy_points": 10.2
+      },
+      {
+        "week": 15,
+        "opponent": "ARI",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 16,
+        "opponent": "BUF",
+        "fantasy_points": 5.5
+      },
+      {
+        "week": 17,
+        "opponent": "LAC",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 18,
+        "opponent": "BUF",
+        "fantasy_points": 2.7
+      }
+    ],
+    "Ben Sims": [
+      {
+        "week": 6,
+        "opponent": "ARI",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 7,
+        "opponent": "HOU",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 8,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "DET",
+        "fantasy_points": 0.2
+      }
+    ],
+    "Ben Sinnott": [
+      {
+        "week": 7,
+        "opponent": "CAR",
+        "fantasy_points": 6.6
+      },
+      {
+        "week": 9,
+        "opponent": "NYG",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 13,
+        "opponent": "TEN",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 15,
+        "opponent": "NO",
+        "fantasy_points": 0.7
+      }
+    ],
+    "Blake Whiteheart": [
+      {
+        "week": 4,
+        "opponent": "LV",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 12,
+        "opponent": "PIT",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 13,
+        "opponent": "DEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "PIT",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "KC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "MIA",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 18,
+        "opponent": "BAL",
+        "fantasy_points": 0.1
+      }
+    ],
+    "Brenton Strange": [
+      {
+        "week": 2,
+        "opponent": "CLE",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 3,
+        "opponent": "BUF",
+        "fantasy_points": 7.2
+      },
+      {
+        "week": 4,
+        "opponent": "HOU",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 5,
+        "opponent": "IND",
+        "fantasy_points": 8.4
+      },
+      {
+        "week": 6,
+        "opponent": "CHI",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 8,
+        "opponent": "GB",
+        "fantasy_points": 5.9
+      },
+      {
+        "week": 10,
+        "opponent": "MIN",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 11,
+        "opponent": "DET",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 13,
+        "opponent": "HOU",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 14,
+        "opponent": "TEN",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 15,
+        "opponent": "NYJ",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 16,
+        "opponent": "LV",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 17,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "IND",
+        "fantasy_points": 6.0
+      }
+    ],
+    "Brevin Jordan": [
+      {
+        "week": 1,
+        "opponent": "IND",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 2,
+        "opponent": "CHI",
+        "fantasy_points": 0.4
+      }
+    ],
+    "Brevyn Spann-Ford": [
+      {
+        "week": 2,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "PIT",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 8,
+        "opponent": "SF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "HOU",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 12,
+        "opponent": "WAS",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 15,
+        "opponent": "CAR",
+        "fantasy_points": 0.2
+      }
+    ],
+    "Brock Bowers": [
+      {
+        "week": 1,
+        "opponent": "LAC",
+        "fantasy_points": 5.8
+      },
+      {
+        "week": 2,
+        "opponent": "BAL",
+        "fantasy_points": 9.8
+      },
+      {
+        "week": 3,
+        "opponent": "CAR",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 4,
+        "opponent": "CLE",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 5,
+        "opponent": "DEN",
+        "fantasy_points": 15.7
+      },
+      {
+        "week": 6,
+        "opponent": "PIT",
+        "fantasy_points": 7.1
+      },
+      {
+        "week": 7,
+        "opponent": "LA",
+        "fantasy_points": 9.3
+      },
+      {
+        "week": 8,
+        "opponent": "KC",
+        "fantasy_points": 5.8
+      },
+      {
+        "week": 9,
+        "opponent": "CIN",
+        "fantasy_points": 10.5
+      },
+      {
+        "week": 11,
+        "opponent": "MIA",
+        "fantasy_points": 18.3
+      },
+      {
+        "week": 12,
+        "opponent": "DEN",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 13,
+        "opponent": "KC",
+        "fantasy_points": 20.2
+      },
+      {
+        "week": 14,
+        "opponent": "TB",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 15,
+        "opponent": "ATL",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 16,
+        "opponent": "JAX",
+        "fantasy_points": 9.9
+      },
+      {
+        "week": 17,
+        "opponent": "NO",
+        "fantasy_points": 7.6
+      },
+      {
+        "week": 18,
+        "opponent": "LAC",
+        "fantasy_points": 11.0
+      }
+    ],
+    "Brock Wright": [
+      {
+        "week": 1,
+        "opponent": "LA",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 3,
+        "opponent": "ARI",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 4,
+        "opponent": "SEA",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 6,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "TEN",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 9,
+        "opponent": "GB",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 11,
+        "opponent": "JAX",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 12,
+        "opponent": "IND",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 13,
+        "opponent": "CHI",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 14,
+        "opponent": "GB",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Cade Otton": [
+      {
+        "week": 1,
+        "opponent": "WAS",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 2,
+        "opponent": "DET",
+        "fantasy_points": -0.4
+      },
+      {
+        "week": 3,
+        "opponent": "DEN",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 4,
+        "opponent": "PHI",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 5,
+        "opponent": "ATL",
+        "fantasy_points": 4.4
+      },
+      {
+        "week": 6,
+        "opponent": "NO",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 7,
+        "opponent": "BAL",
+        "fantasy_points": 10.0
+      },
+      {
+        "week": 8,
+        "opponent": "ATL",
+        "fantasy_points": 20.1
+      },
+      {
+        "week": 9,
+        "opponent": "KC",
+        "fantasy_points": 13.7
+      },
+      {
+        "week": 10,
+        "opponent": "SF",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 12,
+        "opponent": "NYG",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 13,
+        "opponent": "CAR",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 14,
+        "opponent": "LV",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 15,
+        "opponent": "LAC",
+        "fantasy_points": 2.4
+      }
+    ],
+    "Cade Stover": [
+      {
+        "week": 2,
+        "opponent": "CHI",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 4,
+        "opponent": "JAX",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 5,
+        "opponent": "BUF",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 6,
+        "opponent": "NE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "GB",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 8,
+        "opponent": "IND",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 9,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "DET",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 11,
+        "opponent": "DAL",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 12,
+        "opponent": "TEN",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 13,
+        "opponent": "JAX",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 17,
+        "opponent": "BAL",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 18,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Cam Grandy": [
+      {
+        "week": 10,
+        "opponent": "BAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "TEN",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 17,
+        "opponent": "DEN",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 18,
+        "opponent": "PIT",
+        "fantasy_points": 0.9
+      }
+    ],
+    "Charlie Kolar": [
+      {
+        "week": 2,
+        "opponent": "LV",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 3,
+        "opponent": "DAL",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 5,
+        "opponent": "CIN",
+        "fantasy_points": 12.6
+      },
+      {
+        "week": 7,
+        "opponent": "TB",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 8,
+        "opponent": "CLE",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 10,
+        "opponent": "CIN",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 12,
+        "opponent": "LAC",
+        "fantasy_points": 0.6
+      }
+    ],
+    "Charlie Woerner": [
+      {
+        "week": 1,
+        "opponent": "PIT",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 8,
+        "opponent": "TB",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 10,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "LAC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 14,
+        "opponent": "MIN",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 15,
+        "opponent": "LV",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 16,
+        "opponent": "NYG",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "WAS",
+        "fantasy_points": 0.6
+      }
+    ],
+    "Chigoziem Okonkwo": [
+      {
+        "week": 1,
+        "opponent": "CHI",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 2,
+        "opponent": "NYJ",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 3,
+        "opponent": "GB",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 4,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "IND",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 7,
+        "opponent": "BUF",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 8,
+        "opponent": "DET",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 9,
+        "opponent": "NE",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 10,
+        "opponent": "LAC",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 11,
+        "opponent": "MIN",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 12,
+        "opponent": "HOU",
+        "fantasy_points": 13.0
+      },
+      {
+        "week": 13,
+        "opponent": "WAS",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 14,
+        "opponent": "JAX",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 15,
+        "opponent": "CIN",
+        "fantasy_points": 5.9
+      },
+      {
+        "week": 16,
+        "opponent": "IND",
+        "fantasy_points": 8.1
+      },
+      {
+        "week": 17,
+        "opponent": "JAX",
+        "fantasy_points": 5.9
+      }
+    ],
+    "Chris Manhertz": [
+      {
+        "week": 8,
+        "opponent": "PIT",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "WAS",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 17,
+        "opponent": "IND",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 18,
+        "opponent": "PHI",
+        "fantasy_points": 1.6
+      }
+    ],
+    "Colby Parkinson": [
+      {
+        "week": 1,
+        "opponent": "DET",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 2,
+        "opponent": "ARI",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 3,
+        "opponent": "SF",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 4,
+        "opponent": "CHI",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 5,
+        "opponent": "GB",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 7,
+        "opponent": "LV",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 8,
+        "opponent": "MIN",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 11,
+        "opponent": "NE",
+        "fantasy_points": 7.9
+      },
+      {
+        "week": 12,
+        "opponent": "PHI",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 13,
+        "opponent": "NO",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 14,
+        "opponent": "BUF",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 15,
+        "opponent": "SF",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 16,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "ARI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "SEA",
+        "fantasy_points": 0.6
+      }
+    ],
+    "Cole Kmet": [
+      {
+        "week": 1,
+        "opponent": "TEN",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 2,
+        "opponent": "HOU",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 3,
+        "opponent": "IND",
+        "fantasy_points": 15.7
+      },
+      {
+        "week": 4,
+        "opponent": "LA",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 5,
+        "opponent": "CAR",
+        "fantasy_points": 5.7
+      },
+      {
+        "week": 6,
+        "opponent": "JAX",
+        "fantasy_points": 19.0
+      },
+      {
+        "week": 8,
+        "opponent": "WAS",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 10,
+        "opponent": "NE",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 11,
+        "opponent": "GB",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 12,
+        "opponent": "MIN",
+        "fantasy_points": 6.4
+      },
+      {
+        "week": 13,
+        "opponent": "DET",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 15,
+        "opponent": "MIN",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 16,
+        "opponent": "DET",
+        "fantasy_points": 6.9
+      },
+      {
+        "week": 18,
+        "opponent": "GB",
+        "fantasy_points": 0.3
+      }
+    ],
+    "Connor Heyward": [
+      {
+        "week": 3,
+        "opponent": "LAC",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 5,
+        "opponent": "DAL",
+        "fantasy_points": 8.3
+      },
+      {
+        "week": 6,
+        "opponent": "LV",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 16,
+        "opponent": "BAL",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 17,
+        "opponent": "KC",
+        "fantasy_points": 0.8
+      }
+    ],
+    "Dallas Goedert": [
+      {
+        "week": 1,
+        "opponent": "GB",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 2,
+        "opponent": "ATL",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 3,
+        "opponent": "NO",
+        "fantasy_points": 17.0
+      },
+      {
+        "week": 4,
+        "opponent": "TB",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 6,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "DAL",
+        "fantasy_points": 8.5
+      },
+      {
+        "week": 11,
+        "opponent": "WAS",
+        "fantasy_points": 6.1
+      },
+      {
+        "week": 12,
+        "opponent": "LA",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 13,
+        "opponent": "BAL",
+        "fantasy_points": 9.5
+      },
+      {
+        "week": 18,
+        "opponent": "NYG",
+        "fantasy_points": 5.5
+      }
+    ],
+    "Dallin Holker": [
+      {
+        "week": 14,
+        "opponent": "NYG",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 18,
+        "opponent": "TB",
+        "fantasy_points": 1.1
+      }
+    ],
+    "Dalton Kincaid": [
+      {
+        "week": 1,
+        "opponent": "ARI",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 2,
+        "opponent": "MIA",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 3,
+        "opponent": "JAX",
+        "fantasy_points": 10.1
+      },
+      {
+        "week": 4,
+        "opponent": "BAL",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 5,
+        "opponent": "HOU",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 6,
+        "opponent": "NYJ",
+        "fantasy_points": 5.1
+      },
+      {
+        "week": 7,
+        "opponent": "TEN",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 8,
+        "opponent": "SEA",
+        "fantasy_points": 9.1
+      },
+      {
+        "week": 9,
+        "opponent": "MIA",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 10,
+        "opponent": "IND",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 15,
+        "opponent": "DET",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 16,
+        "opponent": "NE",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 17,
+        "opponent": "NYJ",
+        "fantasy_points": 2.4
+      }
+    ],
+    "Dalton Schultz": [
+      {
+        "week": 1,
+        "opponent": "IND",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 2,
+        "opponent": "CHI",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 3,
+        "opponent": "MIN",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 4,
+        "opponent": "JAX",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 5,
+        "opponent": "BUF",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 6,
+        "opponent": "NE",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 7,
+        "opponent": "GB",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 8,
+        "opponent": "IND",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 9,
+        "opponent": "NYJ",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 10,
+        "opponent": "DET",
+        "fantasy_points": 6.6
+      },
+      {
+        "week": 11,
+        "opponent": "DAL",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 12,
+        "opponent": "TEN",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 13,
+        "opponent": "JAX",
+        "fantasy_points": 12.1
+      },
+      {
+        "week": 15,
+        "opponent": "MIA",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 16,
+        "opponent": "KC",
+        "fantasy_points": 10.5
+      },
+      {
+        "week": 17,
+        "opponent": "BAL",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 18,
+        "opponent": "TEN",
+        "fantasy_points": 2.9
+      }
+    ],
+    "Daniel Bellinger": [
+      {
+        "week": 1,
+        "opponent": "MIN",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 3,
+        "opponent": "CLE",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 7,
+        "opponent": "PHI",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 14,
+        "opponent": "NO",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 15,
+        "opponent": "BAL",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 16,
+        "opponent": "ATL",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 18,
+        "opponent": "PHI",
+        "fantasy_points": 0.9
+      }
+    ],
+    "Darnell Washington": [
+      {
+        "week": 1,
+        "opponent": "ATL",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 2,
+        "opponent": "DEN",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 4,
+        "opponent": "IND",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 5,
+        "opponent": "DAL",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "LV",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 7,
+        "opponent": "NYJ",
+        "fantasy_points": 3.6
+      },
+      {
+        "week": 8,
+        "opponent": "NYG",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 10,
+        "opponent": "WAS",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 11,
+        "opponent": "BAL",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 12,
+        "opponent": "CLE",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 13,
+        "opponent": "CIN",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 14,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "KC",
+        "fantasy_points": 0.8
+      }
+    ],
+    "David Martin-Robinson": [
+      {
+        "week": 14,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 16,
+        "opponent": "IND",
+        "fantasy_points": 0.6
+      }
+    ],
+    "David Njoku": [
+      {
+        "week": 1,
+        "opponent": "DAL",
+        "fantasy_points": 4.4
+      },
+      {
+        "week": 5,
+        "opponent": "WAS",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 6,
+        "opponent": "PHI",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 7,
+        "opponent": "CIN",
+        "fantasy_points": 13.6
+      },
+      {
+        "week": 8,
+        "opponent": "BAL",
+        "fantasy_points": 12.1
+      },
+      {
+        "week": 9,
+        "opponent": "LAC",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 11,
+        "opponent": "NO",
+        "fantasy_points": 8.1
+      },
+      {
+        "week": 12,
+        "opponent": "PIT",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 13,
+        "opponent": "DEN",
+        "fantasy_points": 17.2
+      },
+      {
+        "week": 14,
+        "opponent": "PIT",
+        "fantasy_points": 10.2
+      },
+      {
+        "week": 16,
+        "opponent": "CIN",
+        "fantasy_points": 6.6
+      }
+    ],
+    "Davis Allen": [
+      {
+        "week": 1,
+        "opponent": "DET",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "GB",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "SEA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 10,
+        "opponent": "MIA",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 12,
+        "opponent": "PHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "ARI",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Dawson Knox": [
+      {
+        "week": 1,
+        "opponent": "ARI",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 3,
+        "opponent": "JAX",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 4,
+        "opponent": "BAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 6,
+        "opponent": "NYJ",
+        "fantasy_points": 7.2
+      },
+      {
+        "week": 7,
+        "opponent": "TEN",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "SEA",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 9,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 10,
+        "opponent": "IND",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 11,
+        "opponent": "KC",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 13,
+        "opponent": "SF",
+        "fantasy_points": 5.6
+      },
+      {
+        "week": 14,
+        "opponent": "LA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 15,
+        "opponent": "DET",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 16,
+        "opponent": "NE",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 17,
+        "opponent": "NYJ",
+        "fantasy_points": 0.4
+      }
+    ],
+    "Devin Culp": [
+      {
+        "week": 17,
+        "opponent": "CAR",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 18,
+        "opponent": "NO",
+        "fantasy_points": 3.6
+      }
+    ],
+    "Drew Sample": [
+      {
+        "week": 2,
+        "opponent": "KC",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 4,
+        "opponent": "CAR",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "LV",
+        "fantasy_points": 7.4
+      },
+      {
+        "week": 11,
+        "opponent": "LAC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 13,
+        "opponent": "PIT",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 14,
+        "opponent": "DAL",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 15,
+        "opponent": "TEN",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 16,
+        "opponent": "CLE",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 17,
+        "opponent": "DEN",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 18,
+        "opponent": "PIT",
+        "fantasy_points": 1.4
+      }
+    ],
+    "Durham Smythe": [
+      {
+        "week": 1,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "BUF",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 3,
+        "opponent": "SEA",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 5,
+        "opponent": "NE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "BUF",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 10,
+        "opponent": "LA",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 11,
+        "opponent": "LV",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 12,
+        "opponent": "NE",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 13,
+        "opponent": "GB",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 14,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "HOU",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 16,
+        "opponent": "SF",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 18,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      }
+    ],
+    "E.J. Jenkins": [
+      {
+        "week": 17,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "NYG",
+        "fantasy_points": 6.7
+      }
+    ],
+    "Elijah Higgins": [
+      {
+        "week": 1,
+        "opponent": "BUF",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 2,
+        "opponent": "LA",
+        "fantasy_points": 7.8
+      },
+      {
+        "week": 3,
+        "opponent": "DET",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 4,
+        "opponent": "WAS",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 5,
+        "opponent": "SF",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 7,
+        "opponent": "LAC",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 8,
+        "opponent": "MIA",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 9,
+        "opponent": "CHI",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 10,
+        "opponent": "NYJ",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 12,
+        "opponent": "SEA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 13,
+        "opponent": "MIN",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 15,
+        "opponent": "NE",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 16,
+        "opponent": "CAR",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "LA",
+        "fantasy_points": 2.3
+      }
+    ],
+    "Eric Saubert": [
+      {
+        "week": 1,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "MIN",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 3,
+        "opponent": "LA",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 11,
+        "opponent": "SEA",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 12,
+        "opponent": "GB",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "CHI",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 16,
+        "opponent": "MIA",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 18,
+        "opponent": "ARI",
+        "fantasy_points": 1.7
+      }
+    ],
+    "Eric Tomlinson": [
+      {
+        "week": 2,
+        "opponent": "CAR",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "ARI",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 8,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "CLE",
+        "fantasy_points": 0.2
+      }
+    ],
+    "Erick All": [
+      {
+        "week": 2,
+        "opponent": "KC",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 3,
+        "opponent": "WAS",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 4,
+        "opponent": "CAR",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 5,
+        "opponent": "BAL",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 6,
+        "opponent": "NYG",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 7,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "PHI",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 9,
+        "opponent": "LV",
+        "fantasy_points": 2.4
+      }
+    ],
+    "Evan Engram": [
+      {
+        "week": 1,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "CHI",
+        "fantasy_points": 10.2
+      },
+      {
+        "week": 7,
+        "opponent": "NE",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 8,
+        "opponent": "GB",
+        "fantasy_points": 9.6
+      },
+      {
+        "week": 9,
+        "opponent": "PHI",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 10,
+        "opponent": "MIN",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 11,
+        "opponent": "DET",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 13,
+        "opponent": "HOU",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 14,
+        "opponent": "TEN",
+        "fantasy_points": 3.3
+      }
+    ],
+    "Feleipe Franks": [
+      {
+        "week": 4,
+        "opponent": "CIN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "TB",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "ATL",
+        "fantasy_points": 1.2
+      }
+    ],
+    "Foster Moreau": [
+      {
+        "week": 1,
+        "opponent": "CAR",
+        "fantasy_points": 10.3
+      },
+      {
+        "week": 3,
+        "opponent": "PHI",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 5,
+        "opponent": "KC",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 6,
+        "opponent": "TB",
+        "fantasy_points": 5.4
+      },
+      {
+        "week": 7,
+        "opponent": "DEN",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 8,
+        "opponent": "LAC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "CAR",
+        "fantasy_points": 7.7
+      },
+      {
+        "week": 10,
+        "opponent": "ATL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "CLE",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 13,
+        "opponent": "LA",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 14,
+        "opponent": "NYG",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 15,
+        "opponent": "WAS",
+        "fantasy_points": 9.9
+      },
+      {
+        "week": 16,
+        "opponent": "GB",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 17,
+        "opponent": "LV",
+        "fantasy_points": 10.7
+      },
+      {
+        "week": 18,
+        "opponent": "TB",
+        "fantasy_points": 3.1
+      }
+    ],
+    "George Kittle": [
+      {
+        "week": 1,
+        "opponent": "NYJ",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 2,
+        "opponent": "MIN",
+        "fantasy_points": 13.6
+      },
+      {
+        "week": 4,
+        "opponent": "NE",
+        "fantasy_points": 10.5
+      },
+      {
+        "week": 5,
+        "opponent": "ARI",
+        "fantasy_points": 12.4
+      },
+      {
+        "week": 6,
+        "opponent": "SEA",
+        "fantasy_points": 17.8
+      },
+      {
+        "week": 7,
+        "opponent": "KC",
+        "fantasy_points": 9.2
+      },
+      {
+        "week": 8,
+        "opponent": "DAL",
+        "fantasy_points": 18.8
+      },
+      {
+        "week": 10,
+        "opponent": "TB",
+        "fantasy_points": 11.7
+      },
+      {
+        "week": 12,
+        "opponent": "GB",
+        "fantasy_points": 14.2
+      },
+      {
+        "week": 13,
+        "opponent": "BUF",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 14,
+        "opponent": "CHI",
+        "fantasy_points": 15.1
+      },
+      {
+        "week": 15,
+        "opponent": "LA",
+        "fantasy_points": 6.1
+      },
+      {
+        "week": 16,
+        "opponent": "MIA",
+        "fantasy_points": 10.6
+      },
+      {
+        "week": 17,
+        "opponent": "DET",
+        "fantasy_points": 11.2
+      },
+      {
+        "week": 18,
+        "opponent": "ARI",
+        "fantasy_points": 2.7
+      }
+    ],
+    "Gerald Everett": [
+      {
+        "week": 1,
+        "opponent": "TEN",
+        "fantasy_points": -0.1
+      },
+      {
+        "week": 2,
+        "opponent": "HOU",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 3,
+        "opponent": "IND",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "CAR",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 6,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "WAS",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 9,
+        "opponent": "ARI",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 16,
+        "opponent": "DET",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 17,
+        "opponent": "SEA",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Grant Calcaterra": [
+      {
+        "week": 1,
+        "opponent": "GB",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 2,
+        "opponent": "ATL",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 4,
+        "opponent": "TB",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 6,
+        "opponent": "CLE",
+        "fantasy_points": 6.7
+      },
+      {
+        "week": 7,
+        "opponent": "NYG",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "CIN",
+        "fantasy_points": 5.8
+      },
+      {
+        "week": 9,
+        "opponent": "JAX",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 10,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 12,
+        "opponent": "LA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "CAR",
+        "fantasy_points": 7.6
+      },
+      {
+        "week": 15,
+        "opponent": "PIT",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 17,
+        "opponent": "DAL",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 18,
+        "opponent": "NYG",
+        "fantasy_points": 1.0
+      }
+    ],
+    "Greg Dulcich": [
+      {
+        "week": 1,
+        "opponent": "SEA",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 2,
+        "opponent": "PIT",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 4,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Harrison Bryant": [
+      {
+        "week": 2,
+        "opponent": "BAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 4,
+        "opponent": "CLE",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 6,
+        "opponent": "PIT",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 7,
+        "opponent": "LA",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 9,
+        "opponent": "CIN",
+        "fantasy_points": 2.2
+      }
+    ],
+    "Hayden Hurst": [
+      {
+        "week": 1,
+        "opponent": "LV",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 2,
+        "opponent": "CAR",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 3,
+        "opponent": "PIT",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 4,
+        "opponent": "KC",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 9,
+        "opponent": "CLE",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 10,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 16,
+        "opponent": "DEN",
+        "fantasy_points": 0.8
+      }
+    ],
+    "Hunter Henry": [
+      {
+        "week": 1,
+        "opponent": "CIN",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 2,
+        "opponent": "SEA",
+        "fantasy_points": 10.9
+      },
+      {
+        "week": 3,
+        "opponent": "NYJ",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 4,
+        "opponent": "SF",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 5,
+        "opponent": "MIA",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 6,
+        "opponent": "HOU",
+        "fantasy_points": 10.1
+      },
+      {
+        "week": 7,
+        "opponent": "JAX",
+        "fantasy_points": 9.2
+      },
+      {
+        "week": 8,
+        "opponent": "NYJ",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 9,
+        "opponent": "TEN",
+        "fantasy_points": 5.6
+      },
+      {
+        "week": 10,
+        "opponent": "CHI",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 11,
+        "opponent": "LA",
+        "fantasy_points": 6.3
+      },
+      {
+        "week": 12,
+        "opponent": "MIA",
+        "fantasy_points": 4.4
+      },
+      {
+        "week": 13,
+        "opponent": "IND",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 15,
+        "opponent": "ARI",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 16,
+        "opponent": "BUF",
+        "fantasy_points": 9.9
+      },
+      {
+        "week": 17,
+        "opponent": "LAC",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Hunter Long": [
+      {
+        "week": 5,
+        "opponent": "GB",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 7,
+        "opponent": "LV",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "MIN",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 9,
+        "opponent": "SEA",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 13,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "BUF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "SF",
+        "fantasy_points": 1.7
+      }
+    ],
+    "Ian Thomas": [
+      {
+        "week": 6,
+        "opponent": "ATL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "WAS",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 10,
+        "opponent": "NYG",
+        "fantasy_points": 0.3
+      }
+    ],
+    "Isaiah Likely": [
+      {
+        "week": 1,
+        "opponent": "KC",
+        "fantasy_points": 17.1
+      },
+      {
+        "week": 2,
+        "opponent": "LV",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 3,
+        "opponent": "DAL",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 4,
+        "opponent": "BUF",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 5,
+        "opponent": "CIN",
+        "fantasy_points": 13.3
+      },
+      {
+        "week": 6,
+        "opponent": "WAS",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 7,
+        "opponent": "TB",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 8,
+        "opponent": "CLE",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 9,
+        "opponent": "DEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "PIT",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 13,
+        "opponent": "PHI",
+        "fantasy_points": 9.8
+      },
+      {
+        "week": 15,
+        "opponent": "NYG",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 16,
+        "opponent": "PIT",
+        "fantasy_points": 8.9
+      },
+      {
+        "week": 17,
+        "opponent": "HOU",
+        "fantasy_points": 6.9
+      },
+      {
+        "week": 18,
+        "opponent": "CLE",
+        "fantasy_points": 3.8
+      }
+    ],
+    "Ja'Tavion Sanders": [
+      {
+        "week": 1,
+        "opponent": "NO",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 2,
+        "opponent": "LAC",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 3,
+        "opponent": "LV",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 4,
+        "opponent": "CIN",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 5,
+        "opponent": "CHI",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 6,
+        "opponent": "ATL",
+        "fantasy_points": 4.9
+      },
+      {
+        "week": 7,
+        "opponent": "WAS",
+        "fantasy_points": 6.1
+      },
+      {
+        "week": 8,
+        "opponent": "DEN",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 9,
+        "opponent": "NO",
+        "fantasy_points": 8.7
+      },
+      {
+        "week": 10,
+        "opponent": "NYG",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 12,
+        "opponent": "KC",
+        "fantasy_points": 4.9
+      },
+      {
+        "week": 14,
+        "opponent": "PHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "TB",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 18,
+        "opponent": "ATL",
+        "fantasy_points": 3.5
+      }
+    ],
+    "Jack Stoll": [
+      {
+        "week": 4,
+        "opponent": "TB",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 8,
+        "opponent": "CIN",
+        "fantasy_points": 0.6
+      }
+    ],
+    "Jaheim Bell": [
+      {
+        "week": 9,
+        "opponent": "TEN",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 11,
+        "opponent": "LA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "BUF",
+        "fantasy_points": 1.9
+      }
+    ],
+    "Jake Ferguson": [
+      {
+        "week": 1,
+        "opponent": "CLE",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 3,
+        "opponent": "BAL",
+        "fantasy_points": 9.5
+      },
+      {
+        "week": 4,
+        "opponent": "NYG",
+        "fantasy_points": 4.9
+      },
+      {
+        "week": 5,
+        "opponent": "PIT",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 6,
+        "opponent": "DET",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 8,
+        "opponent": "SF",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 9,
+        "opponent": "ATL",
+        "fantasy_points": 7.1
+      },
+      {
+        "week": 10,
+        "opponent": "PHI",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 11,
+        "opponent": "HOU",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 14,
+        "opponent": "CIN",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 15,
+        "opponent": "CAR",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 16,
+        "opponent": "TB",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 17,
+        "opponent": "PHI",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 18,
+        "opponent": "WAS",
+        "fantasy_points": 1.2
+      }
+    ],
+    "Jeremy Ruckert": [
+      {
+        "week": 2,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 3,
+        "opponent": "NE",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 4,
+        "opponent": "DEN",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 6,
+        "opponent": "BUF",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 8,
+        "opponent": "NE",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 9,
+        "opponent": "HOU",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 10,
+        "opponent": "ARI",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 11,
+        "opponent": "IND",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 13,
+        "opponent": "SEA",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 14,
+        "opponent": "MIA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "JAX",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 16,
+        "opponent": "LA",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 18,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      }
+    ],
+    "John Bates": [
+      {
+        "week": 1,
+        "opponent": "TB",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "NYG",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 4,
+        "opponent": "ARI",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 8,
+        "opponent": "CHI",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 11,
+        "opponent": "PHI",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 12,
+        "opponent": "DAL",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 15,
+        "opponent": "NO",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 16,
+        "opponent": "PHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "ATL",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 18,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Johnny Mundt": [
+      {
+        "week": 1,
+        "opponent": "NYG",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 2,
+        "opponent": "SF",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 3,
+        "opponent": "HOU",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 4,
+        "opponent": "GB",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 5,
+        "opponent": "NYJ",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 7,
+        "opponent": "DET",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 8,
+        "opponent": "LA",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 9,
+        "opponent": "IND",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "TEN",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 12,
+        "opponent": "CHI",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 13,
+        "opponent": "ARI",
+        "fantasy_points": 8.2
+      },
+      {
+        "week": 15,
+        "opponent": "CHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "GB",
+        "fantasy_points": 0.7
+      }
+    ],
+    "Jonnu Smith": [
+      {
+        "week": 1,
+        "opponent": "JAX",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 2,
+        "opponent": "BUF",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 3,
+        "opponent": "SEA",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 4,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "NE",
+        "fantasy_points": 6.1
+      },
+      {
+        "week": 7,
+        "opponent": "IND",
+        "fantasy_points": 15.6
+      },
+      {
+        "week": 8,
+        "opponent": "ARI",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 9,
+        "opponent": "BUF",
+        "fantasy_points": 4.6
+      },
+      {
+        "week": 10,
+        "opponent": "LA",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 11,
+        "opponent": "LV",
+        "fantasy_points": 22.1
+      },
+      {
+        "week": 12,
+        "opponent": "NE",
+        "fantasy_points": 14.7
+      },
+      {
+        "week": 13,
+        "opponent": "GB",
+        "fantasy_points": 11.3
+      },
+      {
+        "week": 14,
+        "opponent": "NYJ",
+        "fantasy_points": 10.4
+      },
+      {
+        "week": 15,
+        "opponent": "HOU",
+        "fantasy_points": 10.8
+      },
+      {
+        "week": 16,
+        "opponent": "SF",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 17,
+        "opponent": "CLE",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 18,
+        "opponent": "NYJ",
+        "fantasy_points": 11.6
+      }
+    ],
+    "Jordan Akins": [
+      {
+        "week": 1,
+        "opponent": "DAL",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 2,
+        "opponent": "JAX",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 3,
+        "opponent": "NYG",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 4,
+        "opponent": "LV",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 5,
+        "opponent": "WAS",
+        "fantasy_points": 8.2
+      },
+      {
+        "week": 7,
+        "opponent": "CIN",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 8,
+        "opponent": "BAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "LAC",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 11,
+        "opponent": "NO",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 12,
+        "opponent": "PIT",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 13,
+        "opponent": "DEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "PIT",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 15,
+        "opponent": "KC",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 16,
+        "opponent": "CIN",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 17,
+        "opponent": "MIA",
+        "fantasy_points": 4.9
+      },
+      {
+        "week": 18,
+        "opponent": "BAL",
+        "fantasy_points": 12.0
+      }
+    ],
+    "Joseph Fortson": [
+      {
+        "week": 5,
+        "opponent": "NO",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 7,
+        "opponent": "SF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "LV",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Josh Oliver": [
+      {
+        "week": 1,
+        "opponent": "NYG",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 3,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 4,
+        "opponent": "GB",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 7,
+        "opponent": "DET",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "LA",
+        "fantasy_points": 9.0
+      },
+      {
+        "week": 9,
+        "opponent": "IND",
+        "fantasy_points": 11.8
+      },
+      {
+        "week": 10,
+        "opponent": "JAX",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 11,
+        "opponent": "TEN",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 14,
+        "opponent": "ATL",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 16,
+        "opponent": "SEA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "DET",
+        "fantasy_points": 1.6
+      }
+    ],
+    "Josh Whyle": [
+      {
+        "week": 2,
+        "opponent": "NYJ",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 3,
+        "opponent": "GB",
+        "fantasy_points": 4.3
+      },
+      {
+        "week": 4,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "IND",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 7,
+        "opponent": "BUF",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 8,
+        "opponent": "DET",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 9,
+        "opponent": "NE",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 10,
+        "opponent": "LAC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "MIN",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 13,
+        "opponent": "WAS",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 14,
+        "opponent": "JAX",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 15,
+        "opponent": "CIN",
+        "fantasy_points": 9.7
+      },
+      {
+        "week": 17,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "HOU",
+        "fantasy_points": 2.9
+      }
+    ],
+    "Josiah Deguara": [
+      {
+        "week": 3,
+        "opponent": "BUF",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 5,
+        "opponent": "IND",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 16,
+        "opponent": "LV",
+        "fantasy_points": 0.4
+      }
+    ],
+    "Julian Hill": [
+      {
+        "week": 1,
+        "opponent": "JAX",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 2,
+        "opponent": "BUF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 3,
+        "opponent": "SEA",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 7,
+        "opponent": "IND",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 8,
+        "opponent": "ARI",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 10,
+        "opponent": "LA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "LV",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 12,
+        "opponent": "NE",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 13,
+        "opponent": "GB",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 14,
+        "opponent": "NYJ",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 18,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Juwan Johnson": [
+      {
+        "week": 1,
+        "opponent": "CAR",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 4,
+        "opponent": "ATL",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 5,
+        "opponent": "KC",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 6,
+        "opponent": "TB",
+        "fantasy_points": 4.8
+      },
+      {
+        "week": 7,
+        "opponent": "DEN",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 8,
+        "opponent": "LAC",
+        "fantasy_points": 4.8
+      },
+      {
+        "week": 9,
+        "opponent": "CAR",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 10,
+        "opponent": "ATL",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 11,
+        "opponent": "CLE",
+        "fantasy_points": 9.0
+      },
+      {
+        "week": 13,
+        "opponent": "LA",
+        "fantasy_points": 3.6
+      },
+      {
+        "week": 14,
+        "opponent": "NYG",
+        "fantasy_points": 11.0
+      },
+      {
+        "week": 15,
+        "opponent": "WAS",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 16,
+        "opponent": "GB",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 17,
+        "opponent": "LV",
+        "fantasy_points": 6.6
+      },
+      {
+        "week": 18,
+        "opponent": "TB",
+        "fantasy_points": 8.0
+      }
+    ],
+    "Kenny Yeboah": [
+      {
+        "week": 9,
+        "opponent": "HOU",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 10,
+        "opponent": "ARI",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 11,
+        "opponent": "IND",
+        "fantasy_points": 7.1
+      },
+      {
+        "week": 16,
+        "opponent": "LA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "BUF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "MIA",
+        "fantasy_points": 2.0
+      }
+    ],
+    "Kyle Pitts": [
+      {
+        "week": 1,
+        "opponent": "PIT",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 2,
+        "opponent": "PHI",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 3,
+        "opponent": "KC",
+        "fantasy_points": 5.9
+      },
+      {
+        "week": 4,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "TB",
+        "fantasy_points": 8.8
+      },
+      {
+        "week": 6,
+        "opponent": "CAR",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 7,
+        "opponent": "SEA",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 8,
+        "opponent": "TB",
+        "fantasy_points": 21.1
+      },
+      {
+        "week": 9,
+        "opponent": "DAL",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 10,
+        "opponent": "NO",
+        "fantasy_points": 5.5
+      },
+      {
+        "week": 11,
+        "opponent": "DEN",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 13,
+        "opponent": "LAC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "MIN",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 15,
+        "opponent": "LV",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 16,
+        "opponent": "NYG",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 17,
+        "opponent": "WAS",
+        "fantasy_points": 10.4
+      },
+      {
+        "week": 18,
+        "opponent": "CAR",
+        "fantasy_points": 1.5
+      }
+    ],
+    "Kylen Granson": [
+      {
+        "week": 1,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "GB",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 3,
+        "opponent": "CHI",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 6,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "MIA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "HOU",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 9,
+        "opponent": "MIN",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 10,
+        "opponent": "BUF",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 11,
+        "opponent": "NYJ",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 12,
+        "opponent": "DET",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "NE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "DEN",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 17,
+        "opponent": "NYG",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 18,
+        "opponent": "JAX",
+        "fantasy_points": 0.7
+      }
+    ],
+    "Lucas Krull": [
+      {
+        "week": 5,
+        "opponent": "LV",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 6,
+        "opponent": "LAC",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 7,
+        "opponent": "NO",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 8,
+        "opponent": "CAR",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 9,
+        "opponent": "BAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "KC",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 13,
+        "opponent": "CLE",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 15,
+        "opponent": "IND",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 16,
+        "opponent": "LAC",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 17,
+        "opponent": "CIN",
+        "fantasy_points": 0.3
+      }
+    ],
+    "Luke Farrell": [
+      {
+        "week": 2,
+        "opponent": "CLE",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 3,
+        "opponent": "BUF",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 4,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "IND",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 9,
+        "opponent": "PHI",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 10,
+        "opponent": "MIN",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 11,
+        "opponent": "DET",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 13,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 16,
+        "opponent": "LV",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 18,
+        "opponent": "IND",
+        "fantasy_points": 0.4
+      }
+    ],
+    "Luke Musgrave": [
+      {
+        "week": 1,
+        "opponent": "PHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "IND",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 3,
+        "opponent": "TEN",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 4,
+        "opponent": "MIN",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 16,
+        "opponent": "NO",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "MIN",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 18,
+        "opponent": "CHI",
+        "fantasy_points": 1.9
+      }
+    ],
+    "Luke Schoonmaker": [
+      {
+        "week": 2,
+        "opponent": "NO",
+        "fantasy_points": 4.3
+      },
+      {
+        "week": 3,
+        "opponent": "BAL",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 5,
+        "opponent": "PIT",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 10,
+        "opponent": "PHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "HOU",
+        "fantasy_points": 5.6
+      },
+      {
+        "week": 12,
+        "opponent": "WAS",
+        "fantasy_points": 11.5
+      },
+      {
+        "week": 13,
+        "opponent": "NYG",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 14,
+        "opponent": "CIN",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 16,
+        "opponent": "TB",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 18,
+        "opponent": "WAS",
+        "fantasy_points": 1.6
+      }
+    ],
+    "Mark Andrews": [
+      {
+        "week": 1,
+        "opponent": "KC",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 2,
+        "opponent": "LV",
+        "fantasy_points": 5.1
+      },
+      {
+        "week": 3,
+        "opponent": "DAL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 4,
+        "opponent": "BUF",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "CIN",
+        "fantasy_points": 5.5
+      },
+      {
+        "week": 6,
+        "opponent": "WAS",
+        "fantasy_points": 12.6
+      },
+      {
+        "week": 7,
+        "opponent": "TB",
+        "fantasy_points": 16.1
+      },
+      {
+        "week": 8,
+        "opponent": "CLE",
+        "fantasy_points": 9.6
+      },
+      {
+        "week": 9,
+        "opponent": "DEN",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 10,
+        "opponent": "CIN",
+        "fantasy_points": 12.8
+      },
+      {
+        "week": 11,
+        "opponent": "PIT",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 12,
+        "opponent": "LAC",
+        "fantasy_points": 10.6
+      },
+      {
+        "week": 13,
+        "opponent": "PHI",
+        "fantasy_points": 12.9
+      },
+      {
+        "week": 15,
+        "opponent": "NYG",
+        "fantasy_points": 8.4
+      },
+      {
+        "week": 16,
+        "opponent": "PIT",
+        "fantasy_points": 9.8
+      },
+      {
+        "week": 17,
+        "opponent": "HOU",
+        "fantasy_points": 12.8
+      },
+      {
+        "week": 18,
+        "opponent": "CLE",
+        "fantasy_points": 11.4
+      }
+    ],
+    "Michael Mayer": [
+      {
+        "week": 1,
+        "opponent": "LAC",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 2,
+        "opponent": "BAL",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 3,
+        "opponent": "CAR",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 11,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 12,
+        "opponent": "DEN",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 13,
+        "opponent": "KC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 14,
+        "opponent": "TB",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 15,
+        "opponent": "ATL",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 16,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 17,
+        "opponent": "NO",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 18,
+        "opponent": "LAC",
+        "fantasy_points": 2.1
+      }
+    ],
+    "Mike Gesicki": [
+      {
+        "week": 1,
+        "opponent": "NE",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 2,
+        "opponent": "KC",
+        "fantasy_points": 9.1
+      },
+      {
+        "week": 3,
+        "opponent": "WAS",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 4,
+        "opponent": "CAR",
+        "fantasy_points": -0.9
+      },
+      {
+        "week": 5,
+        "opponent": "BAL",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 7,
+        "opponent": "CLE",
+        "fantasy_points": 0.2
+      },
+      {
+        "week": 8,
+        "opponent": "PHI",
+        "fantasy_points": 7.3
+      },
+      {
+        "week": 9,
+        "opponent": "LV",
+        "fantasy_points": 22.0
+      },
+      {
+        "week": 10,
+        "opponent": "BAL",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 11,
+        "opponent": "LAC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "PIT",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 14,
+        "opponent": "DAL",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 15,
+        "opponent": "TEN",
+        "fantasy_points": 3.7
+      },
+      {
+        "week": 16,
+        "opponent": "CLE",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 17,
+        "opponent": "DEN",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 18,
+        "opponent": "PIT",
+        "fantasy_points": 6.8
+      }
+    ],
+    "Mo Alie-Cox": [
+      {
+        "week": 1,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 2,
+        "opponent": "GB",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 3,
+        "opponent": "CHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "JAX",
+        "fantasy_points": 9.7
+      },
+      {
+        "week": 6,
+        "opponent": "TEN",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 7,
+        "opponent": "MIA",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 8,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 11,
+        "opponent": "NYJ",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 13,
+        "opponent": "NE",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 16,
+        "opponent": "TEN",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 17,
+        "opponent": "NYG",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "JAX",
+        "fantasy_points": 0.0
+      }
+    ],
+    "MyCole Pruitt": [
+      {
+        "week": 1,
+        "opponent": "ATL",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 8,
+        "opponent": "NYG",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 10,
+        "opponent": "WAS",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "CIN",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 14,
+        "opponent": "CLE",
+        "fantasy_points": -0.1
+      },
+      {
+        "week": 16,
+        "opponent": "BAL",
+        "fantasy_points": 6.1
+      }
+    ],
+    "Nate Adkins": [
+      {
+        "week": 2,
+        "opponent": "PIT",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 3,
+        "opponent": "TB",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 4,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 5,
+        "opponent": "LV",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 6,
+        "opponent": "LAC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "CAR",
+        "fantasy_points": 6.3
+      },
+      {
+        "week": 11,
+        "opponent": "ATL",
+        "fantasy_points": 7.2
+      },
+      {
+        "week": 13,
+        "opponent": "CLE",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 15,
+        "opponent": "IND",
+        "fantasy_points": 7.5
+      },
+      {
+        "week": 16,
+        "opponent": "LAC",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 17,
+        "opponent": "CIN",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 18,
+        "opponent": "KC",
+        "fantasy_points": 2.5
+      }
+    ],
+    "Nick Vannett": [
+      {
+        "week": 1,
+        "opponent": "CHI",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 3,
+        "opponent": "GB",
+        "fantasy_points": 6.9
+      },
+      {
+        "week": 7,
+        "opponent": "BUF",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 8,
+        "opponent": "DET",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "NE",
+        "fantasy_points": 9.3
+      },
+      {
+        "week": 11,
+        "opponent": "MIN",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 12,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "WAS",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 14,
+        "opponent": "JAX",
+        "fantasy_points": 0.4
+      },
+      {
+        "week": 15,
+        "opponent": "CIN",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 17,
+        "opponent": "JAX",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 18,
+        "opponent": "HOU",
+        "fantasy_points": 2.6
+      }
+    ],
+    "Noah Fant": [
+      {
+        "week": 1,
+        "opponent": "DEN",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 2,
+        "opponent": "NE",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 3,
+        "opponent": "MIA",
+        "fantasy_points": 6.0
+      },
+      {
+        "week": 4,
+        "opponent": "DET",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 5,
+        "opponent": "NYG",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 6,
+        "opponent": "SF",
+        "fantasy_points": 6.3
+      },
+      {
+        "week": 7,
+        "opponent": "ATL",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 8,
+        "opponent": "BUF",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 13,
+        "opponent": "NYJ",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 14,
+        "opponent": "ARI",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 15,
+        "opponent": "GB",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 16,
+        "opponent": "MIN",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 17,
+        "opponent": "CHI",
+        "fantasy_points": 4.3
+      },
+      {
+        "week": 18,
+        "opponent": "LA",
+        "fantasy_points": 12.3
+      }
+    ],
+    "Noah Gray": [
+      {
+        "week": 1,
+        "opponent": "BAL",
+        "fantasy_points": 3.7
+      },
+      {
+        "week": 3,
+        "opponent": "ATL",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 4,
+        "opponent": "LAC",
+        "fantasy_points": 4.0
+      },
+      {
+        "week": 5,
+        "opponent": "NO",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 7,
+        "opponent": "SF",
+        "fantasy_points": 6.6
+      },
+      {
+        "week": 8,
+        "opponent": "LV",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 9,
+        "opponent": "TB",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "DEN",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 11,
+        "opponent": "BUF",
+        "fantasy_points": 14.3
+      },
+      {
+        "week": 12,
+        "opponent": "CAR",
+        "fantasy_points": 18.6
+      },
+      {
+        "week": 13,
+        "opponent": "LV",
+        "fantasy_points": 5.8
+      },
+      {
+        "week": 14,
+        "opponent": "LAC",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 15,
+        "opponent": "CLE",
+        "fantasy_points": 8.1
+      },
+      {
+        "week": 16,
+        "opponent": "HOU",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 17,
+        "opponent": "PIT",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 18,
+        "opponent": "DEN",
+        "fantasy_points": -0.3
+      }
+    ],
+    "Pat Freiermuth": [
+      {
+        "week": 1,
+        "opponent": "ATL",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 2,
+        "opponent": "DEN",
+        "fantasy_points": 3.9
+      },
+      {
+        "week": 3,
+        "opponent": "LAC",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 4,
+        "opponent": "IND",
+        "fantasy_points": 11.7
+      },
+      {
+        "week": 5,
+        "opponent": "DAL",
+        "fantasy_points": 8.2
+      },
+      {
+        "week": 6,
+        "opponent": "LV",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 7,
+        "opponent": "NYJ",
+        "fantasy_points": 5.1
+      },
+      {
+        "week": 8,
+        "opponent": "NYG",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 10,
+        "opponent": "WAS",
+        "fantasy_points": 7.7
+      },
+      {
+        "week": 11,
+        "opponent": "BAL",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 12,
+        "opponent": "CLE",
+        "fantasy_points": 5.9
+      },
+      {
+        "week": 13,
+        "opponent": "CIN",
+        "fantasy_points": 12.8
+      },
+      {
+        "week": 14,
+        "opponent": "CLE",
+        "fantasy_points": 10.8
+      },
+      {
+        "week": 15,
+        "opponent": "PHI",
+        "fantasy_points": 8.2
+      },
+      {
+        "week": 16,
+        "opponent": "BAL",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 17,
+        "opponent": "KC",
+        "fantasy_points": 6.0
+      },
+      {
+        "week": 18,
+        "opponent": "CIN",
+        "fantasy_points": 14.5
+      }
+    ],
+    "Payne Durham": [
+      {
+        "week": 3,
+        "opponent": "DEN",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 12,
+        "opponent": "NYG",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 16,
+        "opponent": "DAL",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 17,
+        "opponent": "CAR",
+        "fantasy_points": 9.6
+      },
+      {
+        "week": 18,
+        "opponent": "NO",
+        "fantasy_points": 7.6
+      }
+    ],
+    "Peyton Hendershot": [
+      {
+        "week": 9,
+        "opponent": "TB",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 10,
+        "opponent": "DEN",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 11,
+        "opponent": "BUF",
+        "fantasy_points": 1.1
+      },
+      {
+        "week": 18,
+        "opponent": "DEN",
+        "fantasy_points": 2.5
+      }
+    ],
+    "Pharaoh Brown": [
+      {
+        "week": 3,
+        "opponent": "MIA",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 4,
+        "opponent": "DET",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 5,
+        "opponent": "NYG",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 12,
+        "opponent": "ARI",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 13,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "ARI",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 16,
+        "opponent": "MIN",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 17,
+        "opponent": "CHI",
+        "fantasy_points": 0.4
+      }
+    ],
+    "Quintin Morris": [
+      {
+        "week": 9,
+        "opponent": "MIA",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 11,
+        "opponent": "KC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 13,
+        "opponent": "SF",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 17,
+        "opponent": "NYJ",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 18,
+        "opponent": "NE",
+        "fantasy_points": 2.0
+      }
+    ],
+    "Sam LaPorta": [
+      {
+        "week": 1,
+        "opponent": "LA",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 2,
+        "opponent": "TB",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 3,
+        "opponent": "ARI",
+        "fantasy_points": 3.6
+      },
+      {
+        "week": 4,
+        "opponent": "SEA",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 6,
+        "opponent": "DAL",
+        "fantasy_points": 11.2
+      },
+      {
+        "week": 7,
+        "opponent": "MIN",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 8,
+        "opponent": "TEN",
+        "fantasy_points": 10.8
+      },
+      {
+        "week": 9,
+        "opponent": "GB",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 10,
+        "opponent": "HOU",
+        "fantasy_points": 12.6
+      },
+      {
+        "week": 12,
+        "opponent": "IND",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 13,
+        "opponent": "CHI",
+        "fantasy_points": 12.6
+      },
+      {
+        "week": 14,
+        "opponent": "GB",
+        "fantasy_points": 5.4
+      },
+      {
+        "week": 15,
+        "opponent": "BUF",
+        "fantasy_points": 11.1
+      },
+      {
+        "week": 16,
+        "opponent": "CHI",
+        "fantasy_points": 10.3
+      },
+      {
+        "week": 17,
+        "opponent": "SF",
+        "fantasy_points": 12.4
+      },
+      {
+        "week": 18,
+        "opponent": "MIN",
+        "fantasy_points": 6.3
+      }
+    ],
+    "Stone Smartt": [
+      {
+        "week": 6,
+        "opponent": "DEN",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 7,
+        "opponent": "ARI",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 13,
+        "opponent": "ATL",
+        "fantasy_points": 0.3
+      },
+      {
+        "week": 14,
+        "opponent": "KC",
+        "fantasy_points": 5.4
+      },
+      {
+        "week": 15,
+        "opponent": "TB",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 16,
+        "opponent": "DEN",
+        "fantasy_points": 3.7
+      },
+      {
+        "week": 17,
+        "opponent": "NE",
+        "fantasy_points": 2.3
+      }
+    ],
+    "T.J. Hockenson": [
+      {
+        "week": 9,
+        "opponent": "IND",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 10,
+        "opponent": "JAX",
+        "fantasy_points": 7.2
+      },
+      {
+        "week": 11,
+        "opponent": "TEN",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 12,
+        "opponent": "CHI",
+        "fantasy_points": 11.4
+      },
+      {
+        "week": 13,
+        "opponent": "ARI",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 14,
+        "opponent": "ATL",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 15,
+        "opponent": "CHI",
+        "fantasy_points": 5.2
+      },
+      {
+        "week": 16,
+        "opponent": "SEA",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 17,
+        "opponent": "GB",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 18,
+        "opponent": "DET",
+        "fantasy_points": 0.9
+      }
+    ],
+    "Tanner Hudson": [
+      {
+        "week": 1,
+        "opponent": "NE",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 7,
+        "opponent": "CLE",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 9,
+        "opponent": "LV",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 10,
+        "opponent": "BAL",
+        "fantasy_points": 10.3
+      },
+      {
+        "week": 11,
+        "opponent": "LAC",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 13,
+        "opponent": "PIT",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 14,
+        "opponent": "DAL",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 15,
+        "opponent": "TEN",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 18,
+        "opponent": "PIT",
+        "fantasy_points": 1.1
+      }
+    ],
+    "Taysom Hill": [
+      {
+        "week": 1,
+        "opponent": "CAR",
+        "fantasy_points": 3.6
+      },
+      {
+        "week": 2,
+        "opponent": "DAL",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 4,
+        "opponent": "ATL",
+        "fantasy_points": 14.4
+      },
+      {
+        "week": 8,
+        "opponent": "LAC",
+        "fantasy_points": 4.2
+      },
+      {
+        "week": 9,
+        "opponent": "CAR",
+        "fantasy_points": 12.0
+      },
+      {
+        "week": 10,
+        "opponent": "ATL",
+        "fantasy_points": 5.0
+      },
+      {
+        "week": 11,
+        "opponent": "CLE",
+        "fantasy_points": 35.5
+      },
+      {
+        "week": 13,
+        "opponent": "LA",
+        "fantasy_points": 4.7
+      }
+    ],
+    "Theo Johnson": [
+      {
+        "week": 1,
+        "opponent": "MIN",
+        "fantasy_points": 1.8
+      },
+      {
+        "week": 3,
+        "opponent": "CLE",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 4,
+        "opponent": "DAL",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 5,
+        "opponent": "SEA",
+        "fantasy_points": 4.8
+      },
+      {
+        "week": 6,
+        "opponent": "CIN",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 8,
+        "opponent": "PIT",
+        "fantasy_points": 3.5
+      },
+      {
+        "week": 9,
+        "opponent": "WAS",
+        "fantasy_points": 11.1
+      },
+      {
+        "week": 10,
+        "opponent": "CAR",
+        "fantasy_points": 3.7
+      },
+      {
+        "week": 12,
+        "opponent": "TB",
+        "fantasy_points": 3.9
+      },
+      {
+        "week": 13,
+        "opponent": "DAL",
+        "fantasy_points": 5.4
+      }
+    ],
+    "Tip Reiman": [
+      {
+        "week": 5,
+        "opponent": "SF",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 7,
+        "opponent": "LAC",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 13,
+        "opponent": "MIN",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 14,
+        "opponent": "SEA",
+        "fantasy_points": 1.4
+      },
+      {
+        "week": 15,
+        "opponent": "NE",
+        "fantasy_points": 0.8
+      }
+    ],
+    "Tommy Tremble": [
+      {
+        "week": 2,
+        "opponent": "LAC",
+        "fantasy_points": 2.3
+      },
+      {
+        "week": 3,
+        "opponent": "LV",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 5,
+        "opponent": "CHI",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 8,
+        "opponent": "DEN",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 12,
+        "opponent": "KC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 13,
+        "opponent": "TB",
+        "fantasy_points": 7.7
+      },
+      {
+        "week": 14,
+        "opponent": "PHI",
+        "fantasy_points": 6.3
+      },
+      {
+        "week": 15,
+        "opponent": "DAL",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 16,
+        "opponent": "ARI",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 18,
+        "opponent": "ATL",
+        "fantasy_points": 9.0
+      }
+    ],
+    "Travis Kelce": [
+      {
+        "week": 1,
+        "opponent": "BAL",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 2,
+        "opponent": "CIN",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 3,
+        "opponent": "ATL",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 4,
+        "opponent": "LAC",
+        "fantasy_points": 8.9
+      },
+      {
+        "week": 5,
+        "opponent": "NO",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 7,
+        "opponent": "SF",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 8,
+        "opponent": "LV",
+        "fantasy_points": 15.0
+      },
+      {
+        "week": 9,
+        "opponent": "TB",
+        "fantasy_points": 10.0
+      },
+      {
+        "week": 10,
+        "opponent": "DEN",
+        "fantasy_points": 12.4
+      },
+      {
+        "week": 11,
+        "opponent": "BUF",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 12,
+        "opponent": "CAR",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 13,
+        "opponent": "LV",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 14,
+        "opponent": "LAC",
+        "fantasy_points": 4.5
+      },
+      {
+        "week": 15,
+        "opponent": "CLE",
+        "fantasy_points": 2.7
+      },
+      {
+        "week": 16,
+        "opponent": "HOU",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 17,
+        "opponent": "PIT",
+        "fantasy_points": 14.4
+      }
+    ],
+    "Trey McBride": [
+      {
+        "week": 1,
+        "opponent": "BUF",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 2,
+        "opponent": "LA",
+        "fantasy_points": 6.7
+      },
+      {
+        "week": 3,
+        "opponent": "DET",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 5,
+        "opponent": "SF",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 6,
+        "opponent": "GB",
+        "fantasy_points": 9.6
+      },
+      {
+        "week": 7,
+        "opponent": "LAC",
+        "fantasy_points": 5.1
+      },
+      {
+        "week": 8,
+        "opponent": "MIA",
+        "fantasy_points": 12.4
+      },
+      {
+        "week": 9,
+        "opponent": "CHI",
+        "fantasy_points": 9.7
+      },
+      {
+        "week": 10,
+        "opponent": "NYJ",
+        "fantasy_points": 7.1
+      },
+      {
+        "week": 12,
+        "opponent": "SEA",
+        "fantasy_points": 13.3
+      },
+      {
+        "week": 13,
+        "opponent": "MIN",
+        "fantasy_points": 9.6
+      },
+      {
+        "week": 14,
+        "opponent": "SEA",
+        "fantasy_points": 7.0
+      },
+      {
+        "week": 15,
+        "opponent": "NE",
+        "fantasy_points": 8.7
+      },
+      {
+        "week": 16,
+        "opponent": "CAR",
+        "fantasy_points": 2.0
+      },
+      {
+        "week": 17,
+        "opponent": "LA",
+        "fantasy_points": 18.3
+      },
+      {
+        "week": 18,
+        "opponent": "SF",
+        "fantasy_points": 12.5
+      }
+    ],
+    "Tucker Fisk": [
+      {
+        "week": 11,
+        "opponent": "CIN",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 12,
+        "opponent": "BAL",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 13,
+        "opponent": "ATL",
+        "fantasy_points": 0.1
+      },
+      {
+        "week": 14,
+        "opponent": "KC",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 15,
+        "opponent": "TB",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 16,
+        "opponent": "DEN",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 17,
+        "opponent": "NE",
+        "fantasy_points": 0.8
+      }
+    ],
+    "Tucker Kraft": [
+      {
+        "week": 1,
+        "opponent": "PHI",
+        "fantasy_points": 3.7
+      },
+      {
+        "week": 2,
+        "opponent": "IND",
+        "fantasy_points": 1.6
+      },
+      {
+        "week": 3,
+        "opponent": "TEN",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 4,
+        "opponent": "MIN",
+        "fantasy_points": 11.3
+      },
+      {
+        "week": 5,
+        "opponent": "LA",
+        "fantasy_points": 20.8
+      },
+      {
+        "week": 6,
+        "opponent": "ARI",
+        "fantasy_points": 1.5
+      },
+      {
+        "week": 7,
+        "opponent": "HOU",
+        "fantasy_points": 9.3
+      },
+      {
+        "week": 8,
+        "opponent": "JAX",
+        "fantasy_points": 13.8
+      },
+      {
+        "week": 9,
+        "opponent": "DET",
+        "fantasy_points": 3.6
+      },
+      {
+        "week": 11,
+        "opponent": "CHI",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 12,
+        "opponent": "SF",
+        "fantasy_points": 8.6
+      },
+      {
+        "week": 13,
+        "opponent": "MIA",
+        "fantasy_points": 7.8
+      },
+      {
+        "week": 14,
+        "opponent": "DET",
+        "fantasy_points": 10.1
+      },
+      {
+        "week": 15,
+        "opponent": "SEA",
+        "fantasy_points": 3.4
+      },
+      {
+        "week": 16,
+        "opponent": "NO",
+        "fantasy_points": 6.5
+      },
+      {
+        "week": 17,
+        "opponent": "MIN",
+        "fantasy_points": 5.3
+      },
+      {
+        "week": 18,
+        "opponent": "CHI",
+        "fantasy_points": 3.6
+      }
+    ],
+    "Tyler Conklin": [
+      {
+        "week": 1,
+        "opponent": "SF",
+        "fantasy_points": 0.6
+      },
+      {
+        "week": 2,
+        "opponent": "TEN",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 3,
+        "opponent": "NE",
+        "fantasy_points": 9.3
+      },
+      {
+        "week": 4,
+        "opponent": "DEN",
+        "fantasy_points": 1.7
+      },
+      {
+        "week": 5,
+        "opponent": "MIN",
+        "fantasy_points": 5.5
+      },
+      {
+        "week": 6,
+        "opponent": "BUF",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 7,
+        "opponent": "PIT",
+        "fantasy_points": 6.7
+      },
+      {
+        "week": 8,
+        "opponent": "NE",
+        "fantasy_points": 10.2
+      },
+      {
+        "week": 9,
+        "opponent": "HOU",
+        "fantasy_points": -0.3
+      },
+      {
+        "week": 10,
+        "opponent": "ARI",
+        "fantasy_points": 0.8
+      },
+      {
+        "week": 11,
+        "opponent": "IND",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 13,
+        "opponent": "SEA",
+        "fantasy_points": 3.2
+      },
+      {
+        "week": 14,
+        "opponent": "MIA",
+        "fantasy_points": 3.3
+      },
+      {
+        "week": 16,
+        "opponent": "LA",
+        "fantasy_points": 5.9
+      },
+      {
+        "week": 17,
+        "opponent": "BUF",
+        "fantasy_points": 11.7
+      },
+      {
+        "week": 18,
+        "opponent": "MIA",
+        "fantasy_points": 7.6
+      }
+    ],
+    "Tyler Higbee": [
+      {
+        "week": 16,
+        "opponent": "NYJ",
+        "fantasy_points": 7.1
+      },
+      {
+        "week": 17,
+        "opponent": "ARI",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 18,
+        "opponent": "SEA",
+        "fantasy_points": 10.6
+      }
+    ],
+    "Will Dissly": [
+      {
+        "week": 1,
+        "opponent": "LV",
+        "fantasy_points": 1.3
+      },
+      {
+        "week": 2,
+        "opponent": "CAR",
+        "fantasy_points": 2.9
+      },
+      {
+        "week": 3,
+        "opponent": "PIT",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 4,
+        "opponent": "KC",
+        "fantasy_points": 2.4
+      },
+      {
+        "week": 6,
+        "opponent": "DEN",
+        "fantasy_points": 2.6
+      },
+      {
+        "week": 7,
+        "opponent": "ARI",
+        "fantasy_points": 8.1
+      },
+      {
+        "week": 8,
+        "opponent": "NO",
+        "fantasy_points": 4.1
+      },
+      {
+        "week": 9,
+        "opponent": "CLE",
+        "fantasy_points": 0.9
+      },
+      {
+        "week": 10,
+        "opponent": "TEN",
+        "fantasy_points": 3.0
+      },
+      {
+        "week": 11,
+        "opponent": "CIN",
+        "fantasy_points": 14.0
+      },
+      {
+        "week": 12,
+        "opponent": "BAL",
+        "fantasy_points": 4.7
+      },
+      {
+        "week": 13,
+        "opponent": "ATL",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 14,
+        "opponent": "KC",
+        "fantasy_points": 1.9
+      },
+      {
+        "week": 17,
+        "opponent": "NE",
+        "fantasy_points": 2.1
+      },
+      {
+        "week": 18,
+        "opponent": "LV",
+        "fantasy_points": 10.2
+      }
+    ],
+    "Will Mallory": [
+      {
+        "week": 5,
+        "opponent": "JAX",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 6,
+        "opponent": "TEN",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 7,
+        "opponent": "MIA",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 8,
+        "opponent": "HOU",
+        "fantasy_points": 0.0
+      },
+      {
+        "week": 10,
+        "opponent": "BUF",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 13,
+        "opponent": "NE",
+        "fantasy_points": 0.7
+      },
+      {
+        "week": 15,
+        "opponent": "DEN",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Zach Davidson": [
+      {
+        "week": 11,
+        "opponent": "KC",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 13,
+        "opponent": "SF",
+        "fantasy_points": 0.0
+      }
+    ],
+    "Zach Ertz": [
+      {
+        "week": 1,
+        "opponent": "TB",
+        "fantasy_points": 2.8
+      },
+      {
+        "week": 2,
+        "opponent": "NYG",
+        "fantasy_points": 6.2
+      },
+      {
+        "week": 3,
+        "opponent": "CIN",
+        "fantasy_points": 3.8
+      },
+      {
+        "week": 4,
+        "opponent": "ARI",
+        "fantasy_points": 2.2
+      },
+      {
+        "week": 5,
+        "opponent": "CLE",
+        "fantasy_points": 1.0
+      },
+      {
+        "week": 6,
+        "opponent": "BAL",
+        "fantasy_points": 6.8
+      },
+      {
+        "week": 7,
+        "opponent": "CAR",
+        "fantasy_points": 10.0
+      },
+      {
+        "week": 8,
+        "opponent": "CHI",
+        "fantasy_points": 7.7
+      },
+      {
+        "week": 9,
+        "opponent": "NYG",
+        "fantasy_points": 0.5
+      },
+      {
+        "week": 10,
+        "opponent": "PIT",
+        "fantasy_points": 3.1
+      },
+      {
+        "week": 11,
+        "opponent": "PHI",
+        "fantasy_points": 10.7
+      },
+      {
+        "week": 12,
+        "opponent": "DAL",
+        "fantasy_points": 9.8
+      },
+      {
+        "week": 13,
+        "opponent": "TEN",
+        "fantasy_points": 9.5
+      },
+      {
+        "week": 15,
+        "opponent": "NO",
+        "fantasy_points": 2.5
+      },
+      {
+        "week": 16,
+        "opponent": "PHI",
+        "fantasy_points": 1.2
+      },
+      {
+        "week": 17,
+        "opponent": "ATL",
+        "fantasy_points": 19.2
+      },
+      {
+        "week": 18,
+        "opponent": "DAL",
+        "fantasy_points": 10.4
+      }
+    ]
+  }
+}

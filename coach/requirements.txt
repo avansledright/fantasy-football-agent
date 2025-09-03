@@ -1,0 +1,6 @@
+boto3
+requests
+beautifulsoup4
+pandas
+strands-agents
+strands-agents-tools
