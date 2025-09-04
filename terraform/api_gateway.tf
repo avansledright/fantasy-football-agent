@@ -163,4 +163,5 @@ resource "aws_api_gateway_integration" "coach_get" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.coach.invoke_arn
+  timeout_milliseconds    = 70000
 }

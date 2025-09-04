@@ -60,9 +60,12 @@ resource "aws_lambda_function" "coach" {
   role              = aws_iam_role.coach_lambda_role.arn
   handler           = "lambda_function.lambda_handler"
   runtime           = "python3.12"
+  timeout           = 900
+  memory_size       = 512
   s3_bucket         = aws_s3_bucket.lambda_artifacts.id
   s3_key            = aws_s3_object.coach_lambda_package.key
   s3_object_version = aws_s3_object.coach_lambda_package.version_id
+  architectures     = ["arm64"]
 
   source_code_hash = data.archive_file.coach_lambda_zip.output_base64sha256
   layers = [
@@ -71,7 +74,7 @@ resource "aws_lambda_function" "coach" {
   environment {
     variables = {
       BEDROCK_MODEL_ID = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-      DDB_TABLE_STATS  = aws_dynamodb_table.fantasy_player_data.name
+      DDB_TABLE_STATS  = aws_dynamodb_table.season_stats.name
       DDB_TABLE_ROSTER = aws_dynamodb_table.fantasy_football_team_roster.name
       DEFAULT_TEAM_ID  = "1"
       SCORING          = "PPR"
