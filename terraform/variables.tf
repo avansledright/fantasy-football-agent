@@ -52,3 +52,44 @@ variable "s3_bucket_name" {
   type        = string
   default     = "fantasy-football-web-app"
 }
+
+# Cloudfront things
+variable "cloudfront_price_class" {
+  description = "CloudFront price class - using cheapest option for cost optimization"
+  type        = string
+  default     = "PriceClass_100"  # Only US, Canada, Europe edge locations (cheapest)
+  
+  validation {
+    condition = contains([
+      "PriceClass_All",
+      "PriceClass_200", 
+      "PriceClass_100"
+    ], var.cloudfront_price_class)
+    error_message = "Price class must be PriceClass_All, PriceClass_200, or PriceClass_100."
+  }
+}
+
+variable "environment" {
+  description = "Environment name (dev, staging, prod)"
+  type        = string
+  default     = "prod"
+}
+
+# Cost optimization settings
+variable "enable_cloudfront_logging" {
+  description = "Enable CloudFront access logging (adds S3 storage costs)"
+  type        = bool
+  default     = false  # Disabled for cost optimization
+}
+
+variable "cache_ttl_static_assets" {
+  description = "TTL for static assets in seconds (longer = more cost effective)"
+  type        = number
+  default     = 31536000  # 1 year for maximum caching efficiency
+}
+
+variable "cache_ttl_api_responses" {
+  description = "TTL for API responses in seconds (0 = no caching for dynamic content)"
+  type        = number
+  default     = 0  # No API caching to ensure data freshness
+}
