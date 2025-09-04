@@ -6,6 +6,7 @@ from app.tools.projections import get_weekly_projections
 from app.tools.dynamo import load_team_roster, format_roster_for_agent
 from app.batch_history import load_all_player_histories_batch, format_all_histories_for_agent
 from app.tools.lineup import optimize_lineup_direct
+from app.utils.nfl_schedule import get_matchups_by_week
 
 def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> tuple[Agent, dict]:
     """Build agent and pre-compute the optimal lineup.
@@ -25,6 +26,9 @@ def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: l
     # Get projections using the tool (we need this data anyway)
     projections_tool_result = get_weekly_projections(week)
     
+    print(f"Getting weekly team matchups")
+    weekly_matchups = get_matchups_by_week(week)
+    print(weekly_matchups)
     # Parse projections result
     try:
         if isinstance(projections_tool_result, str):
@@ -61,10 +65,15 @@ TEAM ROSTER:
 PLAYER PERFORMANCE DATA:
 {history_context}
 
-COMPUTED OPTIMAL LINEUP:
-{lineup_summary}
+WEEK TEAM MATCHUPS: 
+{weekly_matchups}
+This is shown as AWAY: Home. Example DET: GB is Detroit at Green Bay or Detroit is the away team.
 
-Your task is to explain and potentially refine this lineup. The lineup has been pre-computed using projections and historical data.
+Your task is to identify the optimal lineup using the given team roster, the team matchups and player performance data as well as projection data for 2025.
+
+The roster should consist of EXACTLY these positions:
+{lineup_slots}
+Reminder: The OP slot can be RB/WR/TE/QB
 
 Return your final recommendation in this EXACT JSON format:
 {{
@@ -162,7 +171,7 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
     return lineup_result
 
 # Backward compatibility
-def build_agent(team_id: str, week: int) -> Agent:
+def build_agent(team_id: str, week: int, lineup_slots) -> Agent:
     """Backward compatible function that returns just the agent."""
-    agent, _ = build_agent_with_precomputed_lineup(team_id, week, ["QB","RB","RB","WR","WR","TE","FLEX","K","DST"])
+    agent, _ = build_agent_with_precomputed_lineup(team_id, week, lineup_slots)
     return agent

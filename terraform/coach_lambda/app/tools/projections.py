@@ -2,7 +2,7 @@ import re
 import time
 from typing import Dict, List, Literal, TypedDict
 import requests
-from bs4 import BeautifulSoup  # add to requirements
+from bs4 import BeautifulSoup
 
 from strands import tool
 

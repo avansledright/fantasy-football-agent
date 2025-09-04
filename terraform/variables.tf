@@ -46,3 +46,9 @@ variable "coach_function_name" {
   description = "Name of the coach function"
   default     = "fantasy-football-coach-lambda"
 }
+
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket for static web hosting"
+  type        = string
+  default     = "fantasy-football-web-app"
+}

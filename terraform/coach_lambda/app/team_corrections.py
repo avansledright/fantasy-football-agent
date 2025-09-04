@@ -119,6 +119,7 @@ MAJOR_2025_MOVES = {
     "Stefon Diggs": "Traded from BUF to HOU",
     "Keenan Allen": "Traded from LAC to CHI",
     "Calvin Ridley": "Signed with TEN as free agent",
+    "Amari Cooper": "retired. No longer playing"
 }
 
 def print_major_moves():

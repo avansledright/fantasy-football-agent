@@ -44,7 +44,7 @@ def lambda_handler(event, context):
 
         logger.info("Building agent...")
         try:
-            agent = build_agent(team_id, week)  # Pass team_id and week
+            agent = build_agent(team_id, week, lineup_slots)  # Pass team_id and week
             logger.info("Agent built successfully")
         except Exception as e:
             logger.error(f"Failed to build agent: {str(e)}")

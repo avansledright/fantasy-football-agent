@@ -17,3 +17,11 @@ output "test_command" {
          -d '{"prompt": "Return the weather for Chicago Illinois"}'
   EOT
 }
+
+output "website_endpoint" {
+  value = aws_s3_bucket_website_configuration.fantasy_football_web.website_endpoint
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.fantasy_football_web.bucket
+}

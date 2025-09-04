@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football AI Coach</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-football-ball"></i> Fantasy Football AI Coach</h1>
+            <div class="team-selector">
+                <label for="teamId">Team ID:</label>
+                <input type="text" id="teamId" placeholder="Enter team ID" value="1">
+                <button id="loadTeam" class="btn btn-primary">Load Team</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Team Information Panel -->
+            <div class="panel team-info">
+                <div class="panel-header">
+                    <h2><i class="fas fa-users"></i> Team Information</h2>
+                </div>
+                <div class="panel-content">
+                    <div id="teamDetails">
+                        <p>Select a team to view details</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roster Management Panel -->
+            <div class="panel roster-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-list"></i> Roster Management</h2>
+                    <button id="editRoster" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Edit Roster
+                    </button>
+                </div>
+                <div class="panel-content">
+                    <div id="rosterList">
+                        <p>Load a team to view roster</p>
+                    </div>
+                    <div id="editRosterForm" class="edit-form" style="display: none;">
+                        <h3>Edit Player</h3>
+                        <input type="hidden" id="editPlayerIndex">
+                        <div class="form-group">
+                            <label for="playerName">Player Name:</label>
+                            <input type="text" id="playerName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="playerPosition">Position:</label>
+                            <select id="playerPosition" class="form-control">
+                                <option value="QB">QB</option>
+                                <option value="RB">RB</option>
+                                <option value="WR">WR</option>
+                                <option value="TE">TE</option>
+                                <option value="K">K</option>
+                                <option value="DST">DST</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerTeam">Team:</label>
+                            <input type="text" id="playerTeam" class="form-control" maxlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label for="playerStatus">Status:</label>
+                            <select id="playerStatus" class="form-control">
+                                <option value="starter">Starter</option>
+                                <option value="bench">Bench</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button id="savePlayer" class="btn btn-success">Save</button>
+                            <button id="cancelEdit" class="btn btn-secondary">Cancel</button>
+                            <button id="removePlayer" class="btn btn-danger">Remove Player</button>
+                        </div>
+                    </div>
+                    <div class="roster-actions">
+                        <button id="addPlayer" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Player
+                        </button>
+                        <button id="saveRoster" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Roster
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Analysis Panel -->
+            <div class="panel analysis-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chart-line"></i> Weekly Analysis</h2>
+                    <div class="analysis-controls">
+                        <input type="number" id="weekNumber" placeholder="Week" min="1" max="18" value="1">
+                        <button id="generateAnalysis" class="btn btn-primary">
+                            <i class="fas fa-magic"></i> Generate Analysis
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div id="analysisResult">
+                        <p>Generate analysis to view optimal lineup</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
