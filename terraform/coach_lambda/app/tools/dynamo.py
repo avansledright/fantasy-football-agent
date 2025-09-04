@@ -3,6 +3,7 @@ from typing import Dict, Any, List, TypedDict, Optional
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from strands import tool
+import json
 
 DDB = boto3.resource("dynamodb")
 TABLE_STATS = os.environ.get("DDB_TABLE_STATS", "fantasy-football-2024-stats")
@@ -29,25 +30,85 @@ class HistoryRow(TypedDict, total=False):
     opponent: str
 
 
-@tool
-def get_team_roster(team_id: str) -> TeamRoster:
-    """Load a team's roster from DynamoDB (fantasy-football-team-roster).
+def load_team_roster(team_id: str) -> TeamRoster:
+    """Load a team's roster from DynamoDB at runtime (not as a tool).
+    
     Args:
         team_id: the partition key (e.g., "1")
     Returns:
         TeamRoster with list of players
     """
     table = DDB.Table(TABLE_ROSTER)
-    # Primary key is team_id in the example
-    resp = table.get_item(Key={"team_id": team_id})
-    item = resp.get("Item") or {}
-    # Ensure shape
-    players = item.get("players") or []
-    return TeamRoster(
-        team_id=item.get("team_id", team_id),
-        team_name=item.get("team_name", "My Team"),
-        players=players,
-    )
+    
+    try:
+        resp = table.get_item(Key={"team_id": team_id})
+        item = resp.get("Item") or {}
+        
+        # Ensure proper shape
+        players = item.get("players") or []
+        
+        return TeamRoster(
+            team_id=item.get("team_id", team_id),
+            team_name=item.get("team_name", "My Team"),
+            players=players,
+        )
+    except Exception as e:
+        # Return empty roster on error to prevent lambda failure
+        print(f"Error loading roster for team {team_id}: {str(e)}")
+        return TeamRoster(
+            team_id=team_id,
+            team_name="My Team",
+            players=[],
+        )
+
+def format_roster_for_agent(roster: TeamRoster) -> str:
+    """Format roster data as a clean string for the agent prompt."""
+    if not roster.get("players"):
+        return f"Team {roster['team_id']} has no players in roster."
+    
+    formatted = f"Team: {roster.get('team_name', 'My Team')} (ID: {roster['team_id']})\n"
+    formatted += f"Total Players: {len(roster['players'])}\n"
+    formatted += "*** USE THESE TEAM AFFILIATIONS (2025 CURRENT SEASON) ***\n\n"
+    
+    # Group by position for cleaner display
+    by_position = {}
+    for player in roster["players"]:
+        pos = player.get("position", "UNKNOWN")
+        if pos not in by_position:
+            by_position[pos] = []
+        by_position[pos].append(player)
+    
+    # Display by position
+    position_order = ["QB", "RB", "WR", "TE", "K", "DST"]  # Common fantasy positions
+    
+    for pos in position_order:
+        if pos in by_position:
+            formatted += f"{pos}:\n"
+            for player in by_position[pos]:
+                status = player.get("status", "")
+                team = player.get("team", "")
+                status_str = f" ({status})" if status and status != "active" else ""
+                team_str = f" - {team}" if team else ""
+                formatted += f"  • {player.get('name', 'Unknown')}{team_str}{status_str}\n"
+            formatted += "\n"
+    
+    # Add any remaining positions
+    for pos, players in by_position.items():
+        if pos not in position_order:
+            formatted += f"{pos}:\n"
+            for player in players:
+                team = player.get("team", "")
+                team_str = f" - {team}" if team else ""
+                formatted += f"  • {player.get('name', 'Unknown')}{team_str}\n"
+            formatted += "\n"
+    
+    formatted += "*** END CURRENT ROSTER - These are the correct 2025 team assignments ***\n"
+    
+    return formatted.strip()
+
+def roster_to_json(roster: TeamRoster) -> str:
+    """Convert roster to JSON string for agent context."""
+    return json.dumps(roster, indent=2, default=str)
 
 
 @tool

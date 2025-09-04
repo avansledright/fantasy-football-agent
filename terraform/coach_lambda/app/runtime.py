@@ -1,58 +1,168 @@
 import os
+import json
 from strands import Agent
 from strands.models import BedrockModel
 from app.tools.projections import get_weekly_projections
-from app.tools.dynamo import get_team_roster, get_player_history_2024
-from app.tools.lineup import choose_optimal_lineup
+from app.tools.dynamo import load_team_roster, format_roster_for_agent
+from app.batch_history import load_all_player_histories_batch, format_all_histories_for_agent
+from app.tools.lineup import optimize_lineup_direct
 
-SYSTEM_PROMPT = """\
-You select an optimal fantasy football lineup (PPR by default) for the given team and week.
-Use the registered tools to:
-1) fetch weekly projections by position from FantasyPros,
-2) load the user's current roster from DynamoDB,
-3) enrich each roster player with 2024 history including opponent splits if available,
-4) choose the best starters for the requested lineup slots (QB,RB,RB,WR,WR,TE,FLEX,K,DST by default).
+def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> tuple[Agent, dict]:
+    """Build agent and pre-compute the optimal lineup.
+    
+    Returns:
+        tuple of (agent, precomputed_lineup_result)
+    """
+    
+    print(f"Loading roster for team {team_id}...")
+    roster = load_team_roster(team_id)
+    
+    print(f"Loading history for {len(roster.get('players', []))} players...")
+    player_names = [p.get("name") for p in roster.get("players", []) if p.get("name")]
+    all_histories = load_all_player_histories_batch(player_names)
+    
+    print(f"Fetching weekly projections...")
+    # Get projections using the tool (we need this data anyway)
+    projections_tool_result = get_weekly_projections(week)
+    
+    # Parse projections result
+    try:
+        if isinstance(projections_tool_result, str):
+            projections_data = json.loads(projections_tool_result)
+        else:
+            projections_data = projections_tool_result
+    except Exception as e:
+        print(f"Failed to parse projections: {e}")
+        projections_data = {}
+    
+    print(f"Computing optimal lineup...")
+    # Pre-compute the optimal lineup
+    lineup_result = optimize_lineup_direct(
+        lineup_slots=lineup_slots,
+        roster_players=roster.get("players", []),
+        projections_data=projections_data,
+        histories_data=all_histories
+    )
+    
+    print(f"Lineup computed: {lineup_result.get('debug_info', {})}")
+    
+    # Format all context for agent
+    roster_context = format_roster_for_agent(roster)
+    history_context = format_all_histories_for_agent(all_histories)
+    
+    # Create a summary of the computed lineup
+    lineup_summary = _format_lineup_summary(lineup_result)
+    
+    SYSTEM_PROMPT = f"""You are a fantasy football lineup optimizer for week {week}.
 
-Rules:
-- FLEX may be RB/WR/TE only.
-- OP may be QB/RB/WR/TE.
-- Prefer the player's Week projection; adjust up/down using 2024 opponent split and recent-4 average if available.
-- If two players are close (±0.3 pts), break ties by higher projection, then consistency (lower stdev last 4), then team implied points (if provided).
-- Always return STRICT JSON like:
-{
-  "lineup":[{"slot":"QB","player":"Josh Allen","team":"BUF","position":"QB","projected":22.4,"adjusted":23.1}],
-  "bench":[{"player":"...","position":"WR","projected":...,"adjusted":...}],
-  "explanations":"short rationale text"
-}
+TEAM ROSTER:
+{roster_context}
+
+PLAYER PERFORMANCE DATA:
+{history_context}
+
+COMPUTED OPTIMAL LINEUP:
+{lineup_summary}
+
+Your task is to explain and potentially refine this lineup. The lineup has been pre-computed using projections and historical data.
+
+Return your final recommendation in this EXACT JSON format:
+{{
+  "lineup": [{{"slot":"QB","player":"Josh Allen","team":"BUF","position":"QB","projected":22.4,"adjusted":23.1}}],
+  "bench": [{{"player":"...","position":"WR","projected":...,"adjusted":...}}],
+  "explanations": "Detailed explanation of lineup choices and any adjustments made"
+}}
 """
 
-def build_agent() -> Agent:
-    # Bedrock (Anthropic Claude). Model ID can be overridden via env.
-    # Example Claude 4 Sonnet model id (as commonly shown in Strands docs/blogs).
-    model_id = os.environ.get(
-        "BEDROCK_MODEL_ID",
-        "us.anthropic.claude-sonnet-4-20250514-v1:0",
-    )
-    temperature = float(os.environ.get("MODEL_TEMPERATURE", "0.1"))
-
     bedrock_model = BedrockModel(
-        model_id=model_id,
-        temperature=temperature,
-        streaming=False,
-        # Optional extras:
-        # region_name=os.environ.get("AWS_REGION", "us-west-2"),
-        # cache_prompt="lineup_planner_v1",
+        model_id=os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-haiku-20240620-v1:0"),
+        max_tokens=3000,
+        temperature=0.0,
+        stream=False
     )
 
-    # Build agent with our tools
+    # Minimal agent - most work is done, just need explanation/validation
     agent = Agent(
         model=bedrock_model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[
-            get_weekly_projections,
-            get_team_roster,
-            get_player_history_2024,
-            choose_optimal_lineup,
-        ],
+        tools=[],  # No tools needed - everything is pre-computed
     )
+    
+    return agent, lineup_result
+
+def _format_lineup_summary(lineup_result: dict) -> str:
+    """Format the computed lineup for agent context."""
+    if not lineup_result:
+        return "No lineup computed."
+    
+    summary = "COMPUTED LINEUP:\n"
+    
+    lineup = lineup_result.get("lineup", [])
+    for entry in lineup:
+        slot = entry.get("slot", "")
+        player = entry.get("player", "Empty")
+        if player and player != "Empty":
+            projected = entry.get("projected", 0)
+            adjusted = entry.get("adjusted", 0)
+            team = entry.get("team", "")
+            summary += f"  {slot}: {player} ({team}) - Proj: {projected}, Adj: {adjusted}\n"
+        else:
+            error = entry.get("error", "No player found")
+            summary += f"  {slot}: EMPTY ({error})\n"
+    
+    bench = lineup_result.get("bench", [])[:5]  # Top 5 bench players
+    if bench:
+        summary += "\nTOP BENCH PLAYERS:\n"
+        for player in bench:
+            name = player.get("name", "")
+            pos = player.get("position", "")
+            projected = player.get("projected", 0)
+            adjusted = player.get("adjusted", 0)
+            summary += f"  {name} ({pos}) - Proj: {projected}, Adj: {adjusted}\n"
+    
+    debug = lineup_result.get("debug_info", {})
+    if debug:
+        summary += f"\nDEBUG: {debug.get('lineup_filled', 0)}/{len(lineup)} slots filled, "
+        summary += f"{debug.get('projection_matches', 0)} players with projections\n"
+    
+    return summary
+
+def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
+    """Ultra-fast version that skips the agent entirely and returns pre-computed result.
+    
+    Returns the lineup result directly without LLM processing.
+    """
+    
+    print(f"Ultra-fast mode: Computing lineup without LLM...")
+    
+    roster = load_team_roster(team_id)
+    player_names = [p.get("name") for p in roster.get("players", []) if p.get("name")]
+    all_histories = load_all_player_histories_batch(player_names)
+    
+    projections_tool_result = get_weekly_projections(week)
+    try:
+        projections_data = json.loads(projections_tool_result) if isinstance(projections_tool_result, str) else projections_tool_result
+    except:
+        projections_data = {}
+    
+    lineup_result = optimize_lineup_direct(
+        lineup_slots=lineup_slots,
+        roster_players=roster.get("players", []),
+        projections_data=projections_data,
+        histories_data=all_histories
+    )
+    
+    # Add a simple explanation
+    lineup_result["explanations"] = (
+        f"Lineup optimized using week {week} projections combined with 2024 performance data. "
+        f"Selections based on adjusted scores (70% projection + 20% vs opponent + 10% recent form). "
+        f"Filled {lineup_result.get('debug_info', {}).get('lineup_filled', 0)} slots."
+    )
+    
+    return lineup_result
+
+# Backward compatibility
+def build_agent(team_id: str, week: int) -> Agent:
+    """Backward compatible function that returns just the agent."""
+    agent, _ = build_agent_with_precomputed_lineup(team_id, week, ["QB","RB","RB","WR","WR","TE","FLEX","K","DST"])
     return agent

@@ -112,3 +112,86 @@ def get_weekly_projections(week: int) -> Dict[str, List[ProjectionRow]]:
         except Exception:
             data[pos] = []
     return data
+
+
+@tool  
+def debug_projections(week: int) -> str:
+    """Debug tool to see what projections data looks like."""
+    
+    # Import your actual projections function
+    from app.tools.projections import get_weekly_projections
+    
+    try:
+        result = get_weekly_projections(week)
+        
+        # Parse the result
+        if isinstance(result, str):
+            data = json.loads(result)
+        else:
+            data = result
+            
+        # Check specific players
+        debug_info = {
+            "total_positions": len(data) if isinstance(data, dict) else 0,
+            "positions": list(data.keys()) if isinstance(data, dict) else [],
+            "sample_players": {}
+        }
+        
+        problem_players = ["DK Metcalf", "Sam Darnold", "Saquon Barkley", "Josh Jacobs"]
+        
+        for pos, players in data.items() if isinstance(data, dict) else []:
+            for player in players:
+                name = player.get("name", "")
+                if name in problem_players:
+                    debug_info["sample_players"][name] = {
+                        "position": pos,
+                        "team": player.get("team", ""),
+                        "projected": player.get("projected", 0),
+                        "full_data": player
+                    }
+        
+        return f"Projections Debug for Week {week}:\n{json.dumps(debug_info, indent=2)}"
+        
+    except Exception as e:
+        return f"Debug error: {str(e)}"
+
+# Alternative: Check if your data source is using 2024 data
+def check_data_source_year():
+    """Check if projections are pulling from correct year."""
+    print("🔍 CHECKING DATA SOURCE:")
+    print("1. Is your projections API pulling 2025 data?")
+    print("2. Are you using FantasyPros current week data?") 
+    print("3. Check API endpoint URL for year parameters")
+    print("4. Verify player movement updates in data source")
+
+# Quick fix mapping for immediate use
+QUICK_TEAM_FIXES = {
+    "DK Metcalf": "PIT",
+    "Sam Darnold": "SEA", 
+    "Saquon Barkley": "PHI",
+    "Josh Jacobs": "GB",
+    "Stefon Diggs": "NE",
+    "Keenan Allen": "CHI",
+    "Calvin Ridley": "TEN",
+}
+
+def apply_quick_team_fixes(lineup_data):
+    """Apply quick team fixes to lineup data."""
+    if isinstance(lineup_data, dict):
+        # Fix lineup
+        for player in lineup_data.get("lineup", []):
+            name = player.get("player", "")
+            if name in QUICK_TEAM_FIXES:
+                old_team = player.get("team", "")
+                player["team"] = QUICK_TEAM_FIXES[name]
+                print(f"Fixed {name}: {old_team} → {QUICK_TEAM_FIXES[name]}")
+        
+        # Fix bench
+        for player in lineup_data.get("bench", []):
+            name = player.get("name", player.get("player", ""))
+            if name in QUICK_TEAM_FIXES:
+                old_team = player.get("team", "")
+                player["team"] = QUICK_TEAM_FIXES[name] 
+                print(f"Fixed {name}: {old_team} → {QUICK_TEAM_FIXES[name]}")
+    
+    return lineup_data
