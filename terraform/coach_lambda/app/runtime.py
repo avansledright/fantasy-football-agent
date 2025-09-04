@@ -29,33 +29,11 @@ def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: l
     print(f"Getting weekly team matchups")
     weekly_matchups = get_matchups_by_week(week)
     print(weekly_matchups)
-    # Parse projections result
-    try:
-        if isinstance(projections_tool_result, str):
-            projections_data = json.loads(projections_tool_result)
-        else:
-            projections_data = projections_tool_result
-    except Exception as e:
-        print(f"Failed to parse projections: {e}")
-        projections_data = {}
     
-    print(f"Computing optimal lineup...")
-    # Pre-compute the optimal lineup
-    lineup_result = optimize_lineup_direct(
-        lineup_slots=lineup_slots,
-        roster_players=roster.get("players", []),
-        projections_data=projections_data,
-        histories_data=all_histories
-    )
-    
-    print(f"Lineup computed: {lineup_result.get('debug_info', {})}")
     
     # Format all context for agent
     roster_context = format_roster_for_agent(roster)
     history_context = format_all_histories_for_agent(all_histories)
-    
-    # Create a summary of the computed lineup
-    lineup_summary = _format_lineup_summary(lineup_result)
     
     SYSTEM_PROMPT = f"""You are a fantasy football lineup optimizer for week {week}.
 
