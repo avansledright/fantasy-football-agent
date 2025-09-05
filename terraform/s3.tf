@@ -71,3 +71,27 @@ resource "aws_s3_object" "app_js" {
   content_type = "application/javascript"
   etag         = md5(local.templated_app_js)
 }
+
+resource "null_resource" "invalidate_cloudfront" {
+  depends_on = [
+    aws_s3_object.index_html,
+    aws_s3_object.styles_css,
+    aws_s3_object.app_js
+  ]
+
+  triggers = {
+    index_etag = aws_s3_object.index_html.etag
+    css_etag   = aws_s3_object.styles_css.etag
+    js_etag    = aws_s3_object.app_js.etag
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws lambda invoke \
+        --function-name ${aws_lambda_function.cloudfront_invalidation.function_name} \
+        --payload '{}' \
+        response.json
+    EOT
+  }
+}
+

@@ -106,11 +106,6 @@ def format_roster_for_agent(roster: TeamRoster) -> str:
     
     return formatted.strip()
 
-def roster_to_json(roster: TeamRoster) -> str:
-    """Convert roster to JSON string for agent context."""
-    return json.dumps(roster, indent=2, default=str)
-
-
 @tool
 def get_player_history_2024(player_name: str, opponent: Optional[str] = None) -> Dict[str, Any]:
     """Get 2024 historical rows for a player, optionally filtering to an opponent.

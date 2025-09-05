@@ -55,15 +55,21 @@ resource "aws_iam_role_policy" "lambda_policy" {
 # Create Lambda deployment package
 data "archive_file" "stats_scarpe_lambda_zip" {
   type        = "zip"
+  source_dir  = "${path.module}/stat_scraper_lambda"
   output_path = "fantasy_stats_scraper.zip"
-  
-  source {
-    content = templatefile("${path.module}/stat_scraper_lambda/lambda_function.py", {
-      table_name = "${aws_dynamodb_table.season_stats_2025.name}"
-    })
-    filename = "lambda_function.py"
-  }
 }
+
+# data "archive_file" "stats_scarpe_lambda_zip" {
+#   type        = "zip"
+#   output_path = "fantasy_stats_scraper.zip"
+  
+#   source {
+#     content = templatefile("${path.module}/stat_scraper_lambda/lambda_function.py", {
+#       table_name = "${aws_dynamodb_table.season_stats_2025.name}"
+#     })
+#     filename = "lambda_function.py"
+#   }
+# }
 
 
 # CloudWatch Log Group for Lambda

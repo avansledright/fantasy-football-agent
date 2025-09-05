@@ -53,18 +53,6 @@ def correct_player_team(player_name: str, current_team: str) -> str:
     # Return original if no correction needed
     return current_team
 
-def get_current_team_for_player(player_name: str) -> str:
-    """
-    Get the current team for a player (2025 season).
-    
-    Args:
-        player_name: Player's full name
-        
-    Returns:
-        Current team abbreviation or empty string if unknown
-    """
-    return TEAM_CORRECTIONS.get(player_name, "")
-
 def validate_team_data(lineup_data: dict) -> dict:
     """
     Validate and correct team data in lineup response.
@@ -121,11 +109,3 @@ MAJOR_2025_MOVES = {
     "Calvin Ridley": "Signed with TEN as free agent",
     "Amari Cooper": "retired. No longer playing"
 }
-
-def print_major_moves():
-    """Print major 2025 offseason moves for reference."""
-    print("🔄 Major 2025 NFL Player Moves:")
-    print("=" * 40)
-    for player, move in MAJOR_2025_MOVES.items():
-        print(f"  {player}: {move}")
-    print("=" * 40)

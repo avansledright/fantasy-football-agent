@@ -100,7 +100,7 @@ variable "stats_table_2025" {
 }
 
 variable "lambda_function_name" {
-  description = "Name of the Lambda function"
+  description = "Name of the Stats Scraper Lambda function"
   type        = string
   default     = "fantasy-football-stats-scraper"
 }

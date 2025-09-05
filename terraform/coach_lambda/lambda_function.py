@@ -66,21 +66,14 @@ def lambda_handler(event, context):
         logger.info(f"Agent prompt: {prompt}")
 
         try:
-            # Option 1: Ultra-fast mode (no LLM, direct computation)
-            if os.environ.get("ULTRA_FAST_MODE", "false").lower() == "true":
-                logger.info("Using ultra-fast mode (no LLM)")
-                result = build_agent_ultra_fast(team_id, week, req["lineup_slots"])
-                logger.info("Ultra-fast computation completed")
-            else:
-                # Option 2: Pre-computed + LLM explanation
-                agent = build_agent_with_precomputed_lineup(team_id, week, req["lineup_slots"])
-                logger.info("Agent built successfully with pre-computed lineup")
-                
-                result = agent(
-                    f"Review and explain the computed lineup for week {week}. "
-                    "Make any necessary adjustments and return the final lineup in the required JSON format."
-                )
-                logger.info("Agent execution completed")
+            agent = build_agent_with_precomputed_lineup(team_id, week, req["lineup_slots"])
+            logger.info("Agent built successfully with pre-computed lineup")
+            
+            result = agent(
+                f"Review and explain the computed lineup for week {week}. "
+                "Make any necessary adjustments and return the final lineup in the required JSON format."
+            )
+            logger.info("Agent execution completed")
         except Exception as e:
             logger.error(f"Agent execution failed: {str(e)}")
             logger.error(f"Agent execution traceback: {traceback.format_exc()}")
