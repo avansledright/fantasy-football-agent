@@ -93,3 +93,14 @@ variable "cache_ttl_api_responses" {
   type        = number
   default     = 0  # No API caching to ensure data freshness
 }
+
+variable "stats_table_2025" {
+  description = "name of the 2025 stats table"
+  default = "fantasy-football-2025-stats"
+}
+
+variable "lambda_function_name" {
+  description = "Name of the Lambda function"
+  type        = string
+  default     = "fantasy-football-stats-scraper"
+}
