@@ -58,9 +58,7 @@ resource "aws_lambda_layer_version" "python_dependencies" {
 }
 
 resource "aws_lambda_function" "draft_agent" {
-  s3_bucket         = aws_s3_bucket.lambda_artifacts.id
-  s3_key            = aws_s3_object.lambda_package.key
-  s3_object_version = aws_s3_object.lambda_package.version_id
+  filename = data.archive_file.lambda_zip.output_path
   function_name     = var.agent_name
   role              = aws_iam_role.lambda_role.arn
   handler           = "lambda_function.lambda_handler"
@@ -86,6 +84,6 @@ resource "aws_lambda_function" "draft_agent" {
   depends_on = [
     aws_iam_role_policy_attachment.lambda_basic,
     aws_iam_role_policy_attachment.bedrock_access,
-    aws_s3_object.lambda_package
+    data.archive_file.lambda_zip
   ]
 }

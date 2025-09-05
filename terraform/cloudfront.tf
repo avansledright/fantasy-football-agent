@@ -139,8 +139,6 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
   # SSL Certificate
   viewer_certificate {
     cloudfront_default_certificate = true
-    ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
 
@@ -239,7 +237,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront_logs" 
   }
 }
 
-# Update S3 bucket policy to allow CloudFront OAC access
 resource "aws_s3_bucket_policy" "fantasy_football_web_cloudfront" {
   bucket = aws_s3_bucket.fantasy_football_web.id
 
@@ -247,7 +244,7 @@ resource "aws_s3_bucket_policy" "fantasy_football_web_cloudfront" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudFrontServicePrincipal"
+        Sid    = "PublicReadGetObject"
         Effect = "Allow"
         Principal = {
           Service = "cloudfront.amazonaws.com"

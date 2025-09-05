@@ -62,11 +62,8 @@ resource "aws_lambda_function" "coach" {
   runtime           = "python3.12"
   timeout           = 900
   memory_size       = 512
-  s3_bucket         = aws_s3_bucket.lambda_artifacts.id
-  s3_key            = aws_s3_object.coach_lambda_package.key
-  s3_object_version = aws_s3_object.coach_lambda_package.version_id
   architectures     = ["arm64"]
-
+  filename = data.archive_file.coach_lambda_zip.output_path
   source_code_hash = data.archive_file.coach_lambda_zip.output_base64sha256
   layers = [
     aws_lambda_layer_version.python_dependencies.arn
@@ -82,8 +79,7 @@ resource "aws_lambda_function" "coach" {
     }
   }
 
-  depends_on = [aws_iam_role_policy_attachment.coach_lambda_extra_attach,
-  aws_s3_object.coach_lambda_package]
+  depends_on = [aws_iam_role_policy_attachment.coach_lambda_extra_attach, data.archive_file.coach_lambda_zip]
 }
 
 resource "aws_lambda_permission" "apigw_coach" {
