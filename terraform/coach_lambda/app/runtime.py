@@ -75,7 +75,7 @@ Return your final recommendation in this EXACT JSON format:
         tools=[],  # No tools needed - everything is pre-computed
     )
     
-    return agent, lineup_result
+    return agent
 
 def _format_lineup_summary(lineup_result: dict) -> str:
     """Format the computed lineup for agent context."""
@@ -151,5 +151,5 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
 # Backward compatibility
 def build_agent(team_id: str, week: int, lineup_slots) -> Agent:
     """Backward compatible function that returns just the agent."""
-    agent, _ = build_agent_with_precomputed_lineup(team_id, week, lineup_slots)
+    agent = build_agent_with_precomputed_lineup(team_id, week, lineup_slots)
     return agent

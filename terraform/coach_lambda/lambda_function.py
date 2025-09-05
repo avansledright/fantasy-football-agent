@@ -73,7 +73,7 @@ def lambda_handler(event, context):
                 logger.info("Ultra-fast computation completed")
             else:
                 # Option 2: Pre-computed + LLM explanation
-                agent, precomputed_result = build_agent_with_precomputed_lineup(team_id, week, req["lineup_slots"])
+                agent = build_agent_with_precomputed_lineup(team_id, week, req["lineup_slots"])
                 logger.info("Agent built successfully with pre-computed lineup")
                 
                 result = agent(
