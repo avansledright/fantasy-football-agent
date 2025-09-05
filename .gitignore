@@ -1,3 +1,5 @@
+*.log
+
 # -----------------------------
 # Python
 # -----------------------------
@@ -79,6 +81,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+.terraform.lock.hcl
 
 # -----------------------------
 # Other
@@ -92,3 +95,4 @@ terraform.rc
 .DS_Store
 Thumbs.db
 *.zip
+application/draft_session.json

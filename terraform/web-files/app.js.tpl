@@ -5,6 +5,20 @@ const API_CONFIG = {
     COACH_ENDPOINT: "/coach"
 };
 
+// Starting lineup configuration
+const LINEUP_SLOTS = [
+    { position: "QB", slot: "QB", maxCount: 1 },
+    { position: "RB", slot: "RB1", maxCount: 1 },
+    { position: "RB", slot: "RB2", maxCount: 1 },
+    { position: "WR", slot: "WR1", maxCount: 1 },
+    { position: "WR", slot: "WR2", maxCount: 1 },
+    { position: "TE", slot: "TE", maxCount: 1 },
+    { position: "FLEX", slot: "FLEX", maxCount: 1 }, // RB/WR/TE eligible
+    { position: "OP", slot: "OP", maxCount: 1 }, // Offensive Player (QB/RB/WR/TE)
+    { position: "K", slot: "K", maxCount: 1 },
+    { position: "DST", slot: "DST", maxCount: 1 }
+];
+
 // Global state
 let currentTeam = null;
 let isEditing = false;
@@ -29,6 +43,7 @@ const elements = {
     playerPosition: document.getElementById("playerPosition"),
     playerTeam: document.getElementById("playerTeam"),
     playerStatus: document.getElementById("playerStatus"),
+    playerSlot: document.getElementById("playerSlot"),
     savePlayer: document.getElementById("savePlayer"),
     cancelEdit: document.getElementById("cancelEdit"),
     removePlayer: document.getElementById("removePlayer"),
@@ -226,34 +241,157 @@ function displayRoster(players) {
         return;
     }
     
-    // Sort players by position and status
-    const sortedPlayers = [...players].sort((a, b) => {
-        const positionOrder = { "QB": 1, "RB": 2, "WR": 3, "TE": 4, "K": 5, "DST": 6 };
-        const statusOrder = { "starter": 1, "bench": 2 };
-        
-        if (a.status !== b.status) {
-            return statusOrder[a.status] - statusOrder[b.status];
-        }
-        return positionOrder[a.position] - positionOrder[b.position];
-    });
+    // Organize players by their assigned slots
+    const organizedRoster = organizePlayersIntoLineup(players);
     
     const rosterHTML = `
-        <div class="roster-list">
-            ${sortedPlayers.map((player, index) => `
-                <div class="player-card ${player.status}" onclick="editPlayer(${index})" data-index="${index}">
-                    <div class="player-info">
-                        <div class="player-name">${player.name}</div>
-                        <div class="player-details">
-                            ${player.team} • ${player.position} • ${player.status}
-                        </div>
-                    </div>
-                    <div class="position-badge">${player.position}</div>
+        <div class="lineup-container">
+            <div class="starting-lineup">
+                <h3><i class="fas fa-star"></i> Starting Lineup</h3>
+                <div class="lineup-slots">
+                    ${LINEUP_SLOTS.map(slot => generateSlotHTML(slot, organizedRoster.starters[slot.slot])).join("")}
                 </div>
-            `).join("")}
+            </div>
+            
+            <div class="bench-players">
+                <h3><i class="fas fa-users"></i> Bench Players</h3>
+                <div class="bench-list">
+                    ${organizedRoster.bench.map((player, index) => `
+                        <div class="player-card bench" onclick="editPlayer(${players.indexOf(player)})" data-index="${players.indexOf(player)}">
+                            <div class="player-info">
+                                <div class="player-name">${player.name}</div>
+                                <div class="player-details">
+                                    ${player.team} • ${player.position}
+                                </div>
+                            </div>
+                            <div class="position-badge">${player.position}</div>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
         </div>
     `;
     
     elements.rosterList.innerHTML = rosterHTML;
+}
+
+function organizePlayersIntoLineup(players) {
+    const starters = {};
+    const bench = [];
+    
+    // Initialize empty slots
+    LINEUP_SLOTS.forEach(slot => {
+        starters[slot.slot] = null;
+    });
+    
+    // Sort players by status and position priority
+    const sortedPlayers = [...players].sort((a, b) => {
+        if (a.status !== b.status) {
+            return a.status === "starter" ? -1 : 1;
+        }
+        return 0;
+    });
+    
+    // Place players in lineup slots
+    for (const player of sortedPlayers) {
+        if (player.status === "starter") {
+            // If player has a specific slot assigned, use it
+            if (player.slot && starters[player.slot] === null) {
+                starters[player.slot] = player;
+                continue;
+            }
+            
+            // Auto-assign to appropriate slot
+            const assignedSlot = findAvailableSlot(player, starters);
+            if (assignedSlot) {
+                starters[assignedSlot] = player;
+                // Update player's slot assignment
+                player.slot = assignedSlot;
+            } else {
+                // No available starter slot, move to bench
+                player.status = "bench";
+                bench.push(player);
+            }
+        } else {
+            bench.push(player);
+        }
+    }
+    
+    return { starters, bench };
+}
+
+function findAvailableSlot(player, starters) {
+    // First, try to find exact position match
+    for (const slot of LINEUP_SLOTS) {
+        if (starters[slot.slot] === null && isPlayerEligibleForSlot(player, slot)) {
+            return slot.slot;
+        }
+    }
+    return null;
+}
+
+function isPlayerEligibleForSlot(player, slot) {
+    const position = player.position;
+    
+    switch (slot.position) {
+        case "QB":
+            return position === "QB";
+        case "RB":
+            return position === "RB";
+        case "WR":
+            return position === "WR";
+        case "TE":
+            return position === "TE";
+        case "K":
+            return position === "K";
+        case "DST":
+            return position === "DST";
+        case "FLEX":
+            return ["RB", "WR", "TE"].includes(position);
+        case "OP":
+            return ["QB", "RB", "WR", "TE"].includes(position);
+        default:
+            return false;
+    }
+}
+
+function generateSlotHTML(slot, player) {
+    const playerId = player ? currentTeam.players.indexOf(player) : -1;
+    
+    return `
+        <div class="lineup-slot ${player ? 'filled' : 'empty'}" 
+             data-slot="${slot.slot}" 
+             ${player ? `onclick="editPlayer(${playerId})" data-index="${playerId}"` : `onclick="addPlayerToSlot('${slot.slot}')"`}>
+            <div class="slot-header">
+                <span class="slot-name">${slot.slot}</span>
+                <span class="slot-position">${getSlotDescription(slot.position)}</span>
+            </div>
+            <div class="slot-content">
+                ${player ? `
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-details">
+                            ${player.team} • ${player.position}
+                        </div>
+                    </div>
+                    <div class="position-badge">${player.position}</div>
+                ` : `
+                    <div class="empty-slot">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Player</span>
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+function getSlotDescription(position) {
+    switch (position) {
+        case "FLEX": return "RB/WR/TE";
+        case "OP": return "QB/RB/WR/TE";
+        default: return position;
+    }
 }
 
 function displayAnalysis(analysisData) {
@@ -320,7 +458,7 @@ function toggleEditMode() {
         '<i class="fas fa-times"></i> Cancel Edit' : 
         '<i class="fas fa-edit"></i> Edit Roster';
     
-    const playerCards = document.querySelectorAll(".player-card");
+    const playerCards = document.querySelectorAll(".player-card, .lineup-slot");
     playerCards.forEach(card => {
         card.style.cursor = isEditing ? "pointer" : "default";
     });
@@ -342,10 +480,23 @@ function editPlayer(index) {
     elements.playerTeam.value = player.team;
     elements.playerStatus.value = player.status;
     
+    // Update slot dropdown with available options
+    updateSlotDropdown(player);
+    elements.playerSlot.value = player.slot || "";
+    
     showEditForm();
 }
 
-function addNewPlayer() {
+function addPlayerToSlot(slotName) {
+    if (!isEditing) {
+        showToast("Enable edit mode first", "warning");
+        return;
+    }
+    
+    addNewPlayer(slotName);
+}
+
+function addNewPlayer(targetSlot = null) {
     if (!isEditing) {
         showToast("Enable edit mode first", "warning");
         return;
@@ -366,9 +517,28 @@ function addNewPlayer() {
     elements.playerName.value = "";
     elements.playerPosition.value = "QB";
     elements.playerTeam.value = "";
-    elements.playerStatus.value = "bench";
+    elements.playerStatus.value = targetSlot ? "starter" : "bench";
+    
+    // Update slot dropdown and set target slot if specified
+    updateSlotDropdown({ position: "QB" });
+    elements.playerSlot.value = targetSlot || "";
     
     showEditForm();
+}
+
+function updateSlotDropdown(player) {
+    const slotSelect = elements.playerSlot;
+    slotSelect.innerHTML = '<option value="">Select Slot (optional)</option>';
+    
+    // Add bench option
+    slotSelect.innerHTML += '<option value="bench">Bench</option>';
+    
+    // Add available starter slots based on player position
+    LINEUP_SLOTS.forEach(slot => {
+        if (isPlayerEligibleForSlot(player, slot)) {
+            slotSelect.innerHTML += `<option value="${slot.slot}">${slot.slot} (${getSlotDescription(slot.position)})</option>`;
+        }
+    });
 }
 
 function savePlayer() {
@@ -378,8 +548,17 @@ function savePlayer() {
         position: elements.playerPosition.value,
         team: elements.playerTeam.value.trim().toUpperCase(),
         status: elements.playerStatus.value,
+        slot: elements.playerSlot.value === "bench" ? null : elements.playerSlot.value,
         player_id: generatePlayerId(elements.playerName.value, elements.playerPosition.value)
     };
+    
+    // Adjust status based on slot selection
+    if (playerData.slot && playerData.slot !== "bench") {
+        playerData.status = "starter";
+    } else if (playerData.slot === "bench" || !playerData.slot) {
+        playerData.status = "bench";
+        playerData.slot = null;
+    }
     
     if (!playerData.name || !playerData.team) {
         showToast("Player name and team are required", "error");

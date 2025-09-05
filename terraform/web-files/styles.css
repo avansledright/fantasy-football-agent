@@ -206,8 +206,123 @@ body {
     margin-bottom: 5px;
 }
 
-/* Roster List */
-.roster-list {
+/* Lineup Container */
+.lineup-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Starting Lineup */
+.starting-lineup h3 {
+    color: #1e3c72;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lineup-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.lineup-slot {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 120px;
+}
+
+.lineup-slot.filled {
+    background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+    border-color: #4caf50;
+}
+
+.lineup-slot.empty {
+    background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%);
+    border-color: #ff9800;
+    border-style: dashed;
+}
+
+.lineup-slot:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.lineup-slot.filled:hover {
+    border-color: #2e7d32;
+    background: linear-gradient(135deg, #e0f2e0 0%, #e8f5e8 100%);
+}
+
+.lineup-slot.empty:hover {
+    border-color: #f57c00;
+    background: linear-gradient(135deg, #fff8e1 0%, #fce4ec 100%);
+}
+
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.slot-name {
+    font-weight: 700;
+    color: #1e3c72;
+    font-size: 1.1rem;
+}
+
+.slot-position {
+    background: #2a5298;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.slot-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 60px;
+}
+
+.empty-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-weight: 500;
+    width: 100%;
+    gap: 8px;
+}
+
+.empty-slot i {
+    font-size: 1.5rem;
+    color: #ff9800;
+}
+
+/* Bench Players */
+.bench-players h3 {
+    color: #1e3c72;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bench-list {
     display: grid;
     gap: 15px;
 }
@@ -228,10 +343,6 @@ body {
     border-color: #2a5298;
     background: #e3f2fd;
     transform: translateX(5px);
-}
-
-.player-card.starter {
-    border-left: 4px solid #28a745;
 }
 
 .player-card.bench {
@@ -374,12 +485,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
-}
-
-.slot-name {
-    font-weight: 700;
-    color: #1e3c72;
-    font-size: 0.9rem;
 }
 
 .lineup-player-name {
@@ -525,6 +630,10 @@ body {
     .roster-panel, .analysis-panel {
         grid-column: 1;
     }
+    
+    .lineup-slots {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
@@ -563,6 +672,10 @@ body {
     .roster-actions {
         justify-content: center;
     }
+    
+    .lineup-slots {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -578,5 +691,10 @@ body {
     
     .bench-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .slot-content {
+        flex-direction: column;
+        gap: 10px;
     }
 }

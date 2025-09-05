@@ -52,7 +52,7 @@
                         </div>
                         <div class="form-group">
                             <label for="playerPosition">Position:</label>
-                            <select id="playerPosition" class="form-control">
+                            <select id="playerPosition" class="form-control" onchange="updateSlotDropdown({position: this.value})">
                                 <option value="QB">QB</option>
                                 <option value="RB">RB</option>
                                 <option value="WR">WR</option>
@@ -70,6 +70,12 @@
                             <select id="playerStatus" class="form-control">
                                 <option value="starter">Starter</option>
                                 <option value="bench">Bench</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerSlot">Lineup Slot:</label>
+                            <select id="playerSlot" class="form-control">
+                                <option value="">Select Slot (optional)</option>
                             </select>
                         </div>
                         <div class="form-actions">
