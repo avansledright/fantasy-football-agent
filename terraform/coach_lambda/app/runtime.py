@@ -4,8 +4,10 @@ from strands import Agent
 from strands.models import BedrockModel
 from app.tools.projections import get_roster_projections
 from app.tools.dynamo import load_team_roster, format_roster_for_agent
+from app.tools.stats import get_previous_week_stats, get_player_recent_trends, get_position_leaders_by_week
 from app.batch_history import load_all_player_histories_batch, format_all_histories_for_agent
 from app.tools.lineup import optimize_lineup_direct
+from app.tools.stats_tools_wrapper import create_context_aware_stats_tools
 from app.utils.nfl_schedule import get_matchups_by_week
 
 def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> tuple[Agent, dict]:
@@ -50,7 +52,15 @@ This is shown as AWAY: Home. Example DET: GB is Detroit at Green Bay or Detroit 
 
 PROJECTIONS:
 {projections_tool_result}
-Your task is to identify the optimal lineup using the given team roster, the team matchups and player performance data as well as projection data for 2025.
+
+You have access to additional tools for analyzing 2025 season stats:
+- get_previous_week_stats: Get actual performance data from previous weeks in 2025
+- get_player_recent_trends: Analyze recent performance trends for specific players
+- get_position_leaders_by_week: See top performers by position for any week
+
+Use these tools to gather additional context about player performance and trends before making your final lineup recommendations.
+
+Your task is to identify the optimal lineup using the given team roster, the team matchups, player performance data, and current 2025 season stats.
 
 The roster should consist of EXACTLY these positions:
 {lineup_slots}
@@ -71,11 +81,26 @@ Return your final recommendation in this EXACT JSON format:
         stream=False
     )
 
-    # Minimal agent - most work is done, just need explanation/validation
+    # Create context-aware stats tools with the current week
+    (
+        get_previous_week_stats,
+        get_player_recent_trends,
+        get_position_leaders_by_week,
+        get_week_schedule_and_completion_status,
+        get_optimal_analysis_week
+    ) = create_context_aware_stats_tools(week)
+    
+    # Include the context-aware stats tools
     agent = Agent(
         model=bedrock_model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[],  # No tools needed - everything is pre-computed
+        tools=[
+            get_previous_week_stats,
+            get_player_recent_trends, 
+            get_position_leaders_by_week,
+            get_week_schedule_and_completion_status,
+            get_optimal_analysis_week
+        ],
     )
     
     return agent
@@ -114,7 +139,7 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
     
     return lineup_result
 
-# Backward compatibility
+# Backward compatibility  
 def build_agent(team_id: str, week: int, lineup_slots) -> Agent:
     """Backward compatible function that returns just the agent."""
     agent = build_agent_with_precomputed_lineup(team_id, week, lineup_slots)

@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
           "dynamodb:Scan",
           "dynamodb:Query"
         ]
-        Resource = "${aws_dynamodb_table.fantasy_football_team_roster.arn}"
+        Resource = ["${aws_dynamodb_table.fantasy_football_team_roster.arn}", "${aws_dynamodb_table.season_stats_2025.arn}"]
       },
       {
         Effect = "Allow"
@@ -70,6 +70,7 @@ resource "aws_lambda_function" "roster_management" {
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.fantasy_football_team_roster.name
+      PLAYER_STATS_TABLE = aws_dynamodb_table.season_stats_2025.name
     }
   }
 }

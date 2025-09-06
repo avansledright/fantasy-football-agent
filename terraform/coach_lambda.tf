@@ -76,6 +76,7 @@ resource "aws_lambda_function" "coach" {
       DEFAULT_TEAM_ID  = "1"
       SCORING          = "PPR"
       LINEUP_SLOTS     = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"
+      DDB_TABLE_STATS_2025 = aws_dynamodb_table.season_stats_2025.name
     }
   }
 

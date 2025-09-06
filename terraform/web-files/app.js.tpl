@@ -36,7 +36,6 @@ const elements = {
     analysisResult: document.getElementById("analysisResult"),
     loadingOverlay: document.getElementById("loadingOverlay"),
     toastContainer: document.getElementById("toastContainer"),
-    
     // Form elements
     editPlayerIndex: document.getElementById("editPlayerIndex"),
     playerName: document.getElementById("playerName"),
@@ -52,13 +51,9 @@ const elements = {
 };
 
 // Event Listeners
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     initializeEventListeners();
-    
-    // Debug: Log the API endpoint for verification
     console.log("API Configuration loaded:", API_CONFIG);
-    
-    // Load team if teamId is already filled
     if (elements.teamId.value) {
         loadTeamData();
     }
@@ -73,18 +68,21 @@ function initializeEventListeners() {
     elements.removePlayer.addEventListener("click", removePlayer);
     elements.addPlayer.addEventListener("click", addNewPlayer);
     elements.saveRoster.addEventListener("click", saveRosterChanges);
-    
-    // Allow Enter key to load team
-    elements.teamId.addEventListener("keypress", function(e) {
+    elements.teamId.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
             loadTeamData();
         }
     });
-    
-    // Allow Enter key to generate analysis
-    elements.weekNumber.addEventListener("keypress", function(e) {
+    elements.weekNumber.addEventListener("keypress", function (e) {
         if (e.key === "Enter") {
             generateWeeklyAnalysis();
+        }
+    });
+    
+    // Auto-reload roster when week number changes (if team is loaded)
+    elements.weekNumber.addEventListener("change", function () {
+        if (currentTeam && elements.teamId.value.trim()) {
+            loadTeamData();
         }
     });
 }
@@ -92,36 +90,61 @@ function initializeEventListeners() {
 // API Functions
 async function loadTeamData() {
     const teamId = elements.teamId.value.trim();
+    const week = elements.weekNumber.value.trim();
+    
     if (!teamId) {
         showToast("Please enter a team ID", "error");
+        return;
+    }
+    
+    // Validate week number if provided
+    if (week && (isNaN(week) || week < 1 || week > 18)) {
+        showToast("Please enter a valid week number (1-18)", "error");
         return;
     }
     
     showLoading(true);
     
     try {
-        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.TEAMS_ENDPOINT}?team_id=${encodeURIComponent(teamId)}`);
+        // Build query parameters
+        let queryParams = `team_id=${encodeURIComponent(teamId)}`;
+        if (week) {
+            queryParams += `&week=${encodeURIComponent(week)}`;
+        }
+        
+        const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.TEAMS_ENDPOINT}?${queryParams}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
         
         if (!response.ok) {
             if (response.status === 404) {
-                throw new Error("Team not found");
+                throw new Error('Team not found');
             }
-            throw new Error(`Failed to load team data: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const teamData = await response.json();
         currentTeam = teamData;
         
-        displayTeamInfo(teamData);
+        displayTeamDetails(teamData);
         displayRoster(teamData.players || []);
-        showToast("Team loaded successfully", "success");
+        
+        const message = week ? 
+            `Team loaded successfully with Week ${week} stats` : 
+            "Team loaded successfully";
+        showToast(message, "success");
         
     } catch (error) {
-        console.error("Error loading team:", error);
-        showToast(error.message, "error");
-        currentTeam = null;
-        elements.teamDetails.innerHTML = "<p>Failed to load team data</p>";
+        console.error('Error loading team data:', error);
+        showToast(`Error loading team: ${error.message}`, "error");
+        
+        // Clear displays on error
+        elements.teamDetails.innerHTML = "<p>Failed to load team details</p>";
         elements.rosterList.innerHTML = "<p>Failed to load roster</p>";
+        currentTeam = null;
     } finally {
         showLoading(false);
     }
@@ -129,15 +152,20 @@ async function loadTeamData() {
 
 async function generateWeeklyAnalysis() {
     const teamId = elements.teamId.value.trim();
-    const week = elements.weekNumber.value;
+    const week = elements.weekNumber.value.trim();
     
     if (!teamId) {
-        showToast("Please load a team first", "error");
+        showToast("Please enter a team ID", "error");
         return;
     }
     
     if (!week || week < 1 || week > 18) {
         showToast("Please enter a valid week number (1-18)", "error");
+        return;
+    }
+    
+    if (!currentTeam || !currentTeam.players || currentTeam.players.length === 0) {
+        showToast("Please load a team first", "warning");
         return;
     }
     
@@ -147,16 +175,17 @@ async function generateWeeklyAnalysis() {
         const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.COACH_ENDPOINT}?team_id=${encodeURIComponent(teamId)}&week=${week}`);
         
         if (!response.ok) {
-            throw new Error(`Failed to generate analysis: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const analysisData = await response.json();
         displayAnalysis(analysisData);
+        
         showToast("Analysis generated successfully", "success");
         
     } catch (error) {
-        console.error("Error generating analysis:", error);
-        showToast(error.message, "error");
+        console.error('Error generating analysis:', error);
+        showToast(`Error generating analysis: ${error.message}`, "error");
         elements.analysisResult.innerHTML = "<p>Failed to generate analysis</p>";
     } finally {
         showLoading(false);
@@ -165,7 +194,13 @@ async function generateWeeklyAnalysis() {
 
 async function saveRosterChanges() {
     if (!currentTeam) {
-        showToast("No team loaded", "error");
+        showToast("No team data to save", "warning");
+        return;
+    }
+    
+    const teamId = elements.teamId.value.trim();
+    if (!teamId) {
+        showToast("Please enter a team ID", "error");
         return;
     }
     
@@ -173,64 +208,82 @@ async function saveRosterChanges() {
     
     try {
         const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.TEAMS_ENDPOINT}`, {
-            method: "PUT",
+            method: 'PUT',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(currentTeam)
+            body: JSON.stringify({
+                team_id: teamId,
+                players: currentTeam.players || [],
+                league_id: currentTeam.league_id,
+                owner: currentTeam.owner
+            })
         });
         
         if (!response.ok) {
-            throw new Error(`Failed to save roster: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
+        const result = await response.json();
         showToast("Roster saved successfully", "success");
-        toggleEditMode(); // Exit edit mode
         
     } catch (error) {
-        console.error("Error saving roster:", error);
-        showToast(error.message, "error");
+        console.error('Error saving roster:', error);
+        showToast(`Error saving roster: ${error.message}`, "error");
     } finally {
         showLoading(false);
     }
 }
 
 // Display Functions
-function displayTeamInfo(teamData) {
+function displayTeamDetails(teamData) {
+    if (!teamData) {
+        elements.teamDetails.innerHTML = "<p>No team data available</p>";
+        return;
+    }
+    
     const playerCount = teamData.players ? teamData.players.length : 0;
-    const starters = teamData.players ? teamData.players.filter(p => p.status === "starter").length : 0;
-    const bench = playerCount - starters;
+    const starterCount = teamData.players ? teamData.players.filter(p => p.status === 'starter').length : 0;
+    const benchCount = playerCount - starterCount;
+    
+    // Calculate total team points if final scores are available
+    let totalPoints = 0;
+    let hasScores = false;
+    if (teamData.players) {
+        teamData.players.forEach(player => {
+            if (player.final_score !== undefined && player.status === 'starter') {
+                totalPoints += player.final_score;
+                hasScores = true;
+            }
+        });
+    }
     
     elements.teamDetails.innerHTML = `
-        <div class="team-details">
-            <div class="detail-item">
-                <strong>Team ID</strong>
-                ${teamData.team_id}
+        <div class="team-summary">
+            <h3>Team ${teamData.team_id}</h3>
+            ${teamData.owner ? `<p><strong>Owner:</strong> ${teamData.owner}</p>` : ''}
+            ${teamData.league_id ? `<p><strong>League:</strong> ${teamData.league_id}</p>` : ''}
+            <div class="team-stats">
+                <div class="stat">
+                    <span class="stat-label">Total Players:</span>
+                    <span class="stat-value">${playerCount}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Starters:</span>
+                    <span class="stat-value">${starterCount}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Bench:</span>
+                    <span class="stat-value">${benchCount}</span>
+                </div>
+                ${hasScores ? `
+                <div class="stat">
+                    <span class="stat-label">Week Total:</span>
+                    <span class="stat-value">${totalPoints.toFixed(1)} pts</span>
+                </div>
+                ` : ''}
             </div>
-            <div class="detail-item">
-                <strong>Owner</strong>
-                ${teamData.owner || "N/A"}
-            </div>
-            <div class="detail-item">
-                <strong>League ID</strong>
-                ${teamData.league_id || "N/A"}
-            </div>
-            <div class="detail-item">
-                <strong>Total Players</strong>
-                ${playerCount}
-            </div>
-            <div class="detail-item">
-                <strong>Starters</strong>
-                ${starters}
-            </div>
-            <div class="detail-item">
-                <strong>Bench</strong>
-                ${bench}
-            </div>
-            <div class="detail-item">
-                <strong>Last Updated</strong>
-                ${new Date(teamData.last_updated).toLocaleDateString()}
-            </div>
+            ${teamData.last_updated ? `<p class="last-updated">Last updated: ${new Date(teamData.last_updated).toLocaleString()}</p>` : ''}
         </div>
     `;
 }
@@ -241,157 +294,79 @@ function displayRoster(players) {
         return;
     }
     
-    // Organize players by their assigned slots
-    const organizedRoster = organizePlayersIntoLineup(players);
+    // Separate starters and bench players
+    const starters = players.filter(p => p.status === 'starter');
+    const bench = players.filter(p => p.status === 'bench');
     
-    const rosterHTML = `
-        <div class="lineup-container">
-            <div class="starting-lineup">
+    // Create lineup slots display
+    const lineupHTML = LINEUP_SLOTS.map(slot => {
+        const player = starters.find(p => p.slot === slot.slot);
+        const playerInfo = player ? `
+            <div class="player-info">
+                <div class="player-name">${sanitizeHTML(player.name)}</div>
+                <div class="player-details">${sanitizeHTML(player.team)} • ${sanitizeHTML(player.position)}</div>
+                ${player.final_score !== undefined ? 
+                    `<div class="final-score">${formatPoints(player.final_score)} pts</div>` : ''
+                }
+                ${player.opponent ? 
+                    `<div class="opponent">vs ${sanitizeHTML(player.opponent)}</div>` : ''
+                }
+            </div>
+        ` : `
+            <div class="empty-slot" onclick="addPlayerToSlot('${slot.slot}')">
+                <i class="fas fa-plus"></i> Add ${slot.position}
+            </div>
+        `;
+        
+        return `
+            <div class="lineup-slot ${player ? 'filled' : 'empty'}" onclick="${player ? `editPlayer(${players.indexOf(player)})` : ''}">
+                <div class="slot-header">
+                    <span class="slot-name">${slot.slot}</span>
+                    <span class="slot-position">${getSlotDescription(slot.position)}</span>
+                </div>
+                ${playerInfo}
+            </div>
+        `;
+    }).join('');
+    
+    // Create bench players display
+    const benchHTML = bench.map((player, index) => {
+        const playerIndex = players.indexOf(player);
+        return `
+            <div class="player-card bench-player" onclick="editPlayer(${playerIndex})">
+                <div class="player-info">
+                    <div class="player-name">${sanitizeHTML(player.name)}</div>
+                    <div class="player-details">${sanitizeHTML(player.team)} • ${sanitizeHTML(player.position)}</div>
+                    ${player.final_score !== undefined ? 
+                        `<div class="final-score">${formatPoints(player.final_score)} pts</div>` : ''
+                    }
+                    ${player.opponent ? 
+                        `<div class="opponent">vs ${sanitizeHTML(player.opponent)}</div>` : ''
+                    }
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    elements.rosterList.innerHTML = `
+        <div class="roster-display">
+            <div class="lineup-section">
                 <h3><i class="fas fa-star"></i> Starting Lineup</h3>
-                <div class="lineup-slots">
-                    ${LINEUP_SLOTS.map(slot => generateSlotHTML(slot, organizedRoster.starters[slot.slot])).join("")}
+                <div class="lineup-grid">
+                    ${lineupHTML}
                 </div>
             </div>
             
-            <div class="bench-players">
-                <h3><i class="fas fa-users"></i> Bench Players</h3>
-                <div class="bench-list">
-                    ${organizedRoster.bench.map((player, index) => `
-                        <div class="player-card bench" onclick="editPlayer(${players.indexOf(player)})" data-index="${players.indexOf(player)}">
-                            <div class="player-info">
-                                <div class="player-name">${player.name}</div>
-                                <div class="player-details">
-                                    ${player.team} • ${player.position}
-                                </div>
-                            </div>
-                            <div class="position-badge">${player.position}</div>
-                        </div>
-                    `).join("")}
+            ${bench.length > 0 ? `
+                <div class="bench-section">
+                    <h3><i class="fas fa-users"></i> Bench Players</h3>
+                    <div class="bench-grid">
+                        ${benchHTML}
+                    </div>
                 </div>
-            </div>
+            ` : ''}
         </div>
     `;
-    
-    elements.rosterList.innerHTML = rosterHTML;
-}
-
-function organizePlayersIntoLineup(players) {
-    const starters = {};
-    const bench = [];
-    
-    // Initialize empty slots
-    LINEUP_SLOTS.forEach(slot => {
-        starters[slot.slot] = null;
-    });
-    
-    // Sort players by status and position priority
-    const sortedPlayers = [...players].sort((a, b) => {
-        if (a.status !== b.status) {
-            return a.status === "starter" ? -1 : 1;
-        }
-        return 0;
-    });
-    
-    // Place players in lineup slots
-    for (const player of sortedPlayers) {
-        if (player.status === "starter") {
-            // If player has a specific slot assigned, use it
-            if (player.slot && starters[player.slot] === null) {
-                starters[player.slot] = player;
-                continue;
-            }
-            
-            // Auto-assign to appropriate slot
-            const assignedSlot = findAvailableSlot(player, starters);
-            if (assignedSlot) {
-                starters[assignedSlot] = player;
-                // Update player's slot assignment
-                player.slot = assignedSlot;
-            } else {
-                // No available starter slot, move to bench
-                player.status = "bench";
-                bench.push(player);
-            }
-        } else {
-            bench.push(player);
-        }
-    }
-    
-    return { starters, bench };
-}
-
-function findAvailableSlot(player, starters) {
-    // First, try to find exact position match
-    for (const slot of LINEUP_SLOTS) {
-        if (starters[slot.slot] === null && isPlayerEligibleForSlot(player, slot)) {
-            return slot.slot;
-        }
-    }
-    return null;
-}
-
-function isPlayerEligibleForSlot(player, slot) {
-    const position = player.position;
-    
-    switch (slot.position) {
-        case "QB":
-            return position === "QB";
-        case "RB":
-            return position === "RB";
-        case "WR":
-            return position === "WR";
-        case "TE":
-            return position === "TE";
-        case "K":
-            return position === "K";
-        case "DST":
-            return position === "DST";
-        case "FLEX":
-            return ["RB", "WR", "TE"].includes(position);
-        case "OP":
-            return ["QB", "RB", "WR", "TE"].includes(position);
-        default:
-            return false;
-    }
-}
-
-function generateSlotHTML(slot, player) {
-    const playerId = player ? currentTeam.players.indexOf(player) : -1;
-    
-    return `
-        <div class="lineup-slot ${player ? 'filled' : 'empty'}" 
-             data-slot="${slot.slot}" 
-             ${player ? `onclick="editPlayer(${playerId})" data-index="${playerId}"` : `onclick="addPlayerToSlot('${slot.slot}')"`}>
-            <div class="slot-header">
-                <span class="slot-name">${slot.slot}</span>
-                <span class="slot-position">${getSlotDescription(slot.position)}</span>
-            </div>
-            <div class="slot-content">
-                ${player ? `
-                    <div class="player-info">
-                        <div class="player-name">${player.name}</div>
-                        <div class="player-details">
-                            ${player.team} • ${player.position}
-                        </div>
-                    </div>
-                    <div class="position-badge">${player.position}</div>
-                ` : `
-                    <div class="empty-slot">
-                        <i class="fas fa-plus"></i>
-                        <span>Add Player</span>
-                    </div>
-                `}
-            </div>
-        </div>
-    `;
-}
-
-function getSlotDescription(position) {
-    switch (position) {
-        case "FLEX": return "RB/WR/TE";
-        case "OP": return "QB/RB/WR/TE";
-        default: return position;
-    }
 }
 
 function displayAnalysis(analysisData) {
@@ -399,32 +374,32 @@ function displayAnalysis(analysisData) {
         elements.analysisResult.innerHTML = "<p>No analysis data available</p>";
         return;
     }
-    
+
     const lineupHTML = analysisData.lineup.map(player => `
         <div class="lineup-player starter">
             <div class="lineup-info">
-                <div class="slot-name">${player.slot}</div>
-                <div class="lineup-player-name">${player.player}</div>
-                <div class="lineup-team">${player.team} • ${player.position}</div>
+                <div class="slot-name">${sanitizeHTML(player.slot)}</div>
+                <div class="lineup-player-name">${sanitizeHTML(player.player)}</div>
+                <div class="lineup-team">${sanitizeHTML(player.team)} • ${sanitizeHTML(player.position)}</div>
             </div>
             <div class="projections">
-                <div class="projected">Proj: ${player.projected}</div>
-                <div class="adjusted">Adj: ${player.adjusted}</div>
+                <div class="projected">Proj: ${formatPoints(player.projected)}</div>
+                <div class="adjusted">Adj: ${formatPoints(player.adjusted)}</div>
             </div>
         </div>
     `).join("");
-    
+
     const benchHTML = analysisData.bench ? analysisData.bench.map(player => `
         <div class="bench-player">
-            <div class="lineup-player-name">${player.player}</div>
-            <div class="lineup-team">${player.position}</div>
+            <div class="lineup-player-name">${sanitizeHTML(player.player)}</div>
+            <div class="lineup-team">${sanitizeHTML(player.position)}</div>
             <div class="projections">
-                <div class="projected">Proj: ${player.projected}</div>
-                <div class="adjusted">Adj: ${player.adjusted}</div>
+                <div class="projected">Proj: ${formatPoints(player.projected)}</div>
+                <div class="adjusted">Adj: ${formatPoints(player.adjusted)}</div>
             </div>
         </div>
     `).join("") : "";
-    
+
     elements.analysisResult.innerHTML = `
         <div class="lineup-section">
             <h3><i class="fas fa-star"></i> Optimal Lineup</h3>
@@ -445,45 +420,68 @@ function displayAnalysis(analysisData) {
         ${analysisData.explanations ? `
             <div class="explanations">
                 <h4><i class="fas fa-lightbulb"></i> Analysis Explanation</h4>
-                <p>${analysisData.explanations}</p>
+                <p>${sanitizeHTML(analysisData.explanations)}</p>
             </div>
         ` : ""}
     `;
 }
 
+function getSlotDescription(position) {
+    switch (position) {
+        case "FLEX": return "RB/WR/TE";
+        case "OP": return "QB/RB/WR/TE";
+        default: return position;
+    }
+}
+
+// Utility Functions
+function formatPoints(points) {
+    if (points === undefined || points === null) return "0.0";
+    return parseFloat(points).toFixed(1);
+}
+
+function sanitizeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 // Roster Management Functions
 function toggleEditMode() {
     isEditing = !isEditing;
-    elements.editRoster.innerHTML = isEditing ? 
-        '<i class="fas fa-times"></i> Cancel Edit' : 
+    elements.editRoster.innerHTML = isEditing ?
+        '<i class="fas fa-times"></i> Cancel Edit' :
         '<i class="fas fa-edit"></i> Edit Roster';
-    
+
     const playerCards = document.querySelectorAll(".player-card, .lineup-slot");
     playerCards.forEach(card => {
         card.style.cursor = isEditing ? "pointer" : "default";
     });
-    
+
     if (!isEditing) {
         hideEditForm();
     }
+    
+    showToast(isEditing ? "Edit mode enabled" : "Edit mode disabled", "info");
 }
 
 function editPlayer(index) {
     if (!isEditing || !currentTeam || !currentTeam.players) return;
-    
+
     const player = currentTeam.players[index];
     if (!player) return;
-    
+
     elements.editPlayerIndex.value = index;
     elements.playerName.value = player.name;
     elements.playerPosition.value = player.position;
     elements.playerTeam.value = player.team;
     elements.playerStatus.value = player.status;
-    
+
     // Update slot dropdown with available options
     updateSlotDropdown(player);
     elements.playerSlot.value = player.slot || "";
-    
+
     showEditForm();
 }
 
@@ -492,7 +490,7 @@ function addPlayerToSlot(slotName) {
         showToast("Enable edit mode first", "warning");
         return;
     }
-    
+
     addNewPlayer(slotName);
 }
 
@@ -501,44 +499,62 @@ function addNewPlayer(targetSlot = null) {
         showToast("Enable edit mode first", "warning");
         return;
     }
-    
+
     if (!currentTeam) {
         currentTeam = {
             team_id: elements.teamId.value,
             players: []
         };
     }
-    
+
     if (!currentTeam.players) {
         currentTeam.players = [];
     }
-    
+
     elements.editPlayerIndex.value = -1; // -1 indicates new player
     elements.playerName.value = "";
     elements.playerPosition.value = "QB";
     elements.playerTeam.value = "";
     elements.playerStatus.value = targetSlot ? "starter" : "bench";
-    
+
     // Update slot dropdown and set target slot if specified
     updateSlotDropdown({ position: "QB" });
     elements.playerSlot.value = targetSlot || "";
-    
+
     showEditForm();
 }
 
 function updateSlotDropdown(player) {
     const slotSelect = elements.playerSlot;
     slotSelect.innerHTML = '<option value="">Select Slot (optional)</option>';
-    
+
     // Add bench option
     slotSelect.innerHTML += '<option value="bench">Bench</option>';
-    
+
     // Add available starter slots based on player position
     LINEUP_SLOTS.forEach(slot => {
         if (isPlayerEligibleForSlot(player, slot)) {
             slotSelect.innerHTML += `<option value="${slot.slot}">${slot.slot} (${getSlotDescription(slot.position)})</option>`;
         }
     });
+}
+
+function isPlayerEligibleForSlot(player, slot) {
+    if (!player || !slot) return false;
+    
+    const playerPos = player.position;
+    const slotPos = slot.position;
+    
+    // Direct position match
+    if (playerPos === slotPos) return true;
+    
+    // FLEX slot eligibility (RB/WR/TE)
+    if (slotPos === "FLEX" && ["RB", "WR", "TE"].includes(playerPos)) return true;
+    
+    // OP slot eligibility (QB/RB/WR/TE)
+    if (slotPos === "OP" && ["QB", "RB", "WR", "TE"].includes(playerPos)) return true;
+    
+    return false;
 }
 
 function savePlayer() {
@@ -551,7 +567,7 @@ function savePlayer() {
         slot: elements.playerSlot.value === "bench" ? null : elements.playerSlot.value,
         player_id: generatePlayerId(elements.playerName.value, elements.playerPosition.value)
     };
-    
+
     // Adjust status based on slot selection
     if (playerData.slot && playerData.slot !== "bench") {
         playerData.status = "starter";
@@ -559,16 +575,16 @@ function savePlayer() {
         playerData.status = "bench";
         playerData.slot = null;
     }
-    
+
     if (!playerData.name || !playerData.team) {
         showToast("Player name and team are required", "error");
         return;
     }
-    
+
     if (!currentTeam.players) {
         currentTeam.players = [];
     }
-    
+
     if (index === -1) {
         // Add new player
         currentTeam.players.push(playerData);
@@ -578,19 +594,19 @@ function savePlayer() {
         currentTeam.players[index] = playerData;
         showToast("Player updated successfully", "success");
     }
-    
+
     displayRoster(currentTeam.players);
     hideEditForm();
 }
 
 function removePlayer() {
     const index = parseInt(elements.editPlayerIndex.value);
-    
+
     if (index === -1) {
         hideEditForm();
         return;
     }
-    
+
     if (confirm("Are you sure you want to remove this player?")) {
         currentTeam.players.splice(index, 1);
         displayRoster(currentTeam.players);
@@ -612,7 +628,6 @@ function hideEditForm() {
     elements.editRosterForm.style.display = "none";
 }
 
-// Utility Functions
 function generatePlayerId(name, position) {
     return name.toLowerCase().replace(/\s+/g, "_") + "_" + position.toLowerCase();
 }
@@ -630,16 +645,16 @@ function showToast(message, type = "info") {
             <span>${message}</span>
         </div>
     `;
-    
+
     elements.toastContainer.appendChild(toast);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
         if (toast.parentNode) {
             toast.parentNode.removeChild(toast);
         }
     }, 5000);
-    
+
     // Remove on click
     toast.addEventListener("click", () => {
         if (toast.parentNode) {
@@ -658,13 +673,13 @@ function getToastIcon(type) {
 }
 
 // Error Handling
-window.addEventListener("error", function(e) {
+window.addEventListener("error", function (e) {
     console.error("JavaScript Error:", e.error);
     showToast("An unexpected error occurred", "error");
 });
 
 // Handle fetch errors globally
-window.addEventListener("unhandledrejection", function(e) {
+window.addEventListener("unhandledrejection", function (e) {
     console.error("Unhandled Promise Rejection:", e.reason);
     if (e.reason instanceof TypeError && e.reason.message.includes("fetch")) {
         showToast("Network error: Please check your connection", "error");
