@@ -56,26 +56,26 @@ resource "aws_iam_role_policy_attachment" "coach_lambda_policy" {
 }
 
 resource "aws_lambda_function" "coach" {
-  function_name     = var.coach_function_name
-  role              = aws_iam_role.coach_lambda_role.arn
-  handler           = "lambda_function.lambda_handler"
-  runtime           = "python3.12"
-  timeout           = 900
-  memory_size       = 512
-  architectures     = ["arm64"]
-  filename = data.archive_file.coach_lambda_zip.output_path
+  function_name    = var.coach_function_name
+  role             = aws_iam_role.coach_lambda_role.arn
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.12"
+  timeout          = 900
+  memory_size      = 512
+  architectures    = ["arm64"]
+  filename         = data.archive_file.coach_lambda_zip.output_path
   source_code_hash = data.archive_file.coach_lambda_zip.output_base64sha256
   layers = [
     aws_lambda_layer_version.python_dependencies.arn
   ]
   environment {
     variables = {
-      BEDROCK_MODEL_ID = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-      DDB_TABLE_STATS  = aws_dynamodb_table.season_stats.name
-      DDB_TABLE_ROSTER = aws_dynamodb_table.fantasy_football_team_roster.name
-      DEFAULT_TEAM_ID  = "1"
-      SCORING          = "PPR"
-      LINEUP_SLOTS     = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"
+      BEDROCK_MODEL_ID     = "us.anthropic.claude-sonnet-4-20250514-v1:0"
+      DDB_TABLE_STATS      = aws_dynamodb_table.season_stats.name
+      DDB_TABLE_ROSTER     = aws_dynamodb_table.fantasy_football_team_roster.name
+      DEFAULT_TEAM_ID      = "1"
+      SCORING              = "PPR"
+      LINEUP_SLOTS         = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"
       DDB_TABLE_STATS_2025 = aws_dynamodb_table.season_stats_2025.name
     }
   }

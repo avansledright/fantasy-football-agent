@@ -147,3 +147,25 @@ resource "aws_dynamodb_table" "season_stats_2025" {
     ManagedBy   = "terraform"
   }
 }
+
+resource "aws_dynamodb_table" "waiver_table" {
+  name         = "${var.agent_name}-2025-waiver-table"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "player_season"
+
+  attribute {
+    name = "player_season"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "updated_at"
+    enabled        = false
+  }
+
+  tags = {
+    Name        = "fantasy-players-table"
+    Environment = "production"
+  }
+}

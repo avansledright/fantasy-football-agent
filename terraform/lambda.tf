@@ -58,14 +58,14 @@ resource "aws_lambda_layer_version" "python_dependencies" {
 }
 
 resource "aws_lambda_function" "draft_agent" {
-  filename = data.archive_file.lambda_zip.output_path
-  function_name     = var.agent_name
-  role              = aws_iam_role.lambda_role.arn
-  handler           = "lambda_function.lambda_handler"
-  runtime           = "python3.12"
-  timeout           = 900
-  memory_size       = 512
-  architectures     = ["arm64"] #ARM 64 is required for Strands
+  filename      = data.archive_file.lambda_zip.output_path
+  function_name = var.agent_name
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 900
+  memory_size   = 512
+  architectures = ["arm64"] #ARM 64 is required for Strands
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 

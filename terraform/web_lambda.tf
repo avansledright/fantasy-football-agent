@@ -58,18 +58,18 @@ data "archive_file" "roster_management_zip" {
 
 # Lambda function for roster management
 resource "aws_lambda_function" "roster_management" {
-  filename         = data.archive_file.roster_management_zip.output_path
-  function_name    = "fantasy-football-roster-management"
-  role            = aws_iam_role.web_lambda_role.arn
-  handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.12"
-  timeout         = 30
+  filename      = data.archive_file.roster_management_zip.output_path
+  function_name = "fantasy-football-roster-management"
+  role          = aws_iam_role.web_lambda_role.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 30
 
   source_code_hash = data.archive_file.roster_management_zip.output_base64sha256
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.fantasy_football_team_roster.name
+      DYNAMODB_TABLE     = aws_dynamodb_table.fantasy_football_team_roster.name
       PLAYER_STATS_TABLE = aws_dynamodb_table.season_stats_2025.name
     }
   }

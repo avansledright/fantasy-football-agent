@@ -59,19 +59,6 @@ data "archive_file" "stats_scarpe_lambda_zip" {
   output_path = "fantasy_stats_scraper.zip"
 }
 
-# data "archive_file" "stats_scarpe_lambda_zip" {
-#   type        = "zip"
-#   output_path = "fantasy_stats_scraper.zip"
-  
-#   source {
-#     content = templatefile("${path.module}/stat_scraper_lambda/lambda_function.py", {
-#       table_name = "${aws_dynamodb_table.season_stats_2025.name}"
-#     })
-#     filename = "lambda_function.py"
-#   }
-# }
-
-
 # CloudWatch Log Group for Lambda
 resource "aws_cloudwatch_log_group" "stats_scarper_lambda_zip" {
   name              = "/aws/lambda/${var.lambda_function_name}"
@@ -88,7 +75,7 @@ resource "aws_cloudwatch_log_group" "stats_scarper_lambda_zip" {
 resource "aws_cloudwatch_event_rule" "tuesday_noon_trigger" {
   name                = "${var.lambda_function_name}-tuesday-trigger"
   description         = "Trigger fantasy stats collection every Tuesday at noon ET"
-  schedule_expression = "cron(0 17 ? * TUE *)"  # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
+  schedule_expression = "cron(0 17 ? * TUE *)" # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
 
   tags = {
     Project     = "fantasy-football"
@@ -115,14 +102,14 @@ resource "aws_lambda_permission" "allow_eventbridge" {
 
 # Attach the layer to the Lambda function
 resource "aws_lambda_function" "fantasy_stats_scraper_with_layer" {
-  filename         = data.archive_file.stats_scarpe_lambda_zip.output_path
-  function_name    = var.lambda_function_name
-  role            = aws_iam_role.lambda_execution_role.arn
-  handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.12"
-  timeout         = 900
-  memory_size     = 1024
-  layers          = [aws_lambda_layer_version.python_dependencies.arn]
+  filename      = data.archive_file.stats_scarpe_lambda_zip.output_path
+  function_name = var.lambda_function_name
+  role          = aws_iam_role.lambda_execution_role.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 900
+  memory_size   = 1024
+  layers        = [aws_lambda_layer_version.python_dependencies.arn]
 
   source_code_hash = data.archive_file.stats_scarpe_lambda_zip.output_base64sha256
 

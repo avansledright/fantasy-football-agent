@@ -1,10 +1,10 @@
 # CloudFront Origin Access Control for S3
 resource "aws_cloudfront_origin_access_control" "s3_oac" {
-  name               = "${var.agent_name}-s3-oac"
-  description        = "OAC for Fantasy Football S3 bucket"
+  name                              = "${var.agent_name}-s3-oac"
+  description                       = "OAC for Fantasy Football S3 bucket"
   origin_access_control_origin_type = "s3"
-  signing_behavior   = "always"
-  signing_protocol   = "sigv4"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 
@@ -44,11 +44,11 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
 
   # Default cache behavior (for web assets)
   default_cache_behavior {
-    target_origin_id         = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
-    viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods           = ["GET", "HEAD"]
-    compress                 = true
+    target_origin_id       = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
 
     forwarded_values {
       query_string = false
@@ -60,18 +60,18 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
     }
 
     min_ttl     = 0
-    default_ttl = 86400   # 24 hours
+    default_ttl = 86400    # 24 hours
     max_ttl     = 31536000 # 1 year
   }
 
   # Cache behavior for API calls
   ordered_cache_behavior {
-    path_pattern             = "/api/*"
-    target_origin_id         = "API-${aws_api_gateway_rest_api.main.name}"
-    viewer_protocol_policy   = "https-only"
-    allowed_methods          = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods           = ["GET", "HEAD", "OPTIONS"]
-    compress                 = true
+    path_pattern           = "/api/*"
+    target_origin_id       = "API-${aws_api_gateway_rest_api.main.name}"
+    viewer_protocol_policy = "https-only"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    compress               = true
 
     forwarded_values {
       query_string = true
@@ -83,18 +83,18 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
     }
 
     min_ttl     = 0
-    default_ttl = 0    # Don't cache API responses by default
+    default_ttl = 0     # Don't cache API responses by default
     max_ttl     = 86400 # 24 hours max
   }
 
   # Cache behavior for static assets with longer TTL
   ordered_cache_behavior {
-    path_pattern             = "*.css"
-    target_origin_id         = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
-    viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["GET", "HEAD"]
-    cached_methods           = ["GET", "HEAD"]
-    compress                 = true
+    path_pattern           = "*.css"
+    target_origin_id       = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
 
     forwarded_values {
       query_string = false
@@ -110,12 +110,12 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
 
   # Cache behavior for JavaScript files
   ordered_cache_behavior {
-    path_pattern             = "*.js"
-    target_origin_id         = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
-    viewer_protocol_policy   = "redirect-to-https"
-    allowed_methods          = ["GET", "HEAD"]
-    cached_methods           = ["GET", "HEAD"]
-    compress                 = true
+    path_pattern           = "*.js"
+    target_origin_id       = "S3-${aws_s3_bucket.fantasy_football_web.bucket}"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
 
     forwarded_values {
       query_string = false
@@ -125,8 +125,8 @@ resource "aws_cloudfront_distribution" "fantasy_football_cdn" {
     }
 
     min_ttl     = 0
-    default_ttl = 86400   # 24 hours (shorter for JS due to API endpoint changes)
-    max_ttl     = 604800  # 1 week
+    default_ttl = 86400  # 24 hours (shorter for JS due to API endpoint changes)
+    max_ttl     = 604800 # 1 week
   }
 
   # Geographic restrictions
@@ -167,7 +167,7 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
     }
 
     access_control_max_age_sec = 3600
-    origin_override           = false
+    origin_override            = false
   }
 
   security_headers_config {
@@ -212,7 +212,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
   rule {
     id     = "delete_old_logs"
     status = "Enabled"
-    
+
     filter {
       prefix = ""
     }
@@ -310,12 +310,12 @@ resource "aws_iam_role_policy" "cloudfront_invalidation" {
 
 # Lambda function for CloudFront invalidation
 resource "aws_lambda_function" "cloudfront_invalidation" {
-  filename         = data.archive_file.cloudfront_invalidation_zip.output_path
-  function_name    = "${var.agent_name}-cloudfront-invalidation"
-  role            = aws_iam_role.cloudfront_invalidation.arn
-  handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.12"
-  timeout         = 60
+  filename      = data.archive_file.cloudfront_invalidation_zip.output_path
+  function_name = "${var.agent_name}-cloudfront-invalidation"
+  role          = aws_iam_role.cloudfront_invalidation.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.12"
+  timeout       = 60
 
   source_code_hash = data.archive_file.cloudfront_invalidation_zip.output_base64sha256
 
@@ -330,9 +330,9 @@ resource "aws_lambda_function" "cloudfront_invalidation" {
 data "archive_file" "cloudfront_invalidation_zip" {
   type        = "zip"
   output_path = "${path.module}/cloudfront_invalidation.zip"
-  
+
   source {
-    content = <<EOF
+    content  = <<EOF
 import boto3
 import json
 import os
