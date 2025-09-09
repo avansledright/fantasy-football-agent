@@ -12,6 +12,7 @@ from app.dynamo import load_team_roster, format_roster_for_agent
 from app.player_data import load_roster_player_data, format_player_histories, analyze_player_performance, compare_roster_players
 from app.lineup import optimize_lineup_direct
 from app.schedule import get_matchups_by_week
+from app.waiver_wire import get_position_waiver_targets, analyze_waiver_opportunities_with_projections
 
 def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> Agent:
     """Build agent with comprehensive unified table data."""
@@ -39,6 +40,8 @@ def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: l
 TEAM ROSTER:
 {roster_context}
 
+If the team roster contains players with below 10 points projected we should be considering alternative players through waiver acquisition
+
 COMPREHENSIVE PLAYER DATA:
 {player_data_context}
 
@@ -52,6 +55,8 @@ You have access to advanced analysis tools:
 
 - analyze_player_performance: Get comprehensive analysis for individual players
 - compare_roster_players: Compare multiple players across different metrics
+- get_position_waiver_targets(position, week={week}) - Get specific waiver targets for a position with low ownership.
+-  analyze_waiver_opportunities_with_projections(current_roster, external_projections, week={week}) - Analyze waiver wire opportunities using external projection data.
 
 Your task: Optimize the lineup for week {week} using:
 1. 2024 historical performance data
@@ -59,6 +64,10 @@ Your task: Optimize the lineup for week {week} using:
 3. Current 2025 weekly performance
 4. External weekly projections
 5. Team matchups and game context
+6. Consider player acquisitions through waiver wire using the tool get_position_waiver_targets(position, week={week})
+7. Analyze best waiver wire acquisitions with the tool analyze_waiver_opportunities_with_projections
+8. For waiver suggestions be sure to analyze their past performance against their opponents
+9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
 
 Required lineup positions: {lineup_slots}
 (FLEX = RB/WR/TE, OP = QB/RB/WR/TE)
@@ -67,7 +76,7 @@ Return in this exact JSON format:
 {{
   "lineup": [{{"slot":"QB","player":"Josh Allen","team":"BUF","position":"QB","projected":22.4,"adjusted":23.1}}],
   "bench": [{{"player":"...","position":"...","projected":...,"adjusted":...}}],
-  "explanations": "Detailed reasoning incorporating all data sources and analysis"
+  "explanations": "Detailed reasoning incorporating all data sources and analysis. Including all top waiver picks (atleast 3 per position). Include explanation into each waiver wire selection"
 }}
 """
 
@@ -84,7 +93,7 @@ Return in this exact JSON format:
     agent = Agent(
         model=bedrock_model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[analyze_player_performance, compare_roster_players, analyze_injury_impact]
+        tools=[analyze_player_performance, compare_roster_players, analyze_injury_impact, analyze_waiver_opportunities_with_projections, get_position_waiver_targets]
     )
     
     return agent

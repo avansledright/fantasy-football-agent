@@ -27,10 +27,13 @@ resource "aws_iam_policy" "coach_lambda_extra_policy" {
         Action = [
           "dynamodb:GetItem",
           "dynamodb:Query",
-          "dynamodb:Scan"
+          "dynamodb:Scan",
+          "dynamodb:BatchGetItem"
         ]
         Resource = [
-          "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/fantasy-football-*"
+          "${aws_dynamodb_table.fantasy_football_team_roster.arn}",
+          "${aws_dynamodb_table.waiver_table.arn}",
+          "${aws_dynamodb_table.fantasy_football_players.arn}",
         ]
       },
       {
@@ -73,6 +76,7 @@ resource "aws_lambda_function" "coach" {
       BEDROCK_MODEL_ID     = "us.anthropic.claude-sonnet-4-20250514-v1:0"
       PLAYERS_TABLE      = aws_dynamodb_table.fantasy_football_players.name
       DDB_TABLE_ROSTER     = aws_dynamodb_table.fantasy_football_team_roster.name
+      WAIVER_TABLE = aws_dynamodb_table.waiver_table.name
       DEFAULT_TEAM_ID      = "7"
       SCORING              = "PPR"
       LINEUP_SLOTS         = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"

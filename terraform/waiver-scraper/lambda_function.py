@@ -480,10 +480,6 @@ def filter_relevant_players(transformed_players):
         position = player.get("position", "")
         percent_owned = player.get("percent_owned", Decimal('0'))
         weekly_projections = player.get("weekly_projections", {})
-        
-        # Skip certain positions
-        if position in ["K"]:  # Skip kickers
-            continue
             
         # Keep players with some ownership or projections
         has_projections = len(weekly_projections) > 0
@@ -562,7 +558,7 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": json.dumps("No relevant players to store.")
         }
-    
+    print(filtered_players)
     # Store in DynamoDB
     store_players_in_dynamodb(filtered_players, PLAYER_TABLE_NAME)
     

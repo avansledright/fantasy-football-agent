@@ -13,7 +13,8 @@ logger.setLevel(logging.INFO)
 # Set required environment variables with defaults
 ENV_DEFAULTS = {
     "PLAYERS_TABLE": "fantasy-football-players",
-    "DDB_TABLE_ROSTER": "fantasy-football-team-roster"
+    "DDB_TABLE_ROSTER": "fantasy-football-team-roster",
+    "WAIVER_TABLE": "waiver-players"
 }
 
 for var, default in ENV_DEFAULTS.items():

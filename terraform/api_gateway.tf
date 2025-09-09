@@ -213,7 +213,7 @@ resource "aws_api_gateway_integration" "teams_get" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.roster_management.invoke_arn
-  timeout_milliseconds    = 30000
+  timeout_milliseconds    = 70000
 }
 
 # NEW: PUT method for updating team roster
@@ -242,7 +242,7 @@ resource "aws_api_gateway_integration" "teams_put" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.roster_management.invoke_arn
-  timeout_milliseconds    = 30000
+  timeout_milliseconds    = 70000
 }
 
 resource "aws_api_gateway_integration_response" "teams_put_200" {

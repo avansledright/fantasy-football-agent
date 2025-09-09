@@ -53,7 +53,7 @@ resource "aws_iam_role_policy" "waiver_lambda_dynamodb_policy" {
           "dynamodb:DeleteItem"
         ]
         Resource = [
-          aws_dynamodb_table.waiver_table.arn,
+          "${aws_dynamodb_table.waiver_table.arn}",
           "${aws_dynamodb_table.waiver_table.arn}/index/*"
         ]
       }
@@ -65,7 +65,7 @@ resource "aws_iam_role_policy" "waiver_lambda_dynamodb_policy" {
 resource "aws_lambda_function" "waiver_wire_lambda" {
   filename         = data.archive_file.waiver_lambda_zip.output_path
   function_name    = "fantasy-football-waiver-wire"
-  role             = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.waiver_lambda_role.arn
   handler          = "lambda_function.lambda_handler"
   source_code_hash = data.archive_file.waiver_lambda_zip.output_base64sha256
   runtime          = "python3.12"
@@ -95,30 +95,30 @@ resource "aws_lambda_function" "waiver_wire_lambda" {
   }
 }
 
-# # EventBridge rule to trigger Lambda daily at noon CST
-# resource "aws_cloudwatch_event_rule" "daily_waiver_update" {
-#   name                = "fantasy-football-daily-waiver-update"
-#   description         = "Trigger waiver wire update daily at noon CST"
-#   schedule_expression = "cron(0 18 * * ? *)" # 18:00 UTC = 12:00 CST (accounting for CDT/CST)
+# EventBridge rule to trigger Lambda daily at noon CST
+resource "aws_cloudwatch_event_rule" "daily_waiver_update" {
+  name                = "fantasy-football-daily-waiver-update"
+  description         = "Trigger waiver wire update daily at noon CST"
+  schedule_expression = "cron(0 18 * * ? *)" # 18:00 UTC = 12:00 CST (accounting for CDT/CST)
 
-#   tags = {
-#     Environment = var.environment
-#     Purpose     = "Fantasy Football Daily Schedule"
-#   }
-# }
+  tags = {
+    Environment = var.environment
+    Purpose     = "Fantasy Football Daily Schedule"
+  }
+}
 
-# # EventBridge target to invoke Lambda
-# resource "aws_cloudwatch_event_target" "waiver_lambda_target" {
-#   rule      = aws_cloudwatch_event_rule.daily_waiver_update.name
-#   target_id = "fantasy-football-lambda-target"
-#   arn       = aws_lambda_function.waiver_wire_lambda.arn
-# }
+# EventBridge target to invoke Lambda
+resource "aws_cloudwatch_event_target" "waiver_lambda_target" {
+  rule      = aws_cloudwatch_event_rule.daily_waiver_update.name
+  target_id = "fantasy-football-lambda-target"
+  arn       = aws_lambda_function.waiver_wire_lambda.arn
+}
 
-# # Permission for EventBridge to invoke Lambda
-# resource "aws_lambda_permission" "waiver_allow_eventbridge" {
-#   statement_id  = "AllowExecutionFromEventBridge"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.waiver_wire_lambda.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.daily_waiver_update.arn
-# }
+# Permission for EventBridge to invoke Lambda
+resource "aws_lambda_permission" "waiver_allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.waiver_wire_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_waiver_update.arn
+}
