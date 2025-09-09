@@ -7,6 +7,7 @@ from decimal import Decimal
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
+players_table = dynamodb.Table(os.environ['PLAYERS_TABLE'])  # New consolidated players table
 
 def decimal_default(obj):
     """JSON serializer for Decimal objects"""
@@ -122,30 +123,34 @@ def get_team_roster(event):
 
 def get_player_stats_batch(players, season, week):
     """
-    Efficiently fetch player stats using batch operations
+    Efficiently fetch player stats from the new consolidated players table
     """
     if not players:
         return {}
     
-    stats_table = dynamodb.Table(os.environ['PLAYER_STATS_TABLE'])
     player_stats = {}
     
     # Prepare batch get items - DynamoDB batch_get_item supports up to 100 items
     batch_size = 100
-    player_names = [p.get('name') for p in players if p.get('name')]
     
-    for i in range(0, len(player_names), batch_size):
-        batch_players = player_names[i:i + batch_size]
+    # Create player_ids from roster players
+    player_ids = []
+    for player in players:
+        player_name = player.get('name')
+        position = player.get('position')
+        if player_name and position:
+            player_id = f"{player_name}#{position}"
+            player_ids.append((player_id, player_name))
+    
+    for i in range(0, len(player_ids), batch_size):
+        batch_player_ids = player_ids[i:i + batch_size]
         
         # Build request items for batch operation
         request_items = {
-            os.environ['PLAYER_STATS_TABLE']: {
+            os.environ['PLAYERS_TABLE']: {
                 'Keys': [
-                    {
-                        'player_season': f"{player_name}#{season}",
-                        'week': week
-                    }
-                    for player_name in batch_players
+                    {'player_id': player_id}
+                    for player_id, _ in batch_player_ids
                 ]
             }
         }
@@ -154,13 +159,35 @@ def get_player_stats_batch(players, season, week):
             response = dynamodb.batch_get_item(RequestItems=request_items)
             
             # Process responses
-            if os.environ['PLAYER_STATS_TABLE'] in response.get('Responses', {}):
-                for item in response['Responses'][os.environ['PLAYER_STATS_TABLE']]:
-                    # Extract player name from player_season key
-                    player_season = item.get('player_season', '')
-                    if '#' in player_season:
-                        player_name = player_season.split('#')[0]
-                        player_stats[player_name] = item
+            if os.environ['PLAYERS_TABLE'] in response.get('Responses', {}):
+                for item in response['Responses'][os.environ['PLAYERS_TABLE']]:
+                    # Extract stats for the specified week and season
+                    player_name = item.get('player_name')
+                    if not player_name:
+                        continue
+                    
+                    # Look for current season stats first (2025)
+                    current_stats = item.get('current_season_stats', {}).get(str(season), {})
+                    week_stats = current_stats.get(str(week))
+                    
+                    if week_stats:
+                        player_stats[player_name] = {
+                            'fantasy_points': week_stats.get('fantasy_points', 0),
+                            'opponent': week_stats.get('opponent', ''),
+                            'team': week_stats.get('team', '')
+                        }
+                    else:
+                        # If no current season stats, check historical seasons
+                        historical_stats = item.get('historical_seasons', {}).get(str(season), {})
+                        weekly_stats = historical_stats.get('weekly_stats', {})
+                        week_stats = weekly_stats.get(str(week))
+                        
+                        if week_stats:
+                            player_stats[player_name] = {
+                                'fantasy_points': week_stats.get('fantasy_points', 0),
+                                'opponent': week_stats.get('opponent', ''),
+                                'team': week_stats.get('team', '')
+                            }
             
             # Handle unprocessed items (due to throttling, etc.)
             unprocessed = response.get('UnprocessedKeys', {})
@@ -171,29 +198,70 @@ def get_player_stats_batch(players, season, week):
                 print(f"Retrying unprocessed items, attempt {retry_count + 1}")
                 response = dynamodb.batch_get_item(RequestItems=unprocessed)
                 
-                if os.environ['PLAYER_STATS_TABLE'] in response.get('Responses', {}):
-                    for item in response['Responses'][os.environ['PLAYER_STATS_TABLE']]:
-                        player_season = item.get('player_season', '')
-                        if '#' in player_season:
-                            player_name = player_season.split('#')[0]
-                            player_stats[player_name] = item
+                if os.environ['PLAYERS_TABLE'] in response.get('Responses', {}):
+                    for item in response['Responses'][os.environ['PLAYERS_TABLE']]:
+                        player_name = item.get('player_name')
+                        if not player_name:
+                            continue
+                        
+                        # Look for current season stats first (2025)
+                        current_stats = item.get('current_season_stats', {}).get(str(season), {})
+                        week_stats = current_stats.get(str(week))
+                        
+                        if week_stats:
+                            player_stats[player_name] = {
+                                'fantasy_points': week_stats.get('fantasy_points', 0),
+                                'opponent': week_stats.get('opponent', ''),
+                                'team': week_stats.get('team', '')
+                            }
+                        else:
+                            # If no current season stats, check historical seasons
+                            historical_stats = item.get('historical_seasons', {}).get(str(season), {})
+                            weekly_stats = historical_stats.get('weekly_stats', {})
+                            week_stats = weekly_stats.get(str(week))
+                            
+                            if week_stats:
+                                player_stats[player_name] = {
+                                    'fantasy_points': week_stats.get('fantasy_points', 0),
+                                    'opponent': week_stats.get('opponent', ''),
+                                    'team': week_stats.get('team', '')
+                                }
                 
                 unprocessed = response.get('UnprocessedKeys', {})
                 retry_count += 1
                 
         except Exception as e:
-            print(f"Error in batch operation for players {batch_players}: {str(e)}")
+            print(f"Error in batch operation for players {[pid for pid, _ in batch_player_ids]}: {str(e)}")
             # Fall back to individual queries for this batch
-            for player_name in batch_players:
+            for player_id, player_name in batch_player_ids:
                 try:
-                    individual_response = stats_table.get_item(
-                        Key={
-                            'player_season': f"{player_name}#{season}",
-                            'week': week
-                        }
-                    )
+                    individual_response = players_table.get_item(Key={'player_id': player_id})
                     if 'Item' in individual_response:
-                        player_stats[player_name] = individual_response['Item']
+                        item = individual_response['Item']
+                        
+                        # Look for current season stats first (2025)
+                        current_stats = item.get('current_season_stats', {}).get(str(season), {})
+                        week_stats = current_stats.get(str(week))
+                        
+                        if week_stats:
+                            player_stats[player_name] = {
+                                'fantasy_points': week_stats.get('fantasy_points', 0),
+                                'opponent': week_stats.get('opponent', ''),
+                                'team': week_stats.get('team', '')
+                            }
+                        else:
+                            # If no current season stats, check historical seasons
+                            historical_stats = item.get('historical_seasons', {}).get(str(season), {})
+                            weekly_stats = historical_stats.get('weekly_stats', {})
+                            week_stats = weekly_stats.get(str(week))
+                            
+                            if week_stats:
+                                player_stats[player_name] = {
+                                    'fantasy_points': week_stats.get('fantasy_points', 0),
+                                    'opponent': week_stats.get('opponent', ''),
+                                    'team': week_stats.get('team', '')
+                                }
+                                
                 except Exception as individual_error:
                     print(f"Error fetching stats for {player_name}: {str(individual_error)}")
     
@@ -227,8 +295,12 @@ def update_team_roster(event):
         # Add optional fields if provided
         if 'league_id' in body:
             update_data['league_id'] = body['league_id']
+        if 'league_name' in body:
+            update_data['league_name'] = body['league_name']
         if 'owner' in body:
             update_data['owner'] = body['owner']
+        if 'team_name' in body:
+            update_data['team_name'] = body['team_name']
         if 'players' in body:
             update_data['players'] = body['players']
         

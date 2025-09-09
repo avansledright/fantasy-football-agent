@@ -71,12 +71,11 @@ resource "aws_lambda_function" "coach" {
   environment {
     variables = {
       BEDROCK_MODEL_ID     = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-      DDB_TABLE_STATS      = aws_dynamodb_table.season_stats.name
+      PLAYERS_TABLE      = aws_dynamodb_table.fantasy_football_players.name
       DDB_TABLE_ROSTER     = aws_dynamodb_table.fantasy_football_team_roster.name
-      DEFAULT_TEAM_ID      = "1"
+      DEFAULT_TEAM_ID      = "7"
       SCORING              = "PPR"
       LINEUP_SLOTS         = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"
-      DDB_TABLE_STATS_2025 = aws_dynamodb_table.season_stats_2025.name
     }
   }
 

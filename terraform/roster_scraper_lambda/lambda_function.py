@@ -33,6 +33,28 @@ def get_position_name(position_id):
     positions = {1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K', 16: 'DST'}
     return positions.get(position_id, 'UNKNOWN')
 
+def get_injury_status(player):
+    """Extract and format injury status from player data"""
+    try:
+        # ESPN API provides injuryStatus in the player object
+        injury_status = player.get('injuryStatus', 'ACTIVE')
+        
+        # Map ESPN injury status codes to readable format
+        injury_mapping = {
+            'ACTIVE': 'Healthy',
+            'QUESTIONABLE': 'Questionable',
+            'DOUBTFUL': 'Doubtful', 
+            'OUT': 'Out',
+            'IR': 'IR',
+            'PUP': 'PUP',
+            'SUSPENSION': 'Suspended',
+            'NA': 'Healthy'
+        }
+        
+        return injury_mapping.get(injury_status, injury_status)
+    except:
+        return 'Healthy'
+
 def get_owner_name(owner_id, members_data):
     """Convert owner UUID to display name"""
     for member in members_data:
@@ -79,8 +101,11 @@ def process_team_roster(team, league_id, league_name, members_data):
         slot_id = entry.get('lineupSlotId')
         pro_team_id = player.get('proTeamId', 0)
         
+        # Get injury status for the player
+        injury_status = get_injury_status(player)
+        
         # Log player and their initial lineupSlotId
-        logger.info(f"Processing player: {name} (ID: {player.get('id')}), API lineupSlotId: {slot_id}")
+        logger.info(f"Processing player: {name} (ID: {player.get('id')}), API lineupSlotId: {slot_id}, Injury: {injury_status}")
         
         # Special case for DST
         if position == 'DST':
@@ -94,7 +119,8 @@ def process_team_roster(team, league_id, league_name, members_data):
             'player_id': player_id,
             'position': position,
             'status': 'starter' if slot_id != 20 else 'bench',
-            'team': get_team_abbreviation(pro_team_id)
+            'team': get_team_abbreviation(pro_team_id),
+            'injury_status': injury_status  # New field added here
         }
 
         if slot_id == 20: # Bench player
@@ -161,7 +187,7 @@ def process_team_roster(team, league_id, league_name, members_data):
     # Log the final processed roster for comparison
     logger.info(f"Final processed roster for team {team.get('id')}:")
     for player in final_players:
-        logger.info(f"  Player: {player['name']}, Final Slot: {player['slot']}, Status: {player['status']}")
+        logger.info(f"  Player: {player['name']}, Final Slot: {player['slot']}, Status: {player['status']}, Injury: {player['injury_status']}")
 
     # Get owner names
     owner_ids = team.get('owners', [])

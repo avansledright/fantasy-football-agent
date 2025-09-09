@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
           "dynamodb:Scan",
           "dynamodb:Query"
         ]
-        Resource = ["${aws_dynamodb_table.fantasy_football_team_roster.arn}", "${aws_dynamodb_table.season_stats_2025.arn}"]
+        Resource = ["${aws_dynamodb_table.fantasy_football_team_roster.arn}", "${aws_dynamodb_table.fantasy_football_players.arn}"]
       },
       {
         Effect = "Allow"
@@ -69,23 +69,8 @@ resource "aws_lambda_function" "roster_management" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE     = aws_dynamodb_table.fantasy_football_team_roster.name
-      PLAYER_STATS_TABLE = aws_dynamodb_table.season_stats_2025.name
+      DYNAMODB_TABLE = aws_dynamodb_table.fantasy_football_team_roster.name
+      PLAYERS_TABLE  = aws_dynamodb_table.fantasy_football_players.name
     }
   }
-}
-
-# # Permission for API Gateway to invoke the Lambda function
-# resource "aws_lambda_permission" "api_gateway_invoke_roster" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.roster_management.function_name
-#   principal     = "apigateway.amazonaws.com"
-
-#   source_arn = "${data.aws_api_gateway_rest_api.existing.execution_arn}/*/*"
-# }
-
-# Output Lambda function ARN
-output "roster_management_function_arn" {
-  value = aws_lambda_function.roster_management.arn
 }

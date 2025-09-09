@@ -95,8 +95,8 @@ resource "aws_lambda_function" "roster_scraper" {
       DYNAMODB_TABLE_NAME = aws_dynamodb_table.fantasy_football_team_roster.name
       ESPN_LEAGUE_ID      = var.espn_league_id
       ESPN_SWID           = var.espn_swid
-      ESPN_S2        = var.espn_s2_value
-      SEASON_YEAR    = "2025"
+      ESPN_S2             = var.espn_s2_value
+      SEASON_YEAR         = "2025"
     }
   }
   tags = {

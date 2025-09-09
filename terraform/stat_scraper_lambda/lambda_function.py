@@ -23,7 +23,7 @@ except Exception as e:
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ.get('DYNAMODB_TABLE_NAME', 'fantasy-football-2025-stats')
+table_name = os.environ.get('DYNAMODB_TABLE_NAME', 'fantasy-football-players')
 table = dynamodb.Table(table_name)
 
 # Current season
@@ -56,7 +56,7 @@ def lambda_handler(event, context):
             players_data = scrape_fantasypros_stats(position, current_week)
 
             if players_data:
-                batch_write_to_dynamodb(players_data)
+                update_player_stats_in_consolidated_table(players_data, current_week)
                 total_players_processed += len(players_data)
                 logger.info(f"Processed {len(players_data)} {position} players")
             else:
@@ -237,7 +237,7 @@ def resolve_opponent_from_schedule(team: str, week: int) -> str:
 def parse_player_row(row, position: str, week: int, player_idx: Optional[int], fpts_idx: Optional[int]) -> Optional[Dict]:
     """
     Parse a single player row from the stats table using header indices.
-    Returns dict with 'player_season', 'week', 'fantasy_points', 'opponent', 'player_name', 'position', 'season', 'team', 'updated_at'
+    Returns dict with player data for updating consolidated table.
     """
     try:
         cells = row.find_all(['td', 'th'])
@@ -317,16 +317,15 @@ def parse_player_row(row, position: str, week: int, player_idx: Optional[int], f
                     except (ValueError, InvalidOperation):
                         continue
 
-        # Build player data
+        # Build player data for updating consolidated table
         player_data = {
-            'player_season': f"{player_name}#{CURRENT_SEASON}",
-            'week': int(week),
-            'fantasy_points': fantasy_points,
-            'opponent': get_opponent_from_row(cells, team),  # may be empty; will be overwritten by schedule lookup if available
             'player_name': player_name,
             'position': position,
-            'season': int(CURRENT_SEASON),
             'team': team,
+            'fantasy_points': fantasy_points,
+            'opponent': get_opponent_from_row(cells, team),  # may be empty; will be overwritten by schedule lookup if available
+            'week': int(week),
+            'season': int(CURRENT_SEASON),
             'updated_at': datetime.now().isoformat()
         }
 
@@ -353,10 +352,10 @@ def get_opponent_from_row(cells, team: str) -> str:
         return ""
 
 
-def batch_write_to_dynamodb(players_data: List[Dict]):
+def update_player_stats_in_consolidated_table(players_data: List[Dict], week: int):
     """
-    Write player data to DynamoDB in batches (25 item batch limit).
-    Ensures numeric types are Decimal for DynamoDB compatibility.
+    Update player stats in the consolidated fantasy-football-players table.
+    Each player's current_season_stats gets updated with the new week's data.
     """
     try:
         batch_size = 25
@@ -366,16 +365,67 @@ def batch_write_to_dynamodb(players_data: List[Dict]):
 
             with table.batch_writer() as batch_writer:
                 for player_data in batch:
-                    item = dict(player_data)  # copy
-                    # Convert floats to Decimal
-                    for k, v in list(item.items()):
-                        if isinstance(v, float):
-                            item[k] = Decimal(str(v))
-                        # already Decimal -> leave alone
-                    batch_writer.put_item(Item=item)
+                    player_name = player_data['player_name']
+                    position = player_data['position']
+                    player_id = f"{player_name}#{position}"
+                    
+                    # Check if player exists in consolidated table
+                    try:
+                        response = table.get_item(Key={'player_id': player_id})
+                        
+                        if 'Item' in response:
+                            # Update existing player
+                            existing_item = response['Item']
+                            
+                            # Initialize current_season_stats if not present
+                            if 'current_season_stats' not in existing_item:
+                                existing_item['current_season_stats'] = {}
+                            
+                            # Initialize 2025 season if not present
+                            if str(CURRENT_SEASON) not in existing_item['current_season_stats']:
+                                existing_item['current_season_stats'][str(CURRENT_SEASON)] = {}
+                            
+                            # Update the specific week's stats
+                            existing_item['current_season_stats'][str(CURRENT_SEASON)][str(week)] = {
+                                'fantasy_points': player_data['fantasy_points'],
+                                'opponent': player_data['opponent'],
+                                'team': player_data['team'],
+                                'updated_at': player_data['updated_at']
+                            }
+                            
+                            # Write updated item back to table
+                            batch_writer.put_item(Item=existing_item)
+                            logger.debug(f"Updated existing player: {player_id} week {week}")
+                            
+                        else:
+                            # Create new player entry
+                            new_item = {
+                                'player_id': player_id,
+                                'player_name': player_name,
+                                'position': position,
+                                'historical_seasons': {},
+                                'projections': {},
+                                'current_season_stats': {
+                                    str(CURRENT_SEASON): {
+                                        str(week): {
+                                            'fantasy_points': player_data['fantasy_points'],
+                                            'opponent': player_data['opponent'],
+                                            'team': player_data['team'],
+                                            'updated_at': player_data['updated_at']
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            batch_writer.put_item(Item=new_item)
+                            logger.debug(f"Created new player: {player_id} week {week}")
+                            
+                    except Exception as e:
+                        logger.error(f"Error processing player {player_id}: {str(e)}")
+                        continue
 
-            logger.info(f"Wrote batch of {len(batch)} items to DynamoDB")
+            logger.info(f"Processed batch of {len(batch)} players for week {week}")
 
     except Exception as e:
-        logger.error(f"Error writing to DynamoDB: {str(e)}", exc_info=True)
+        logger.error(f"Error updating consolidated table: {str(e)}", exc_info=True)
         raise

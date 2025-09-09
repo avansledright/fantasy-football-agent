@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "dynamodb:BatchWriteItem",
           "dynamodb:UpdateItem"
         ]
-        Resource = "${aws_dynamodb_table.season_stats_2025.arn}"
+        Resource = "${aws_dynamodb_table.fantasy_football_players.arn}"
       }
     ]
   })
@@ -71,34 +71,34 @@ resource "aws_cloudwatch_log_group" "stats_scarper_lambda_zip" {
   }
 }
 
-# EventBridge (CloudWatch Events) rule to trigger Lambda on Tuesdays at noon
-resource "aws_cloudwatch_event_rule" "tuesday_noon_trigger" {
-  name                = "${var.lambda_function_name}-tuesday-trigger"
-  description         = "Trigger fantasy stats collection every Tuesday at noon ET"
-  schedule_expression = "cron(0 17 ? * TUE *)" # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
+# # EventBridge (CloudWatch Events) rule to trigger Lambda on Tuesdays at noon
+# resource "aws_cloudwatch_event_rule" "tuesday_noon_trigger" {
+#   name                = "${var.lambda_function_name}-tuesday-trigger"
+#   description         = "Trigger fantasy stats collection every Tuesday at noon ET"
+#   schedule_expression = "cron(0 15 ? * TUE *)" # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
 
-  tags = {
-    Project     = "fantasy-football"
-    Environment = "prod"
-    ManagedBy   = "terraform"
-  }
-}
+#   tags = {
+#     Project     = "fantasy-football"
+#     Environment = "prod"
+#     ManagedBy   = "terraform"
+#   }
+# }
 
-# EventBridge target
-resource "aws_cloudwatch_event_target" "lambda_target" {
-  rule      = aws_cloudwatch_event_rule.tuesday_noon_trigger.name
-  target_id = "fantasy-stats-lambda-target"
-  arn       = aws_lambda_function.fantasy_stats_scraper_with_layer.arn
-}
+# # EventBridge target
+# resource "aws_cloudwatch_event_target" "lambda_target" {
+#   rule      = aws_cloudwatch_event_rule.tuesday_noon_trigger.name
+#   target_id = "fantasy-stats-lambda-target"
+#   arn       = aws_lambda_function.fantasy_stats_scraper_with_layer.arn
+# }
 
-# Lambda permission for EventBridge
-resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.fantasy_stats_scraper_with_layer.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.tuesday_noon_trigger.arn
-}
+# # Lambda permission for EventBridge
+# resource "aws_lambda_permission" "allow_eventbridge" {
+#   statement_id  = "AllowExecutionFromEventBridge"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.fantasy_stats_scraper_with_layer.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.tuesday_noon_trigger.arn
+# }
 
 # Attach the layer to the Lambda function
 resource "aws_lambda_function" "fantasy_stats_scraper_with_layer" {
@@ -115,7 +115,7 @@ resource "aws_lambda_function" "fantasy_stats_scraper_with_layer" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE_NAME = aws_dynamodb_table.season_stats_2025.name
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.fantasy_football_players.name
     }
   }
 
@@ -129,10 +129,4 @@ resource "aws_lambda_function" "fantasy_stats_scraper_with_layer" {
     Environment = "prod"
     ManagedBy   = "terraform"
   }
-}
-
-
-output "eventbridge_rule_name" {
-  description = "Name of the EventBridge rule"
-  value       = aws_cloudwatch_event_rule.tuesday_noon_trigger.name
 }
