@@ -13,6 +13,7 @@ from app.player_data import load_roster_player_data, format_player_histories, an
 from app.lineup import optimize_lineup_direct
 from app.schedule import get_matchups_by_week
 from app.waiver_wire import get_position_waiver_targets, analyze_waiver_opportunities_with_projections
+from app.example_output import EXAMPLE_OUTPUT
 
 def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> Agent:
     """Build agent with comprehensive unified table data."""
@@ -78,6 +79,8 @@ Return in this exact JSON format:
   "bench": [{{"player":"...","position":"...","projected":...,"adjusted":...}}],
   "explanations": "Detailed reasoning incorporating all data sources and analysis. Including all top waiver picks (atleast 3 per position). Include explanation into each waiver wire selection"
 }}
+
+For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
 """
 
     bedrock_model = BedrockModel(

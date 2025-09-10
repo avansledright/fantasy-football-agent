@@ -72,17 +72,30 @@ resource "aws_s3_object" "app_js" {
   etag         = md5(local.templated_app_js)
 }
 
+resource "aws_s3_object" "js_files" {
+  for_each = fileset("${path.module}/web-files", "*.js")
+  
+  bucket       = aws_s3_bucket.fantasy_football_web.id
+  key          = each.value
+  source       = "${path.module}/web-files/${each.value}"
+  content_type = "application/javascript"
+  etag         = filemd5("${path.module}/web-files/${each.value}")
+}
+
+
 resource "null_resource" "invalidate_cloudfront" {
   depends_on = [
     aws_s3_object.index_html,
     aws_s3_object.styles_css,
-    aws_s3_object.app_js
+    aws_s3_object.app_js,
+    aws_s3_object.js_files
   ]
 
   triggers = {
     index_etag = aws_s3_object.index_html.etag
     css_etag   = aws_s3_object.styles_css.etag
     js_etag    = aws_s3_object.app_js.etag
+    js_files   = join(",", [for obj in aws_s3_object.js_files : obj.etag])
   }
 
   provisioner "local-exec" {
