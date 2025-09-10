@@ -38,7 +38,6 @@ def create_unified_projections(
         
         # Get player data from unified table
         player_data = unified_data.get(player_name, {})
-        print(f"Player_data: {player_data}")
         # Calculate weekly projection from multiple sources
         weekly_projection = _calculate_weekly_projection(player_data, week)
         

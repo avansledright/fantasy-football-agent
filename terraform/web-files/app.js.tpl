@@ -28,61 +28,93 @@ let currentTeam = null;
 let isEditing = false;
 
 // DOM Elements cache
-const elements = {
-    teamId: document.getElementById("teamId"),
-    loadTeam: document.getElementById("loadTeam"),
-    teamDetails: document.getElementById("teamDetails"),
-    rosterList: document.getElementById("rosterList"),
-    editRoster: document.getElementById("editRoster"),
-    editRosterForm: document.getElementById("editRosterForm"),
-    weekNumber: document.getElementById("weekNumber"),
-    generateAnalysis: document.getElementById("generateAnalysis"),
-    analysisResult: document.getElementById("analysisResult"),
-    loadingOverlay: document.getElementById("loadingOverlay"),
-    toastContainer: document.getElementById("toastContainer"),
-    editPlayerIndex: document.getElementById("editPlayerIndex"),
-    playerName: document.getElementById("playerName"),
-    playerPosition: document.getElementById("playerPosition"),
-    playerTeam: document.getElementById("playerTeam"),
-    playerStatus: document.getElementById("playerStatus"),
-    playerSlot: document.getElementById("playerSlot"),
-    savePlayer: document.getElementById("savePlayer"),
-    cancelEdit: document.getElementById("cancelEdit"),
-    removePlayer: document.getElementById("removePlayer"),
-    addPlayer: document.getElementById("addPlayer"),
-    saveRoster: document.getElementById("saveRoster")
-};
+let elements = {};
 
 // ================================
-// INITIALIZATION
+// INITIALIZATION - Make initializeApp global for auth system
 // ================================
 
-document.addEventListener("DOMContentLoaded", function () {
-    initializeEventListeners();
-    console.log("API Configuration loaded:", API_CONFIG);
-    if (elements.teamId.value) {
-        loadTeamData();
-    }
-});
+// REMOVED the DOMContentLoaded listener - auth system will handle initialization
 
-function initializeEventListeners() {
-    elements.loadTeam.addEventListener("click", loadTeamData);
-    elements.editRoster.addEventListener("click", RosterManager.toggleEditMode);
-    elements.generateAnalysis.addEventListener("click", generateWeeklyAnalysis);
-    elements.savePlayer.addEventListener("click", RosterManager.savePlayer);
-    elements.cancelEdit.addEventListener("click", RosterManager.cancelEdit);
-    elements.removePlayer.addEventListener("click", RosterManager.removePlayer);
-    elements.addPlayer.addEventListener("click", RosterManager.addNewPlayer);
-    elements.saveRoster.addEventListener("click", saveRosterChanges);
+// Make initializeApp globally accessible for the auth system
+window.initializeApp = function initializeApp() {
+    console.log('Initializing main app...');
     
-    // Keyboard shortcuts
-    elements.teamId.addEventListener("keypress", e => e.key === "Enter" && loadTeamData());
-    elements.weekNumber.addEventListener("keypress", e => e.key === "Enter" && generateWeeklyAnalysis());
-    elements.weekNumber.addEventListener("change", () => {
-        if (currentTeam && elements.teamId.value.trim()) {
+    // Wait a bit for DOM elements to be ready
+    setTimeout(() => {
+        // Cache DOM elements
+        cacheElements();
+        
+        // Initialize event listeners
+        initializeEventListeners();
+        
+        console.log("API Configuration loaded:", API_CONFIG);
+        
+        // Load team if teamId is pre-filled
+        if (elements.teamId && elements.teamId.value) {
             loadTeamData();
         }
-    });
+    }, 100);
+}
+
+function cacheElements() {
+    console.log('Caching DOM elements...');
+    
+    elements = {
+        teamId: document.getElementById("teamId"),
+        loadTeam: document.getElementById("loadTeam"),
+        teamDetails: document.getElementById("teamDetails"),
+        rosterList: document.getElementById("rosterList"),
+        editRoster: document.getElementById("editRoster"),
+        editRosterForm: document.getElementById("editRosterForm"),
+        weekNumber: document.getElementById("weekNumber"),
+        generateAnalysis: document.getElementById("generateAnalysis"),
+        analysisResult: document.getElementById("analysisResult"),
+        loadingOverlay: document.getElementById("loadingOverlay"),
+        toastContainer: document.getElementById("toastContainer"),
+        editPlayerIndex: document.getElementById("editPlayerIndex"),
+        playerName: document.getElementById("playerName"),
+        playerPosition: document.getElementById("playerPosition"),
+        playerTeam: document.getElementById("playerTeam"),
+        playerStatus: document.getElementById("playerStatus"),
+        playerSlot: document.getElementById("playerSlot"),
+        savePlayer: document.getElementById("savePlayer"),
+        cancelEdit: document.getElementById("cancelEdit"),
+        removePlayer: document.getElementById("removePlayer"),
+        addPlayer: document.getElementById("addPlayer"),
+        saveRoster: document.getElementById("saveRoster")
+    };
+    
+    console.log('Elements cached:', Object.keys(elements).length);
+}
+
+function initializeEventListeners() {
+    console.log('Setting up event listeners...');
+    
+    // Check if elements exist before adding listeners
+    if (elements.loadTeam) elements.loadTeam.addEventListener("click", loadTeamData);
+    if (elements.editRoster) elements.editRoster.addEventListener("click", RosterManager.toggleEditMode);
+    if (elements.generateAnalysis) elements.generateAnalysis.addEventListener("click", generateWeeklyAnalysis);
+    if (elements.savePlayer) elements.savePlayer.addEventListener("click", RosterManager.savePlayer);
+    if (elements.cancelEdit) elements.cancelEdit.addEventListener("click", RosterManager.cancelEdit);
+    if (elements.removePlayer) elements.removePlayer.addEventListener("click", RosterManager.removePlayer);
+    if (elements.addPlayer) elements.addPlayer.addEventListener("click", RosterManager.addNewPlayer);
+    if (elements.saveRoster) elements.saveRoster.addEventListener("click", saveRosterChanges);
+    
+    // Keyboard shortcuts
+    if (elements.teamId) {
+        elements.teamId.addEventListener("keypress", e => e.key === "Enter" && loadTeamData());
+    }
+    if (elements.weekNumber) {
+        elements.weekNumber.addEventListener("keypress", e => e.key === "Enter" && generateWeeklyAnalysis());
+        elements.weekNumber.addEventListener("change", () => {
+            if (currentTeam && elements.teamId && elements.teamId.value.trim()) {
+                loadTeamData();
+            }
+        });
+    }
+    
+    console.log('Event listeners set up');
 }
 
 // ================================
@@ -90,8 +122,10 @@ function initializeEventListeners() {
 // ================================
 
 async function loadTeamData() {
+    if (!elements.teamId) return;
+    
     const teamId = elements.teamId.value.trim();
-    const week = elements.weekNumber.value.trim();
+    const week = elements.weekNumber ? elements.weekNumber.value.trim() : '';
     
     if (!APIHelper.validateInputs(teamId, week)) return;
     
@@ -121,6 +155,8 @@ async function loadTeamData() {
 }
 
 async function generateWeeklyAnalysis() {
+    if (!elements.teamId || !elements.weekNumber) return;
+    
     const teamId = elements.teamId.value.trim();
     const week = elements.weekNumber.value.trim();
     
@@ -156,7 +192,9 @@ async function generateWeeklyAnalysis() {
     } catch (error) {
         console.error('Error generating analysis:', error);
         showToast(`Error generating analysis: ${error.message}`, "error");
-        elements.analysisResult.innerHTML = "<p>Failed to generate analysis</p>";
+        if (elements.analysisResult) {
+            elements.analysisResult.innerHTML = "<p>Failed to generate analysis</p>";
+        }
     } finally {
         showLoading(false);
     }
@@ -167,6 +205,8 @@ async function saveRosterChanges() {
         showToast("No team data to save", "warning");
         return;
     }
+    
+    if (!elements.teamId) return;
     
     const teamId = elements.teamId.value.trim();
     if (!teamId) {
@@ -193,10 +233,14 @@ async function saveRosterChanges() {
 // ================================
 
 function showLoading(show) {
-    elements.loadingOverlay.style.display = show ? "flex" : "none";
+    if (elements.loadingOverlay) {
+        elements.loadingOverlay.style.display = show ? "flex" : "none";
+    }
 }
 
 function showToast(message, type = "info") {
+    if (!elements.toastContainer) return;
+    
     const toast = document.createElement("div");
     toast.className = `toast ${type}`;
     toast.innerHTML = `

@@ -20,7 +20,6 @@ def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: l
     
     print(f"Loading roster for team {team_id}...")
     roster = load_team_roster(team_id)
-    print(f"ROSTER: {roster}")
     print(f"Loading comprehensive player data from unified table...")
     roster_players = roster.get("players", [])
     print(f"PLAYERS: {roster_players}")
@@ -73,6 +72,9 @@ Your task: Optimize the lineup for week {week} using:
 8. For waiver suggestions be sure to analyze their past performance against their opponents
 9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
 10. For the OP position. Be sure to give a detailed explanation as to your selection. Typically this is a place to gain a competitive edge given that it can be any of QB/RB/WR/TE positions. 
+
+FOR DEFENSE:
+Because week to week matchups are always exploitable, identify the best defensive matchups for the week. Return them as part of your explanations. Highlight it in another heading section and include the teams that could be good picks from waivers.
 
 LEAGUE ROSTER REQUIREMENTS:
 - 1 QB, 2 RB, 2 WR, 1 TE, 1 FLEX (RB/WR/TE), 1 OP (QB/RB/WR/TE), 1 K, 1 DST

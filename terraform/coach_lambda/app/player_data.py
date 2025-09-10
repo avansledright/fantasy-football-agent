@@ -124,9 +124,7 @@ def extract_current_stats(player_data: Dict[str, Any]) -> Dict[str, Any]:
 def load_roster_player_data(roster_players: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     """Load comprehensive data for all roster players."""
     # Extract player IDs from roster
-    print(f"Inside load_roster_player_data")
     player_ids = [p.get("player_id") for p in roster_players if p.get("player_id")]
-    print(f"Returned Player Data: {player_ids}")
     if not player_ids:
         # Fallback to name-based lookup
         all_data = {}
