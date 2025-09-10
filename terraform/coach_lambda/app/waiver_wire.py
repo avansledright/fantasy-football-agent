@@ -60,11 +60,6 @@ def get_all_rostered_players(use_cache: bool = True) -> Set[str]:
         print(f"Error getting rostered players: {str(e)}")
         return set()
 
-def clear_rostered_players_cache():
-    """Clear the rostered players cache."""
-    global _rostered_players_cache
-    _rostered_players_cache = None
-
 def _extract_weekly_projection(weekly_projections: Dict[str, Any], week: int) -> float:
     """Extract projection for specific week from weekly_projections object."""
     if not weekly_projections or not isinstance(weekly_projections, dict):
@@ -503,66 +498,3 @@ def _classify_target_type(ownership: float, upside_score: float) -> str:
         return "Solid Add"
     else:
         return "Depth Option"
-
-@tool
-def debug_waiver_table(position: str = "TE", week: int = 1) -> Dict[str, Any]:
-    """Debug tool to check waiver table contents and structure."""
-    waiver_table = DDB.Table(WAIVER_TABLE)
-    
-    try:
-        resp = waiver_table.scan(
-            FilterExpression=Attr("position").eq(normalize_position(position)),
-            Limit=10
-        )
-        
-        items = resp.get("Items", [])
-        
-        if items:
-            sample_item = items[0]
-            available_fields = list(sample_item.keys())
-            
-            required_fields = ["player_season", "player_name", "position", "injury_status", "weekly_projections"]
-            missing_fields = [field for field in required_fields if field not in available_fields]
-            
-            active_count = len([item for item in items if item.get("injury_status") == "ACTIVE"])
-            projected_count = 0
-            for item in items:
-                weekly_projs = item.get("weekly_projections", {})
-                if weekly_projs and str(week) in weekly_projs:
-                    projected_count += 1
-            
-            return {
-                "table_name": WAIVER_TABLE,
-                "sample_count": len(items),
-                "available_fields": available_fields,
-                "missing_fields": missing_fields,
-                "active_players": active_count,
-                "players_with_week_projections": projected_count,
-                "sample_data": items[:2],
-                "analysis": f"Found {len(items)} {position} players, {active_count} active, {projected_count} with week {week} projections"
-            }
-        else:
-            return {
-                "table_name": WAIVER_TABLE,
-                "error": f"No {position} players found in waiver table",
-                "total_items_check": _check_total_table_size()
-            }
-            
-    except Exception as e:
-        return {
-            "table_name": WAIVER_TABLE,
-            "error": f"Error accessing waiver table: {str(e)}",
-            "suggestion": "Check if WAIVER_TABLE environment variable is set correctly"
-        }
-
-def _check_total_table_size() -> Dict[str, Any]:
-    """Quick check of total table size."""
-    try:
-        waiver_table = DDB.Table(WAIVER_TABLE)
-        resp = waiver_table.scan(Limit=5)
-        return {
-            "total_sample": len(resp.get("Items", [])),
-            "has_data": len(resp.get("Items", [])) > 0
-        }
-    except Exception as e:
-        return {"error": str(e)}

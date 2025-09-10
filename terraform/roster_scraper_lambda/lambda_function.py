@@ -15,8 +15,8 @@ dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
 
 def generate_player_id(name, position):
     """Generate player_id in format: name_position (e.g., josh_allen_qb)"""
-    clean_name = name.lower().replace(' ', '_').replace('.', '').replace("'", '').replace('-', '_')
-    return f"{clean_name}_{position.lower()}"
+    #clean_name = name.lower().replace(' ', '_').replace('.', '').replace("'", '').replace('-', '_')
+    return f"{name}#{position.upper()}"
 
 def get_team_abbreviation(pro_team_id):
     """Map ESPN pro team ID to team abbreviation"""
@@ -144,6 +144,9 @@ def process_team_roster(team, league_id, league_name, members_data):
         elif slot_id == 6: # TE
             player_data['slot'] = 'TE'
             starters_dict['TE'].append(player_data)
+        elif slot_id == 21: #IR
+            player_data['slot'] = 'IR'
+            bench_players.append(player_data)
         else: # RB and WR
             if position == 'RB':
                 starters_dict['RB'].append(player_data)

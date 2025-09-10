@@ -7,6 +7,15 @@ from typing import Dict, List, Any
 from strands import tool
 from app.player_data import load_roster_player_data, extract_2025_projections, extract_2024_history, extract_current_stats
 
+def safe_float(value):
+    """Safely convert Decimal or any numeric type to float."""
+    if value is None:
+        return 0.0
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return 0.0
+    
 def create_unified_projections(
     roster_players: List[Dict[str, Any]], 
     week: int
@@ -29,7 +38,7 @@ def create_unified_projections(
         
         # Get player data from unified table
         player_data = unified_data.get(player_name, {})
-        
+        print(f"Player_data: {player_data}")
         # Calculate weekly projection from multiple sources
         weekly_projection = _calculate_weekly_projection(player_data, week)
         
@@ -56,7 +65,7 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
     
     if not player_data:
         print("No player data found - returning default 5.0")
-        return 5.0  # Default minimal projection
+        return 5.0
     
     player_name = player_data.get("player_name", "Unknown")
     print(f"DEBUG: Calculating projection for {player_name}")
@@ -66,24 +75,29 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
     history_2024 = extract_2024_history(player_data)
     current_2025 = extract_current_stats(player_data)
     
-    print(f"  2025 projections keys: {list(projections_2025.keys())}")
-    print(f"  2024 history keys: {list(history_2024.keys())}")
-    print(f"  2025 current keys: {list(current_2025.keys())}")
+    # FIRST: Check for specific weekly projection
+    weekly_projections = projections_2025.get("weekly", {})
+    if str(week) in weekly_projections:
+        weekly_proj_raw = weekly_projections[str(week)].get("fantasy_points", 0)
+        weekly_proj = float(weekly_proj_raw)  # Convert Decimal to float
+        if weekly_proj > 0:
+            print(f"  Found weekly projection for week {week}: {weekly_proj}")
+            return round(weekly_proj, 1)
     
-    # Base projection from season total
-    season_projection = projections_2025.get("MISC_FPTS", 0)
+    # Base projection from season total - convert Decimal to float
+    season_projection = float(projections_2025.get("MISC_FPTS", 0))
     weekly_from_season = (season_projection / 17) if season_projection > 0 else 0
     print(f"  Season total: {season_projection}, weekly: {weekly_from_season}")
     
-    # Recent performance from 2024
-    historical_avg = history_2024.get("recent4_avg", 0)
+    # Recent performance from 2024 - convert Decimal to float
+    historical_avg = float(history_2024.get("recent4_avg", 0))
     print(f"  2024 recent avg: {historical_avg}")
     
-    # Current 2025 performance
+    # Current 2025 performance - convert Decimal to float
     current_weeks = current_2025.get("weeks", [])
     current_avg = 0
     if current_weeks:
-        current_avg = sum(w.get("fantasy_points", 0) for w in current_weeks) / len(current_weeks)
+        current_avg = sum(float(w.get("fantasy_points", 0)) for w in current_weeks) / len(current_weeks)
     print(f"  2025 current avg: {current_avg} from {len(current_weeks)} weeks")
     
     # Weighted calculation
@@ -215,11 +229,3 @@ def _calculate_consistency(points_list: List[float]) -> float:
     # Typical CV for fantasy players ranges from 0.3 (consistent) to 1.5+ (boom/bust)
     consistency = max(0, min(1, 1 - (cv / 1.5)))
     return consistency
-
-# Legacy compatibility functions - now powered by unified data
-def create_fallback_projections_unified(
-    roster_players: List[Dict[str, Any]], 
-    week: int
-) -> Dict[str, List[Dict[str, Any]]]:
-    """Create fallback projections using unified data (replaces external API fallback)."""
-    return create_unified_projections(roster_players, week)

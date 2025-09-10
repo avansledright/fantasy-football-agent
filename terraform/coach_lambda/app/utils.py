@@ -8,6 +8,8 @@ from typing import Literal
 
 Positions = Literal["QB", "RB", "WR", "TE", "K", "DST"]
 
+
+
 def normalize_player_name(name: str) -> str:
     """Normalize player names for consistent matching."""
     if not name:
@@ -116,8 +118,8 @@ def generate_player_id_candidates(player_name: str) -> list[str]:
         team_abbrev = player_name.split()[0].lower()
         return [f"{team_abbrev}_dst", team_abbrev]
     
-    # Generate candidates with position suffixes
-    return [
+    # Current format (underscore + lowercase position)
+    candidates = [
         f"{base_id}_qb",
         f"{base_id}_rb", 
         f"{base_id}_wr",
@@ -125,3 +127,16 @@ def generate_player_id_candidates(player_name: str) -> list[str]:
         f"{base_id}_k",
         base_id
     ]
+    
+    # ADD: DynamoDB format (proper case + # + uppercase position)
+    proper_name = player_name.replace("'", "'").strip()
+    candidates.extend([
+        f"{proper_name}#QB",
+        f"{proper_name}#RB",
+        f"{proper_name}#WR", 
+        f"{proper_name}#TE",
+        f"{proper_name}#K",
+        f"{proper_name}#DST"
+    ])
+    
+    return candidates

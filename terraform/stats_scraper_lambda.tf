@@ -44,7 +44,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "dynamodb:PutItem",
           "dynamodb:BatchWriteItem",
-          "dynamodb:UpdateItem"
+          "dynamodb:UpdateItem",
+          "dynamodb:GetItem",
+          "dynamodb:Batch*"
         ]
         Resource = "${aws_dynamodb_table.fantasy_football_players.arn}"
       }

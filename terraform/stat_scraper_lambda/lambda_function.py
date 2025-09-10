@@ -1,5 +1,6 @@
 import json
 import boto3
+from botocore.exceptions import ClientError
 import requests
 from bs4 import BeautifulSoup
 import logging
@@ -61,8 +62,15 @@ def lambda_handler(event, context):
                 logger.info(f"Processed {len(players_data)} {position} players")
             else:
                 logger.warning(f"No data found for {position}")
-
-        logger.info(f"Successfully processed {total_players_processed} total players")
+            logger.info(f"Getting projection data for {position}")
+            proj_data = scrape_fantasypros_projections(position, current_week)
+            logger.info(f"PROJECTION DATA: {proj_data}")
+            if proj_data:
+                update_player_projections_in_table(proj_data, current_week)
+                logger.info(f"Processed {len(proj_data)} {position} projections")
+            else:
+                logger.warning(f"No projections found for {position}")
+                logger.info(f"Successfully processed {total_players_processed} total players")
 
         return {
             'statusCode': 200,
@@ -82,6 +90,213 @@ def lambda_handler(event, context):
             })
         }
 
+def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
+    """
+    Scrape weekly projections (FPTS only) from FantasyPros for a given position.
+
+    Uses parse_player_row() to normalize names exactly like the stats scraper so
+    player_id's line up with existing DynamoDB records.
+    """
+    try:
+        url = f"https://www.fantasypros.com/nfl/projections/{position.lower()}.php"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        params = {'scoring': 'PPR', 'week': week}
+
+        resp = requests.get(url, headers=headers, params=params, timeout=30)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.content, 'html.parser')
+
+        stats_table = soup.find('table', {'id': 'data'}) or soup.find('table', class_='table')
+        if not stats_table:
+            logger.warning(f"No projections table found for {position} week {week} at {url}")
+            return []
+
+        # Grab last header row (handles multi-row headers)
+        thead = stats_table.find('thead')
+        if not thead:
+            logger.warning("No thead found in projections table")
+            return []
+
+        header_rows = thead.find_all('tr')
+        if not header_rows:
+            logger.warning("No header rows in projections thead")
+            return []
+
+        header_cells = header_rows[-1].find_all(['th', 'td'])
+        headers = [hc.get_text(strip=True).upper() for hc in header_cells]
+        header_index = {h: i for i, h in enumerate(headers)}
+
+        # helper like stats scraper: find header index by exact or prefix match
+        def find_header_index(targets):
+            for t in targets:
+                for h, idx in header_index.items():
+                    if h == t or h.startswith(t):
+                        return idx
+            return None
+
+        player_idx = find_header_index(['PLAYER'])
+        team_idx = find_header_index(['TEAM'])  # if projections table has a separate TEAM column
+        fpts_idx = find_header_index(['FPTS']) or find_header_index(['FPTS/G']) or (len(headers) - 1)
+
+        # iterate body rows
+        tbody = stats_table.find('tbody')
+        rows = tbody.find_all('tr') if tbody else stats_table.find_all('tr')[1:]
+        players = []
+
+        for row in rows:
+            try:
+                cells = row.find_all(['td', 'th'])
+                if not cells:
+                    continue
+
+                # Reuse parse_player_row to normalize player_name/team exactly the same way
+                # parse_player_row expects indices for player and fpts (it can handle player_idx==None)
+                parsed = parse_player_row(row, position, week, player_idx, fpts_idx)
+                if not parsed:
+                    continue
+
+                # If the table provides a separate TEAM column, prefer that value (more reliable)
+                if team_idx is not None and team_idx < len(cells):
+                    team_text = cells[team_idx].get_text(strip=True).upper()
+                    # team_text might be full team name or 2-4 letter code; try to extract code
+                    m = re.match(r'^([A-Z]{2,4})$', team_text)
+                    if m:
+                        team_code = m.group(1)
+                    else:
+                        # fallback: take last token if it's an uppercase abbr
+                        toks = team_text.split()
+                        if toks and re.match(r'^[A-Z]{2,4}$', toks[-1]):
+                            team_code = toks[-1]
+                        else:
+                            team_code = team_text  # last resort: use the raw team_text
+                    # override parsed team and strip trailing code from player_name if present
+                    parsed['team'] = team_code
+                    if parsed['player_name'].endswith(' ' + team_code):
+                        parsed['player_name'] = parsed['player_name'][:-(len(team_code) + 1)]
+
+                # For DST, ensure same naming convention as stats scraper
+                if position == "DST":
+                    if parsed.get('team') and parsed['team'] != "UNK":
+                        parsed['player_name'] = f"{parsed['team']} DST"
+
+                # fantasy_points from parse_player_row is already Decimal when possible; ensure type
+                fpts = parsed.get('fantasy_points', Decimal('0'))
+                try:
+                    if not isinstance(fpts, Decimal):
+                        fpts = Decimal(str(fpts))
+                except Exception:
+                    fpts = Decimal('0')
+
+                players.append({
+                    'player_name': parsed['player_name'],
+                    'position': position,
+                    'fantasy_points': fpts,
+                    'week': int(week),
+                    'season': int(CURRENT_SEASON),
+                    'updated_at': datetime.now().isoformat()
+                })
+            except Exception as e:
+                logger.warning(f"Error parsing projection row for {position}: {e}", exc_info=True)
+                continue
+
+        return players
+
+    except requests.RequestException as e:
+        logger.error(f"Request error while scraping projections for {position}: {e}", exc_info=True)
+        return []
+    except Exception as e:
+        logger.error(f"Error scraping projections for {position}: {e}", exc_info=True)
+        return []
+
+
+
+
+def update_player_projections_in_table(players_data: List[Dict], week: int):
+    """
+    Update player projections in the consolidated table.
+    Stores weekly projections under: projections[<season>]['weekly'][<week>].
+    Simple, safe: get -> mutate -> put.
+    """
+    try:
+        season_key = str(CURRENT_SEASON)
+        week_key = str(week)
+
+        with table.batch_writer() as batch:
+            for player in players_data:
+                player_id = f"{player['player_name']}#{player['position']}"
+
+                # Ensure fantasy_points is Decimal
+                try:
+                    fpts = player.get('fantasy_points', 0)
+                    if not isinstance(fpts, Decimal):
+                        fpts = Decimal(str(fpts))
+                except Exception:
+                    fpts = Decimal('0')
+
+                week_val = {
+                    'fantasy_points': fpts,
+                    'updated_at': player.get('updated_at', datetime.now().isoformat())
+                }
+
+                try:
+                    resp = table.get_item(Key={'player_id': player_id})
+                    logger.info(f"resp = {resp}")
+                    if 'Item' in resp:
+                        item = resp['Item']
+
+                        # make sure projections exists
+                        if 'projections' not in item or not isinstance(item['projections'], dict):
+                            item['projections'] = {}
+
+                        # make sure this season exists
+                        if season_key not in item['projections'] or not isinstance(item['projections'][season_key], dict):
+                            # preserve old value if it was not a dict
+                            prev_val = item['projections'].get(season_key)
+                            if prev_val and not isinstance(prev_val, dict):
+                                item['projections'][season_key] = {'season_totals': prev_val}
+                            else:
+                                item['projections'][season_key] = {}
+
+                        # make sure weekly exists
+                        if 'weekly' not in item['projections'][season_key]:
+                            item['projections'][season_key]['weekly'] = {}
+
+                        # set this week's projection
+                        item['projections'][season_key]['weekly'][week_key] = week_val
+                        logger.info(f"Putting new object inside if")
+                        try:
+                            logger.info(f"ITEM TO PUT: {item}")
+                            batch.put_item(Item=item)
+                        except ClientError as e:
+                            logger.info(f"FAILED TO PUT OBJECT {e}")
+
+                    else:
+                        # new item
+                        new_item = {
+                            'player_id': player_id,
+                            'player_name': player['player_name'],
+                            'position': player['position'],
+                            'historical_seasons': {},
+                            'current_season_stats': {},
+                            'projections': {
+                                season_key: {
+                                    'weekly': {
+                                        week_key: week_val
+                                    }
+                                }
+                            }
+                        }
+                        logger.info(f"Putting new object inside else")
+                        logger.info(f"new_item = {new_item}")
+                        batch.put_item(Item=new_item)
+
+                except Exception as e:
+                    logger.error(f"Error updating projections for {player_id}: {e}", exc_info=True)
+
+        logger.info(f"Processed projections for {len(players_data)} players, week {week}")
+
+    except Exception as e:
+        logger.error(f"Error in update_player_projections_in_table: {e}", exc_info=True)
 
 def get_current_nfl_week() -> int:
     """

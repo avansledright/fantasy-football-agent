@@ -134,7 +134,6 @@ def choose_optimal_lineup(
     lineup_slots: List[str],
     roster: Any,
     projections: Any,
-    histories: Any = None  # Not used in streamlined version
 ) -> Dict[str, Any]:
     """Choose optimal lineup with streamlined logic."""
     
