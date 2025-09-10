@@ -7,7 +7,7 @@ import os
 import json
 from strands import Agent
 from strands.models import BedrockModel
-from app.projections import get_roster_projections
+from app.projections import create_unified_projections
 from app.dynamo import load_team_roster, format_roster_for_agent
 from app.player_data import load_roster_player_data, format_player_histories, analyze_player_performance, compare_roster_players
 from app.lineup import optimize_lineup_direct
@@ -25,8 +25,8 @@ def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: l
     roster_players = roster.get("players", [])
     unified_player_data = load_roster_player_data(roster_players)
     
-    print(f"Fetching external weekly projections...")
-    projections_data = get_roster_projections(week, roster_players)
+    print(f"Creating unified weekly projections for week {week}...")
+    projections_data = create_unified_projections(roster_players, week)
     projections_json = json.dumps(projections_data)
     
     print(f"Getting weekly matchups...")
@@ -49,26 +49,33 @@ COMPREHENSIVE PLAYER DATA:
 WEEKLY MATCHUPS: 
 {weekly_matchups}
 
-WEEKLY PROJECTIONS (External API):
+WEEKLY PROJECTIONS (Unified Data):
 {projections_json}
 
 You have access to advanced analysis tools:
 
 - analyze_player_performance: Get comprehensive analysis for individual players
-- compare_roster_players: Compare multiple players across different metrics
-- get_position_waiver_targets(position, week={week}) - Get specific waiver targets for a position with low ownership.
--  analyze_waiver_opportunities_with_projections(current_roster, external_projections, week={week}) - Analyze waiver wire opportunities using external projection data.
+- compare_roster_players: Compare multiple players across different metrics  
+- analyze_roster_needs_for_waivers: Analyze your roster construction to identify positional needs based on league requirements
+- should_target_position_for_waiver: Check if a specific position should be targeted for waiver pickup
+- get_position_waiver_targets(position, week={week}, min_points=5.0, max_ownership=25.0) - Get specific waiver targets for a position with low ownership
+- analyze_waiver_opportunities_with_projections(current_roster, external_projections, week={week}) - Smart waiver analysis considering roster construction
 
 Your task: Optimize the lineup for week {week} using:
 1. 2024 historical performance data
 2. 2025 season projections 
 3. Current 2025 weekly performance
-4. External weekly projections
+4. Unified weekly projections from comprehensive data
 5. Team matchups and game context
-6. Consider player acquisitions through waiver wire using the tool get_position_waiver_targets(position, week={week})
-7. Analyze best waiver wire acquisitions with the tool analyze_waiver_opportunities_with_projections
+6. ROSTER CONSTRUCTION ANALYSIS - Use analyze_roster_needs_for_waivers to identify which positions need help
+7. SMART WAIVER RECOMMENDATIONS - Only suggest waivers for positions that need depth based on league requirements
 8. For waiver suggestions be sure to analyze their past performance against their opponents
 9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
+
+LEAGUE ROSTER REQUIREMENTS:
+- 1 QB, 2 RB, 2 WR, 1 TE, 1 FLEX (RB/WR/TE), 1 OP (QB/RB/WR/TE), 1 K, 1 DST
+- 8 bench spots
+- DO NOT recommend waiver pickups for positions where you already have adequate depth
 
 Required lineup positions: {lineup_slots}
 (FLEX = RB/WR/TE, OP = QB/RB/WR/TE)
@@ -77,7 +84,7 @@ Return in this exact JSON format:
 {{
   "lineup": [{{"slot":"QB","player":"Josh Allen","team":"BUF","position":"QB","projected":22.4,"adjusted":23.1}}],
   "bench": [{{"player":"...","position":"...","projected":...,"adjusted":...}}],
-  "explanations": "Detailed reasoning incorporating all data sources and analysis. Including all top waiver picks (atleast 3 per position). Include explanation into each waiver wire selection"
+  "explanations": "Detailed reasoning incorporating all data sources and analysis. Including all top waiver picks. Include explanation into each waiver wire selection"
 }}
 
 For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
@@ -102,17 +109,16 @@ For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
     return agent
 
 def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
-    """Ultra-fast optimization using direct computation."""
+    """Ultra-fast optimization using direct computation with unified data."""
     
     print(f"Ultra-fast mode: Direct optimization with unified data...")
     
     roster = load_team_roster(team_id)
     roster_players = roster.get("players", [])
     
-    # Get external projections
-    projections_data = get_roster_projections(week, roster_players)
-    if isinstance(projections_data, str):
-        projections_data = json.loads(projections_data)
+    # Get unified projections instead of external
+    print(f"Creating unified projections for week {week}...")
+    projections_data = create_unified_projections(roster_players, week)
     
     # Direct optimization
     result = optimize_lineup_direct(
@@ -122,9 +128,10 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
     )
     
     # Enhanced explanation
+    total_projections = sum(len(players) for players in projections_data.values())
     result["explanations"] = (
         f"Week {week} lineup optimized using comprehensive unified data: "
-        f"external weekly projections, 2025 season projections, 2024 historical performance, "
+        f"unified weekly projections ({total_projections} players), 2025 season projections, 2024 historical performance, "
         f"and confidence-weighted scoring. Filled {result.get('debug_info', {}).get('lineup_filled', 0)} slots "
         f"with average confidence of {result.get('debug_info', {}).get('avg_confidence', 0)}."
     )

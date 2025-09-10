@@ -1,221 +1,225 @@
 # app/projections.py
 """
-Simplified external projections API calls.
+Projections using unified player data table instead of external APIs.
 """
 
-import re
-import time
 from typing import Dict, List, Any
-import requests
-from bs4 import BeautifulSoup
 from strands import tool
+from app.player_data import load_roster_player_data, extract_2025_projections, extract_2024_history, extract_current_stats
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; FantasyAgent/1.0; +https://example.com/agent)"
-}
-
-FP_BASE = "https://www.fantasypros.com/nfl/projections"
-FP_PATHS = {
-    "QB": "qb.php",
-    "RB": "rb.php", 
-    "WR": "wr.php",
-    "TE": "te.php",
-    "K": "k.php",
-    "DST": "dst.php",
-}
-
-def _fetch_position_projections(position: str, week: int) -> List[Dict[str, Any]]:
-    """Fetch projections for a single position."""
-    url = f"{FP_BASE}/{FP_PATHS[position]}?week={week}"
+def create_unified_projections(
+    roster_players: List[Dict[str, Any]], 
+    week: int
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Create weekly projections using unified player data."""
     
-    # Retry logic
-    for attempt in range(3):
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=15)
-            if resp.status_code == 200:
-                break
-            time.sleep(1 + attempt)
-        except requests.RequestException:
-            if attempt == 2:
-                return []
-            time.sleep(1 + attempt)
-    else:
-        return []
-
-    soup = BeautifulSoup(resp.text, "html.parser")
-    table = soup.find("table")
-    if not table:
-        return []
-
-    # Find headers
-    thead = table.find("thead")
-    headers = [th.get_text(strip=True) for th in thead.find_all("th")] if thead else []
+    # Load comprehensive data for all roster players
+    unified_data = load_roster_player_data(roster_players)
     
-    # Find FPTS column
-    fpts_col = None
-    for i, header in enumerate(headers):
-        if "FPTS" in header:
-            fpts_col = i
-            break
+    # Group projections by position
+    projections_by_position = {}
     
-    if fpts_col is None:
-        return []
-
-    rows = []
-    tbody = table.find("tbody")
-    if not tbody:
-        return rows
-
-    for tr in tbody.find_all("tr"):
-        tds = tr.find_all(["td", "th"])
-        if len(tds) <= fpts_col:
+    for player in roster_players:
+        player_name = player.get("name", "")
+        position = player.get("position", "").upper()
+        team = player.get("team", "")
+        
+        if not player_name or position not in ("QB", "RB", "WR", "TE", "K", "DST"):
             continue
-            
-        # Parse player name and team
-        player_cell = tds[0]
-        player_text = player_cell.get_text(" ", strip=True)
         
-        # Extract name and team from "(TEAM)" pattern
-        match = re.match(r"(.+?)\s+\(([A-Z]{2,3})\)", player_text)
-        if match:
-            name, team = match.group(1), match.group(2)
-        else:
-            name = re.sub(r"\s*\([^)]+\)$", "", player_text).strip()
-            team = ""
+        # Get player data from unified table
+        player_data = unified_data.get(player_name, {})
         
-        # Get opponent
-        opp = ""
-        if len(headers) > 1 and "Opp" in headers:
-            opp_col = headers.index("Opp")
-            if len(tds) > opp_col:
-                opp = tds[opp_col].get_text(strip=True).lstrip("@")
+        # Calculate weekly projection from multiple sources
+        weekly_projection = _calculate_weekly_projection(player_data, week)
         
-        # Get projected points
-        projected = 0.0
-        try:
-            proj_text = tds[fpts_col].get_text(strip=True)
-            projected = float(proj_text)
-        except (ValueError, IndexError):
-            projected = 0.0
-        
-        rows.append({
-            "name": name,
+        # Create projection entry
+        projection_entry = {
+            "name": player_name,
             "team": team,
-            "opp": opp,
+            "opp": "",  # Could enhance with schedule data
             "position": position,
-            "projected": projected
-        })
+            "projected": weekly_projection
+        }
+        
+        # Group by position
+        if position not in projections_by_position:
+            projections_by_position[position] = []
+        projections_by_position[position].append(projection_entry)
+        
+        print(f"Unified projection for {player_name} ({position}): {weekly_projection} points")
     
-    return rows
+    return projections_by_position
+
+def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> float:
+    """Calculate weekly projection from unified player data."""
+    
+    if not player_data:
+        print("No player data found - returning default 5.0")
+        return 5.0  # Default minimal projection
+    
+    player_name = player_data.get("player_name", "Unknown")
+    print(f"DEBUG: Calculating projection for {player_name}")
+    
+    # Extract different data sources
+    projections_2025 = extract_2025_projections(player_data)
+    history_2024 = extract_2024_history(player_data)
+    current_2025 = extract_current_stats(player_data)
+    
+    print(f"  2025 projections keys: {list(projections_2025.keys())}")
+    print(f"  2024 history keys: {list(history_2024.keys())}")
+    print(f"  2025 current keys: {list(current_2025.keys())}")
+    
+    # Base projection from season total
+    season_projection = projections_2025.get("MISC_FPTS", 0)
+    weekly_from_season = (season_projection / 17) if season_projection > 0 else 0
+    print(f"  Season total: {season_projection}, weekly: {weekly_from_season}")
+    
+    # Recent performance from 2024
+    historical_avg = history_2024.get("recent4_avg", 0)
+    print(f"  2024 recent avg: {historical_avg}")
+    
+    # Current 2025 performance
+    current_weeks = current_2025.get("weeks", [])
+    current_avg = 0
+    if current_weeks:
+        current_avg = sum(w.get("fantasy_points", 0) for w in current_weeks) / len(current_weeks)
+    print(f"  2025 current avg: {current_avg} from {len(current_weeks)} weeks")
+    
+    # Weighted calculation
+    # 50% season projection, 30% 2024 history, 20% current 2025 performance
+    weights = {
+        "season": 0.5,
+        "historical": 0.3,
+        "current": 0.2
+    }
+    
+    projection = (
+        weights["season"] * weekly_from_season +
+        weights["historical"] * historical_avg +
+        weights["current"] * current_avg
+    )
+    
+    print(f"  Raw projection: {projection}")
+    
+    # Apply position-based adjustments
+    position = player_data.get("position", "")
+    projection = _apply_position_adjustments(projection, position)
+    
+    print(f"  After position adjustment: {projection}")
+    
+    # Ensure minimum projection
+    final_projection = max(round(projection, 1), 3.0)
+    print(f"  Final projection: {final_projection}")
+    
+    return final_projection
+
+def _apply_position_adjustments(projection: float, position: str) -> float:
+    """Apply position-specific adjustments to projections."""
+    
+    position_multipliers = {
+        "QB": 1.1,    # QBs typically score higher
+        "RB": 1.0,    # Baseline
+        "WR": 1.0,    # Baseline
+        "TE": 0.9,    # TEs typically score lower
+        "K": 0.7,     # Kickers much lower
+        "DST": 0.8    # Defenses variable but generally lower
+    }
+    
+    multiplier = position_multipliers.get(position.upper(), 1.0)
+    return projection * multiplier
 
 @tool
 def get_roster_projections(week: int, roster_players: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
-    """Fetch projections only for roster players to reduce API calls."""
+    """Get projections for roster players using unified table data.
     
-    # Group roster players by position
-    roster_by_position = {}
-    for player in roster_players:
-        pos = player.get("position", "").upper()
-        name = player.get("name", "")
-        if pos in FP_PATHS and name:
-            if pos not in roster_by_position:
-                roster_by_position[pos] = set()
-            roster_by_position[pos].add(name.lower())
+    Args:
+        week: Week number (for compatibility, not used in unified approach)
+        roster_players: List of roster players
     
-    # Only fetch for positions we have players for
-    data = {}
-    for pos in roster_by_position:
-        try:
-            all_projections = _fetch_position_projections(pos, week)
-            # Filter to only roster players
-            roster_projections = [
-                p for p in all_projections 
-                if p["name"].lower() in roster_by_position[pos]
-            ]
-            data[pos] = roster_projections
-            print(f"Fetched {len(roster_projections)} {pos} projections for roster players")
-            
-            # If no projections found, create fallback using unified table data
-            if len(roster_projections) == 0:
-                print(f"No external projections found for {pos}, creating fallback...")
-                fallback_projections = _create_fallback_projections(pos, roster_players, week)
-                data[pos] = fallback_projections
-                print(f"Created {len(fallback_projections)} fallback {pos} projections")
-                
-        except Exception as e:
-            print(f"Error fetching {pos} projections: {e}")
-            # Create fallback projections when API fails
-            fallback_projections = _create_fallback_projections(pos, roster_players, week)
-            data[pos] = fallback_projections
-            print(f"Created {len(fallback_projections)} fallback {pos} projections due to API error")
+    Returns:
+        Dict with projections by position
+    """
+    print(f"Creating unified projections for week {week}...")
     
-    return data
-
-def _create_fallback_projections(position: str, roster_players: List[Dict[str, Any]], week: int) -> List[Dict[str, Any]]:
-    """Create fallback projections using unified table data when external API fails."""
-    from app.player_data import get_players_batch, extract_2025_projections
+    projections_data = create_unified_projections(roster_players, week)
     
-    fallback_projections = []
+    # Log summary
+    total_projections = sum(len(players) for players in projections_data.values())
+    print(f"Created {total_projections} unified projections across {len(projections_data)} positions")
     
-    # Get players for this position
-    position_players = [p for p in roster_players if p.get("position", "").upper() == position.upper()]
+    for pos, players in projections_data.items():
+        print(f"  {pos}: {len(players)} players")
     
-    if not position_players:
-        return []
-    
-    # Get player IDs and batch load unified data
-    player_ids = [p.get("player_id") for p in position_players if p.get("player_id")]
-    
-    if player_ids:
-        unified_data = get_players_batch(player_ids)
-        
-        for player in position_players:
-            player_id = player.get("player_id")
-            player_name = player.get("name", "")
-            team = player.get("team", "")
-            
-            if player_id in unified_data:
-                player_data = unified_data[player_id]
-                season_projections = extract_2025_projections(player_data)
-                
-                # Estimate weekly projection from season total
-                season_total = season_projections.get("MISC_FPTS", 0)
-                weekly_estimate = round(season_total / 17, 1) if season_total > 0 else 5.0
-                
-                # Add some variance based on position typical scoring
-                position_adjustment = {
-                    "QB": 1.2,    # QBs typically score higher
-                    "RB": 1.0,
-                    "WR": 1.0,
-                    "TE": 0.9,    # TEs typically score lower
-                    "K": 0.7,     # Kickers much lower
-                    "DST": 0.8    # Defenses variable
-                }.get(position.upper(), 1.0)
-                
-                weekly_estimate *= position_adjustment
-                
-                fallback_projections.append({
-                    "name": player_name,
-                    "team": team,
-                    "opp": "",  # Could enhance this with matchup data
-                    "position": position.upper(),
-                    "projected": max(weekly_estimate, 3.0)  # Minimum 3 points
-                })
-                
-                print(f"Fallback projection for {player_name}: {weekly_estimate} points (from {season_total} season)")
-    
-    return fallback_projections
+    return projections_data
 
 @tool
 def get_weekly_projections(week: int) -> Dict[str, List[Dict[str, Any]]]:
-    """Fetch all weekly projections (use sparingly - makes many API calls)."""
-    data = {}
-    for pos in FP_PATHS:
-        try:
-            data[pos] = _fetch_position_projections(pos, week)
-            print(f"Fetched {len(data[pos])} {pos} projections")
-        except Exception as e:
-            print(f"Error fetching {pos} projections: {e}")
-            data[pos] = []
+    """Get all weekly projections (placeholder - requires roster context for unified approach)."""
+    print("Warning: get_weekly_projections requires roster context when using unified data")
+    return {}
+
+def get_enhanced_projection_with_matchup(
+    player_data: Dict[str, Any], 
+    week: int, 
+    opponent: str = None
+) -> Dict[str, Any]:
+    """Get enhanced projection with matchup analysis."""
     
-    return data
+    base_projection = _calculate_weekly_projection(player_data, week)
+    
+    # Enhanced analysis
+    projections_2025 = extract_2025_projections(player_data)
+    history_2024 = extract_2024_history(player_data)
+    current_2025 = extract_current_stats(player_data)
+    
+    # Calculate consistency metrics
+    if history_2024.get("all"):
+        historical_games = history_2024["all"]
+        historical_points = [g.get("fantasy_points", 0) for g in historical_games]
+        consistency = _calculate_consistency(historical_points)
+    else:
+        consistency = 0.5  # Default neutral consistency
+    
+    # Calculate ceiling/floor
+    ceiling = base_projection * 1.5  # 50% upside
+    floor = base_projection * 0.3   # 70% downside risk
+    
+    return {
+        "player_name": player_data.get("player_name", ""),
+        "position": player_data.get("position", ""),
+        "projected_points": base_projection,
+        "ceiling": round(ceiling, 1),
+        "floor": round(floor, 1),
+        "consistency": round(consistency, 2),
+        "season_total_pace": projections_2025.get("MISC_FPTS", 0),
+        "2024_avg": history_2024.get("recent4_avg", 0),
+        "2025_current_avg": current_2025.get("weeks", [])
+    }
+
+def _calculate_consistency(points_list: List[float]) -> float:
+    """Calculate consistency score from historical points."""
+    if len(points_list) < 2:
+        return 0.5
+    
+    # Calculate coefficient of variation (lower = more consistent)
+    avg = sum(points_list) / len(points_list)
+    if avg == 0:
+        return 0.0
+    
+    variance = sum((x - avg) ** 2 for x in points_list) / len(points_list)
+    std_dev = variance ** 0.5
+    cv = std_dev / avg
+    
+    # Convert to 0-1 scale where 1 = very consistent, 0 = very inconsistent
+    # Typical CV for fantasy players ranges from 0.3 (consistent) to 1.5+ (boom/bust)
+    consistency = max(0, min(1, 1 - (cv / 1.5)))
+    return consistency
+
+# Legacy compatibility functions - now powered by unified data
+def create_fallback_projections_unified(
+    roster_players: List[Dict[str, Any]], 
+    week: int
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Create fallback projections using unified data (replaces external API fallback)."""
+    return create_unified_projections(roster_players, week)

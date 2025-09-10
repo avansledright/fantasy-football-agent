@@ -16,7 +16,7 @@ Explanations: **LINEUP OPTIMIZATION FOR WEEK 2**
 - Any notes on matchups
 
 **WAIVER PRIORITY:**
-1. Waiver priority as a list
+1. Waiver priority as a list (always return top 3 picks)
 
 Final comments
 """
