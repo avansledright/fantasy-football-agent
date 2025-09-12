@@ -17,8 +17,8 @@ def generate_player_id(name, position):
     """Generate player_id in format: name_position (e.g., josh_allen_qb)"""
     #clean_name = name.lower().replace(' ', '_').replace('.', '').replace("'", '').replace('-', '_')
     return f"{name}#{position.upper()}"
-
 def get_team_abbreviation(pro_team_id):
+    logger.info(f"Getting abbreviation for ID: {pro_team_id}")
     """Map ESPN pro team ID to team abbreviation"""
     teams = {
         1: 'ATL', 2: 'BUF', 3: 'CHI', 4: 'CIN', 5: 'CLE', 6: 'DAL', 7: 'DEN', 8: 'DET',
@@ -27,6 +27,20 @@ def get_team_abbreviation(pro_team_id):
         25: 'SF', 26: 'SEA', 27: 'TB', 28: 'WSH', 29: 'CAR', 30: 'JAX', 33: 'BAL', 34: 'HOU'
     }
     return teams.get(pro_team_id, 'FA')
+def get_team_name(pro_team_id):
+    """Map ESPN pro team ID to team name"""
+    logger.info(f"Getting team name for ID: {pro_team_id}")
+    teams = {
+        1: 'Atlanta Falcons', 2: 'Buffalo Bills', 3: 'Chicago Bears', 4: 'Cincinnati Bengals', 
+        5: 'Cleveland Browns', 6: 'Dallas Cowboys', 7: 'Denver Broncos', 8: 'Detroit Lions',
+        9: 'Green Bay Packers', 10: 'Tennessee Titans', 11: 'Indianapolis Colts', 12: 'Kansas City Chiefs', 
+        13: 'Las Vegas Raiders', 14: 'Los Angeles Rams', 15: 'Miami Dolphins', 16: 'Minnesota Vikings',
+        17: 'New England Patriots', 18: 'New Orleans Saints', 19: 'New York Giants', 20: 'New York Jets', 
+        21: 'Philadelphia Eagles', 22: 'Arizona Cardinals', 23: 'Pittsburgh Steelers', 24: 'Los Angeles Chargers',
+        25: 'San Francisco 49ers', 26: 'Seattle Seahawks', 27: 'Tampa Bay Buccaneers', 28: 'Washington Commanders', 
+        29: 'Carolina Panthers', 30: 'Jacksonville Jaguars', 33: 'Baltimore Ravens', 34: 'Houston Texans'
+    }
+    return teams.get(pro_team_id, 'Free Agent')
 
 def get_position_name(position_id):
     """Convert ESPN position ID to position name"""
@@ -109,8 +123,8 @@ def process_team_roster(team, league_id, league_name, members_data):
         
         # Special case for DST
         if position == 'DST':
-            name = f"{get_team_abbreviation(pro_team_id)} DST"
-            player_id = f"{name.lower().replace(' ', '_')}"
+            name = f"{get_team_name(pro_team_id)}#DST"
+            player_id = name
         else:
             player_id = generate_player_id(name, position)
 

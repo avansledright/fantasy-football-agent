@@ -44,7 +44,7 @@ window.initializeApp = function initializeApp() {
     setTimeout(() => {
         // Cache DOM elements
         cacheElements();
-        
+        setCurrentWeek();
         // Initialize event listeners
         initializeEventListeners();
         
@@ -263,6 +263,26 @@ function getToastIcon(type) {
         info: "fa-info-circle"
     };
     return icons[type] || icons.info;
+}
+
+function setCurrentWeek() {
+    if (elements.weekNumber) {
+        const currentWeek = Utils.getCurrentNFLWeek();
+        elements.weekNumber.value = currentWeek;
+        
+        // Optional: Add a visual indicator of the season status
+        const seasonStatus = Utils.getNFLSeasonStatus();
+        console.log(`Current NFL Week: ${currentWeek} (${seasonStatus} season)`);
+        
+        // You could also show a toast notification
+        if (seasonStatus === 'preseason') {
+            showToast(`Season hasn't started yet. Defaulting to Week 1`, "info");
+        } else if (seasonStatus === 'postseason') {
+            showToast(`Regular season ended. Showing Week 18`, "info");
+        } else {
+            showToast(`Current NFL Week: ${currentWeek}`, "success");
+        }
+    }
 }
 
 // Error handling

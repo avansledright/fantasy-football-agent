@@ -6,6 +6,7 @@ Projections using unified player data table instead of external APIs.
 from typing import Dict, List, Any
 from strands import tool
 from app.player_data import load_roster_player_data, extract_2025_projections, extract_2024_history, extract_current_stats
+from app.schedule import matchups_by_week, nfl_games_and_times
 
 def safe_float(value):
     """Safely convert Decimal or any numeric type to float."""
@@ -40,12 +41,31 @@ def create_unified_projections(
         player_data = unified_data.get(player_name, {})
         # Calculate weekly projection from multiple sources
         weekly_projection = _calculate_weekly_projection(player_data, week)
+        # Get opponent from matchups_by_week
+        opponent = ""
+        is_home = False
+        if week in matchups_by_week:
+            week_matchups = matchups_by_week[week]
+            
+            # Check if team is the away team (key in the dictionary)
+            if team in week_matchups:
+                opponent = week_matchups[team]
+                is_home = False  # Away team
+            else:
+                # Check if team is the home team (value in the dictionary)
+                for away_team, home_team in week_matchups.items():
+                    if home_team == team:
+                        opponent = away_team
+                        is_home = True  # Home team
+                        break
         
+        print(f"Opponent is: {opponent} and {team} is home? {is_home}")
         # Create projection entry
         projection_entry = {
             "name": player_name,
             "team": team,
-            "opp": "",  # Could enhance with schedule data
+            "opp": opponent,
+            "home": is_home,
             "position": position,
             "projected": weekly_projection
         }

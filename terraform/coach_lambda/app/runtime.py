@@ -66,7 +66,7 @@ Your task: Optimize the lineup for week {week} using:
 2. 2025 season projections 
 3. Current 2025 weekly performance
 4. Unified weekly projections from comprehensive data
-5. Team matchups and game context
+5. Team matchups and game context - be sure to analyze performance against the opponent
 6. ROSTER CONSTRUCTION ANALYSIS - Use analyze_roster_needs_for_waivers to identify which positions need help
 7. SMART WAIVER RECOMMENDATIONS - Only suggest waivers for positions that need depth based on league requirements
 8. For waiver suggestions be sure to analyze their past performance against their opponents
