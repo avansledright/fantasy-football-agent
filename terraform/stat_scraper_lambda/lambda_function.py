@@ -48,36 +48,55 @@ def lambda_handler(event, context):
 
         logger.info(f"Processing week {current_week} stats")
 
+        # Determine week status
+        week_status = get_week_status(current_week)
+        logger.info(f"Week {current_week} status: {week_status}")
+
         # Scrape stats for each position
         positions = ['QB', 'RB', 'WR', 'TE', 'K', 'DST']
         total_players_processed = 0
+        total_projections_processed = 0
 
         for position in positions:
-            logger.info(f"Processing {position} stats...")
-            players_data = scrape_fantasypros_stats(position, current_week)
+            # Scrape stats only if week is completed (games finished)
+            if week_status == 'completed':
+                logger.info(f"Processing {position} stats for week {current_week} ({week_status})...")
+                players_data = scrape_fantasypros_stats(position, current_week)
 
-            if players_data:
-                update_player_stats_in_consolidated_table(players_data, current_week)
-                total_players_processed += len(players_data)
-                logger.info(f"Processed {len(players_data)} {position} players")
+                if players_data:
+                    update_player_stats_in_consolidated_table(players_data, current_week)
+                    total_players_processed += len(players_data)
+                    logger.info(f"Processed {len(players_data)} {position} players")
+                else:
+                    logger.warning(f"No stats data found for {position}")
             else:
-                logger.warning(f"No data found for {position}")
-            logger.info(f"Getting projection data for {position}")
-            proj_data = scrape_fantasypros_projections(position, current_week)
-            logger.info(f"PROJECTION DATA: {proj_data}")
-            if proj_data:
-                update_player_projections_in_table(proj_data, current_week)
-                logger.info(f"Processed {len(proj_data)} {position} projections")
-            else:
-                logger.warning(f"No projections found for {position}")
-                logger.info(f"Successfully processed {total_players_processed} total players")
+                logger.info(f"Skipping stats for {position} - week {current_week} is {week_status}")
 
+            # Scrape projections if week is current or upcoming
+            if week_status in ['upcoming', 'in_progress']:
+                logger.info(f"Getting projection data for {position} week {current_week} ({week_status})...")
+                proj_data = scrape_fantasypros_projections(position, current_week)
+                
+                if proj_data:
+                    update_player_projections_in_table(proj_data, current_week)
+                    total_projections_processed += len(proj_data)
+                    logger.info(f"Processed {len(proj_data)} {position} projections")
+                else:
+                    logger.warning(f"No projections found for {position}")
+            else:
+                logger.info(f"Skipping projections for {position} - week {current_week} is {week_status}")
+
+        logger.info(f"Successfully processed {total_players_processed} total players")
+        logger.info(f"Successfully proccessed {total_projections_processed} total projections")
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'message': f'Successfully updated {total_players_processed} player stats for week {current_week}',
+                'message': f'Successfully updated {total_players_processed} player stats and processed projections for week {current_week}',
                 'week': current_week,
-                'season': CURRENT_SEASON
+                'week_status': week_status,
+                'season': CURRENT_SEASON,
+                'stats_processed': total_players_processed,
+                'projections_processed': total_projections_processed
             })
         }
 
@@ -90,6 +109,193 @@ def lambda_handler(event, context):
             })
         }
 
+
+def get_week_status(week: int) -> str:
+    """
+    Determine the status of an NFL week:
+    - 'upcoming': Week hasn't started yet
+    - 'in_progress': Week is currently happening (games in progress)
+    - 'completed': All games for the week are finished
+    """
+    today = datetime.now()
+    
+    # NFL season 2025 started approximately September 4, 2025 (Thursday)
+    # Week 1 typically runs Thursday-Monday
+    season_start = datetime(2025, 9, 4)  # Adjust based on actual NFL schedule
+    
+    if today < season_start:
+        return 'upcoming'
+    
+    # Calculate the start of the requested week
+    # Week 1 starts on season_start, each subsequent week starts 7 days later
+    week_start = season_start + timedelta(days=(week - 1) * 7)
+    
+    # NFL weeks typically end on Tuesday morning (after Monday Night Football)
+    # So a week runs from Thursday to the following Tuesday
+    week_end = week_start + timedelta(days=5)  # Thursday to Tuesday
+    
+    if today < week_start:
+        return 'upcoming'
+    elif today >= week_start and today <= week_end:
+        return 'in_progress'
+    else:
+        return 'completed'
+
+
+def get_current_nfl_week() -> int:
+    """
+    Calculate current NFL week based on the date
+    NFL season typically starts first week of September
+    """
+    today = datetime.now()
+
+    # NFL season 2025 started approximately September 4, 2025
+    # Adjust this date based on actual NFL schedule if needed
+    season_start = datetime(2025, 9, 4)
+
+    if today < season_start:
+        return 1
+
+    days_since_start = (today - season_start).days
+    week = (days_since_start // 7) + 1
+
+    # Cap at week 18 (regular season)
+    return min(week, 18)
+
+
+def scrape_fantasypros_stats(position: str, week: int) -> List[Dict]:
+    """
+    Scrape fantasy stats from FantasyPros for a specific position and week (PPR scoring).
+    This function detects the header row and uses header indices to find PLAYER and FPTS columns.
+    Only returns data for players with non-zero fantasy points.
+    """
+    try:
+        url = f"https://www.fantasypros.com/nfl/stats/{position.lower()}.php"
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+
+        # Always include week and PPR scoring
+        params = {
+            'week': week,
+            'scoring': 'PPR'
+        }
+
+        logger.info(f"Scraping stats URL: {url} with params: {params}")
+        response = requests.get(url, headers=headers, params=params, timeout=30)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Check page for indicators this might be showing projections instead of stats
+        page_title = soup.find('title')
+        if page_title:
+            title_text = page_title.get_text().lower()
+            if 'projection' in title_text or 'projected' in title_text:
+                logger.warning(f"Stats page for {position} week {week} appears to be showing projections based on title: {title_text}")
+                return []
+
+        # Find the stats table - FantasyPros typically has <table id="data">
+        stats_table = soup.find('table', {'id': 'data'}) or soup.find('table', class_='table')
+
+        if not stats_table:
+            logger.warning(f"No stats table found for {position} week {week} at {url} with params {params}")
+            return []
+
+        # Get the last header row (handles multi-row grouped headers)
+        thead = stats_table.find('thead')
+        if not thead:
+            logger.warning("No thead found in stats table")
+            return []
+
+        header_rows = thead.find_all('tr')
+        if not header_rows:
+            logger.warning("No header rows found in thead")
+            return []
+
+        header_cells = header_rows[-1].find_all(['th', 'td'])
+        headers = [hc.get_text(strip=True).upper() for hc in header_cells]
+
+        logger.info(f"Found headers: {headers}")
+
+        # Build index map for headers
+        header_index = {h: i for i, h in enumerate(headers)}
+
+        # Helper to find header index by name or substring
+        def find_header_index(targets):
+            for t in targets:
+                for h, idx in header_index.items():
+                    if h == t or h.startswith(t):
+                        return idx
+            return None
+
+        player_idx = find_header_index(['PLAYER', 'TEAM'])  # sometimes labelled differently
+        fpts_idx = find_header_index(['FPTS'])  # prefer exact FPTS
+        if fpts_idx is None:
+            # fallback to FPTS/G or last numeric column
+            fpts_idx = find_header_index(['FPTS/G']) or (len(headers) - 1)
+
+        logger.info(f"Using player_idx: {player_idx}, fpts_idx: {fpts_idx}")
+
+        # Get table body rows
+        tbody = stats_table.find('tbody')
+        rows = tbody.find_all('tr') if tbody else stats_table.find_all('tr')[1:]
+
+        logger.info(f"Found {len(rows)} data rows")
+
+        players_data = []
+        zero_point_players = 0
+
+        for row in rows:
+            try:
+                player_data = parse_player_row(row, position, week, player_idx, fpts_idx)
+                if not player_data:
+                    continue
+
+                # Skip players with zero or negative fantasy points (no games played yet)
+                if player_data['fantasy_points'] <= 0:
+                    zero_point_players += 1
+                    logger.debug(f"Skipping {player_data.get('player_name')} - zero fantasy points (no game played)")
+                    continue
+
+                # Normalize team to uppercase abbreviation
+                team = (player_data.get('team') or "UNK").upper()
+                player_data['team'] = team
+
+                # 1) Skip players on bye week
+                if team in bye_weeks and int(bye_weeks[team]) == int(week):
+                    logger.info(f"Skipping {player_data.get('player_name')} ({team}) - bye week {week}")
+                    continue
+
+                # 2) Populate opponent using matchups_by_week when possible
+                opponent = resolve_opponent_from_schedule(team, week)
+                if opponent:
+                    player_data['opponent'] = opponent
+                else:
+                    # keep previous parsing attempt if available, or empty string
+                    player_data['opponent'] = player_data.get('opponent', "")
+
+                players_data.append(player_data)
+            except Exception as e:
+                logger.warning(f"Error parsing row for {position}: {str(e)}", exc_info=True)
+                continue
+
+        logger.info(f"Processed {len(rows)} rows for {position}: {len(players_data)} with stats, {zero_point_players} with zero points")
+        
+        if players_data:
+            logger.info(f"Sample player data: {players_data[0]}")
+
+        return players_data
+
+    except requests.RequestException as e:
+        logger.error(f"Request error for {position}: {str(e)}", exc_info=True)
+        return []
+    except Exception as e:
+        logger.error(f"Error scraping {position} stats: {str(e)}", exc_info=True)
+        return []
+
+
 def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
     """
     Scrape weekly projections (FPTS only) from FantasyPros for a given position.
@@ -101,6 +307,8 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
         url = f"https://www.fantasypros.com/nfl/projections/{position.lower()}.php"
         headers = {'User-Agent': 'Mozilla/5.0'}
         params = {'scoring': 'PPR', 'week': week}
+
+        logger.info(f"Scraping projections URL: {url} with params: {params}")
 
         resp = requests.get(url, headers=headers, params=params, timeout=30)
         resp.raise_for_status()
@@ -126,6 +334,8 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
         headers = [hc.get_text(strip=True).upper() for hc in header_cells]
         header_index = {h: i for i, h in enumerate(headers)}
 
+        logger.info(f"Projections headers: {headers}")
+
         # helper like stats scraper: find header index by exact or prefix match
         def find_header_index(targets):
             for t in targets:
@@ -137,6 +347,8 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
         player_idx = find_header_index(['PLAYER'])
         team_idx = find_header_index(['TEAM'])  # if projections table has a separate TEAM column
         fpts_idx = find_header_index(['FPTS']) or find_header_index(['FPTS/G']) or (len(headers) - 1)
+
+        logger.info(f"Projections using player_idx: {player_idx}, team_idx: {team_idx}, fpts_idx: {fpts_idx}")
 
         # iterate body rows
         tbody = stats_table.find('tbody')
@@ -150,7 +362,6 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
                     continue
 
                 # Reuse parse_player_row to normalize player_name/team exactly the same way
-                # parse_player_row expects indices for player and fpts (it can handle player_idx==None)
                 parsed = parse_player_row(row, position, week, player_idx, fpts_idx)
                 if not parsed:
                     continue
@@ -187,6 +398,11 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
                 except Exception:
                     fpts = Decimal('0')
 
+                # Skip projections with zero or negative fantasy points
+                if fpts <= 0:
+                    logger.debug(f"Skipping {parsed['player_name']} projection - zero/negative points: {fpts}")
+                    continue
+
                 players.append({
                     'player_name': parsed['player_name'],
                     'position': position,
@@ -199,6 +415,7 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
                 logger.warning(f"Error parsing projection row for {position}: {e}", exc_info=True)
                 continue
 
+        logger.info(f"Processed projections for {position}: {len(players)} players with non-zero projections")
         return players
 
     except requests.RequestException as e:
@@ -206,221 +423,6 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
         return []
     except Exception as e:
         logger.error(f"Error scraping projections for {position}: {e}", exc_info=True)
-        return []
-
-
-
-
-def update_player_projections_in_table(players_data: List[Dict], week: int):
-    """
-    Update player projections in the consolidated table.
-    Stores weekly projections under: projections[<season>]['weekly'][<week>].
-    Simple, safe: get -> mutate -> put.
-    """
-    try:
-        season_key = str(CURRENT_SEASON)
-        week_key = str(week)
-
-        with table.batch_writer() as batch:
-            for player in players_data:
-                player_id = f"{player['player_name']}#{player['position']}"
-
-                # Ensure fantasy_points is Decimal
-                try:
-                    fpts = player.get('fantasy_points', 0)
-                    if not isinstance(fpts, Decimal):
-                        fpts = Decimal(str(fpts))
-                except Exception:
-                    fpts = Decimal('0')
-
-                week_val = {
-                    'fantasy_points': fpts,
-                    'updated_at': player.get('updated_at', datetime.now().isoformat())
-                }
-
-                try:
-                    resp = table.get_item(Key={'player_id': player_id})
-                    logger.info(f"resp = {resp}")
-                    if 'Item' in resp:
-                        item = resp['Item']
-
-                        # make sure projections exists
-                        if 'projections' not in item or not isinstance(item['projections'], dict):
-                            item['projections'] = {}
-
-                        # make sure this season exists
-                        if season_key not in item['projections'] or not isinstance(item['projections'][season_key], dict):
-                            # preserve old value if it was not a dict
-                            prev_val = item['projections'].get(season_key)
-                            if prev_val and not isinstance(prev_val, dict):
-                                item['projections'][season_key] = {'season_totals': prev_val}
-                            else:
-                                item['projections'][season_key] = {}
-
-                        # make sure weekly exists
-                        if 'weekly' not in item['projections'][season_key]:
-                            item['projections'][season_key]['weekly'] = {}
-
-                        # set this week's projection
-                        item['projections'][season_key]['weekly'][week_key] = week_val
-                        logger.info(f"Putting new object inside if")
-                        try:
-                            logger.info(f"ITEM TO PUT: {item}")
-                            batch.put_item(Item=item)
-                        except ClientError as e:
-                            logger.info(f"FAILED TO PUT OBJECT {e}")
-
-                    else:
-                        # new item
-                        new_item = {
-                            'player_id': player_id,
-                            'player_name': player['player_name'],
-                            'position': player['position'],
-                            'historical_seasons': {},
-                            'current_season_stats': {},
-                            'projections': {
-                                season_key: {
-                                    'weekly': {
-                                        week_key: week_val
-                                    }
-                                }
-                            }
-                        }
-                        logger.info(f"Putting new object inside else")
-                        logger.info(f"new_item = {new_item}")
-                        batch.put_item(Item=new_item)
-
-                except Exception as e:
-                    logger.error(f"Error updating projections for {player_id}: {e}", exc_info=True)
-
-        logger.info(f"Processed projections for {len(players_data)} players, week {week}")
-
-    except Exception as e:
-        logger.error(f"Error in update_player_projections_in_table: {e}", exc_info=True)
-
-def get_current_nfl_week() -> int:
-    """
-    Calculate current NFL week based on the date
-    NFL season typically starts first week of September
-    """
-    today = datetime.now()
-
-    # NFL season 2025 started approximately September 4, 2025
-    # Adjust this date based on actual NFL schedule if needed
-    season_start = datetime(2025, 9, 4)
-
-    if today < season_start:
-        return 1
-
-    days_since_start = (today - season_start).days
-    week = (days_since_start // 7) + 1
-
-    # Cap at week 18 (regular season)
-    return min(week, 18)
-
-
-def scrape_fantasypros_stats(position: str, week: int) -> List[Dict]:
-    """
-    Scrape fantasy stats from FantasyPros for a specific position and week (PPR scoring).
-    This function detects the header row and uses header indices to find PLAYER and FPTS columns.
-    """
-    try:
-        url = f"https://www.fantasypros.com/nfl/stats/{position.lower()}.php"
-
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-
-        # Always include week and PPR scoring
-        params = {
-            'week': week,
-            'scoring': 'PPR'
-        }
-
-        response = requests.get(url, headers=headers, params=params, timeout=30)
-        response.raise_for_status()
-
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        # Find the stats table - FantasyPros typically has <table id="data">
-        stats_table = soup.find('table', {'id': 'data'}) or soup.find('table', class_='table')
-
-        if not stats_table:
-            logger.warning(f"No stats table found for {position} week {week} at {url} with params {params}")
-            return []
-
-        # Get the last header row (handles multi-row grouped headers)
-        thead = stats_table.find('thead')
-        if not thead:
-            logger.warning("No thead found in stats table")
-            return []
-
-        header_rows = thead.find_all('tr')
-        if not header_rows:
-            logger.warning("No header rows found in thead")
-            return []
-
-        header_cells = header_rows[-1].find_all(['th', 'td'])
-        headers = [hc.get_text(strip=True).upper() for hc in header_cells]
-
-        # Build index map for headers
-        header_index = {h: i for i, h in enumerate(headers)}
-
-        # Helper to find header index by name or substring
-        def find_header_index(targets):
-            for t in targets:
-                for h, idx in header_index.items():
-                    if h == t or h.startswith(t):
-                        return idx
-            return None
-
-        player_idx = find_header_index(['PLAYER', 'TEAM'])  # sometimes labelled differently
-        fpts_idx = find_header_index(['FPTS'])  # prefer exact FPTS
-        if fpts_idx is None:
-            # fallback to FPTS/G or last numeric column
-            fpts_idx = find_header_index(['FPTS/G']) or (len(headers) - 1)
-
-        # Get table body rows
-        tbody = stats_table.find('tbody')
-        rows = tbody.find_all('tr') if tbody else stats_table.find_all('tr')[1:]
-
-        players_data = []
-
-        for row in rows:
-            try:
-                player_data = parse_player_row(row, position, week, player_idx, fpts_idx)
-                if not player_data:
-                    continue
-
-                # Normalize team to uppercase abbreviation
-                team = (player_data.get('team') or "UNK").upper()
-                player_data['team'] = team
-
-                # 1) Skip players on bye week
-                if team in bye_weeks and int(bye_weeks[team]) == int(week):
-                    logger.info(f"Skipping {player_data.get('player_name')} ({team}) - bye week {week}")
-                    continue
-
-                # 2) Populate opponent using matchups_by_week when possible
-                opponent = resolve_opponent_from_schedule(team, week)
-                if opponent:
-                    player_data['opponent'] = opponent
-                else:
-                    # keep previous parsing attempt if available, or empty string
-                    player_data['opponent'] = player_data.get('opponent', "")
-
-                players_data.append(player_data)
-            except Exception as e:
-                logger.warning(f"Error parsing row for {position}: {str(e)}", exc_info=True)
-                continue
-
-        return players_data
-
-    except requests.RequestException as e:
-        logger.error(f"Request error for {position}: {str(e)}", exc_info=True)
-        return []
-    except Exception as e:
-        logger.error(f"Error scraping {position} stats: {str(e)}", exc_info=True)
         return []
 
 
@@ -504,33 +506,52 @@ def parse_player_row(row, position: str, week: int, player_idx: Optional[int], f
 
         # Extract fantasy points from fpts_idx
         fantasy_points = Decimal('0')
+        fpts_text = ""
+        
         if fpts_idx is not None and fpts_idx < len(cells):
             fpts_text = cells[fpts_idx].get_text(strip=True).replace(',', '')
             try:
-                if fpts_text == '':
+                if fpts_text == '' or fpts_text == '-':
                     fantasy_points = Decimal('0')
                 else:
                     fantasy_points = Decimal(str(float(fpts_text)))
             except (ValueError, InvalidOperation):
-                # fallback: scan cells for a numeric-looking value
-                for c in reversed(cells):
-                    txt = c.get_text(strip=True).replace(',', '')
+                logger.debug(f"Could not parse FPTS '{fpts_text}' for {player_name}, trying fallback")
+                # fallback: scan cells for a numeric-looking value (but exclude roster %)
+                for i, c in enumerate(reversed(cells)):
+                    txt = c.get_text(strip=True).replace(',', '').replace('%', '')
+                    # Skip if this looks like a percentage (roster %)
+                    if '%' in c.get_text(strip=True):
+                        continue
                     if re.match(r'^\d+(\.\d+)?$', txt):
                         try:
-                            fantasy_points = Decimal(str(float(txt)))
-                            break
+                            potential_points = Decimal(str(float(txt)))
+                            # Sanity check: fantasy points should be reasonable (0-100 range typically)
+                            if potential_points <= 100:
+                                fantasy_points = potential_points
+                                logger.debug(f"Used fallback value {fantasy_points} from column {len(cells)-i-1}")
+                                break
                         except (ValueError, InvalidOperation):
                             continue
         else:
-            # fallback: scan last few columns
-            for c in reversed(cells):
+            # Complete fallback: scan last few columns, excluding roster %
+            for i, c in enumerate(reversed(cells)):
                 txt = c.get_text(strip=True).replace(',', '')
+                # Skip if this looks like a percentage
+                if '%' in txt:
+                    continue
+                txt = txt.replace('%', '')
                 if re.match(r'^\d+(\.\d+)?$', txt):
                     try:
-                        fantasy_points = Decimal(str(float(txt)))
-                        break
+                        potential_points = Decimal(str(float(txt)))
+                        if potential_points <= 100:  # Sanity check
+                            fantasy_points = potential_points
+                            break
                     except (ValueError, InvalidOperation):
                         continue
+
+        # Debug logging for troubleshooting
+        logger.debug(f"Parsed row - Player: {player_name}, Team: {team}, FPTS Text: '{fpts_text}', FPTS Value: {fantasy_points}")
 
         # Build player data for updating consolidated table
         player_data = {
@@ -573,6 +594,10 @@ def update_player_stats_in_consolidated_table(players_data: List[Dict], week: in
     Each player's current_season_stats gets updated with the new week's data.
     """
     try:
+        logger.info(f"*** UPDATING CURRENT_SEASON_STATS for week {week} with {len(players_data)} players ***")
+        if players_data:
+            logger.info(f"First player sample: {players_data[0]}")
+
         batch_size = 25
 
         for i in range(0, len(players_data), batch_size):
@@ -583,6 +608,8 @@ def update_player_stats_in_consolidated_table(players_data: List[Dict], week: in
                     player_name = player_data['player_name']
                     position = player_data['position']
                     player_id = f"{player_name}#{position}"
+                    
+                    logger.debug(f"Processing stats update for {player_id}: {player_data['fantasy_points']} points")
                     
                     # Check if player exists in consolidated table
                     try:
@@ -644,3 +671,93 @@ def update_player_stats_in_consolidated_table(players_data: List[Dict], week: in
     except Exception as e:
         logger.error(f"Error updating consolidated table: {str(e)}", exc_info=True)
         raise
+
+
+def update_player_projections_in_table(players_data: List[Dict], week: int):
+    """
+    Update player projections in the consolidated table.
+    Stores weekly projections under: projections[<season>]['weekly'][<week>].
+    Simple, safe: get -> mutate -> put.
+    """
+    try:
+        logger.info(f"*** UPDATING PROJECTIONS for week {week} with {len(players_data)} players ***")
+        if players_data:
+            logger.info(f"First projection sample: {players_data[0]}")
+
+        season_key = str(CURRENT_SEASON)
+        week_key = str(week)
+
+        with table.batch_writer() as batch:
+            for player in players_data:
+                player_id = f"{player['player_name']}#{player['position']}"
+
+                # Ensure fantasy_points is Decimal
+                try:
+                    fpts = player.get('fantasy_points', 0)
+                    if not isinstance(fpts, Decimal):
+                        fpts = Decimal(str(fpts))
+                except Exception:
+                    fpts = Decimal('0')
+
+                week_val = {
+                    'fantasy_points': fpts,
+                    'updated_at': player.get('updated_at', datetime.now().isoformat())
+                }
+
+                try:
+                    resp = table.get_item(Key={'player_id': player_id})
+                    logger.debug(f"Updating projections for {player_id}: {fpts} points")
+                    
+                    if 'Item' in resp:
+                        item = resp['Item']
+
+                        # make sure projections exists
+                        if 'projections' not in item or not isinstance(item['projections'], dict):
+                            item['projections'] = {}
+
+                        # make sure this season exists
+                        if season_key not in item['projections'] or not isinstance(item['projections'][season_key], dict):
+                            # preserve old value if it was not a dict
+                            prev_val = item['projections'].get(season_key)
+                            if prev_val and not isinstance(prev_val, dict):
+                                item['projections'][season_key] = {'season_totals': prev_val}
+                            else:
+                                item['projections'][season_key] = {}
+
+                        # make sure weekly exists
+                        if 'weekly' not in item['projections'][season_key]:
+                            item['projections'][season_key]['weekly'] = {}
+
+                        # set this week's projection
+                        item['projections'][season_key]['weekly'][week_key] = week_val
+                        
+                        try:
+                            batch.put_item(Item=item)
+                        except ClientError as e:
+                            logger.error(f"Failed to put updated item for {player_id}: {e}")
+
+                    else:
+                        # new item
+                        new_item = {
+                            'player_id': player_id,
+                            'player_name': player['player_name'],
+                            'position': player['position'],
+                            'historical_seasons': {},
+                            'current_season_stats': {},
+                            'projections': {
+                                season_key: {
+                                    'weekly': {
+                                        week_key: week_val
+                                    }
+                                }
+                            }
+                        }
+                        batch.put_item(Item=new_item)
+
+                except Exception as e:
+                    logger.error(f"Error updating projections for {player_id}: {e}", exc_info=True)
+
+        logger.info(f"Processed projections for {len(players_data)} players, week {week}")
+
+    except Exception as e:
+        logger.error(f"Error in update_player_projections_in_table: {e}", exc_info=True)
