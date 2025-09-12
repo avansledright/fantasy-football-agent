@@ -35,6 +35,17 @@ resource "aws_dynamodb_table" "waiver_table" {
     type = "S"
   }
 
+  attribute {
+    name = "position"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "position-index"
+    hash_key        = "position"
+    projection_type = "ALL"
+  }
+
   ttl {
     attribute_name = "updated_at"
     enabled        = false

@@ -1,12 +1,13 @@
 // ================================
-// MAIN APP.JS - Core functionality only
+// MAIN APP.JS - Core functionality with Chat Integration
 // ================================
 
 // Configuration - Dynamically templated by Terraform
 const API_CONFIG = {
     BASE_URL: "${api_endpoint}",
     TEAMS_ENDPOINT: "/teams",
-    COACH_ENDPOINT: "/coach"
+    COACH_ENDPOINT: "/coach",
+    CHAT_ENDPOINT: "/chat"  // New chat endpoint
 };
 
 // Starting lineup configuration
@@ -49,6 +50,9 @@ window.initializeApp = function initializeApp() {
         initializeEventListeners();
         
         console.log("API Configuration loaded:", API_CONFIG);
+        
+        // Initialize Chat Feature
+        initializeChatFeature();
         
         // Load team if teamId is pre-filled
         if (elements.teamId && elements.teamId.value) {
@@ -115,6 +119,27 @@ function initializeEventListeners() {
     }
     
     console.log('Event listeners set up');
+}
+
+function initializeChatFeature() {
+    console.log('Initializing chat feature...');
+    
+    // Check if ChatManager exists before initializing
+    if (typeof ChatManager !== 'undefined') {
+        ChatManager.initialize();
+        
+        // Add chat context helpers
+        window.sendTeamContextToChat = function() {
+            if (currentTeam && elements.teamId && elements.weekNumber) {
+                const context = `My team ID is ${elements.teamId.value} for week ${elements.weekNumber.value}. Current roster has ${currentTeam.players ? currentTeam.players.length : 0} players.`;
+                ChatManager.sendProgrammaticMessage(context);
+            }
+        };
+        
+        console.log('Chat feature initialized successfully');
+    } else {
+        console.warn('ChatManager not found - chat feature not available');
+    }
 }
 
 // ================================
@@ -284,6 +309,27 @@ function setCurrentWeek() {
         }
     }
 }
+
+// ================================
+// CHAT INTEGRATION HELPERS
+// ================================
+
+// Global helper functions for chat integration
+window.getChatContext = function() {
+    return {
+        teamId: elements.teamId ? elements.teamId.value.trim() : '',
+        week: elements.weekNumber ? elements.weekNumber.value.trim() : '',
+        currentTeam: currentTeam,
+        isEditing: isEditing,
+        seasonStatus: Utils.getNFLSeasonStatus()
+    };
+};
+
+window.sendQuickChatMessage = function(message) {
+    if (typeof ChatManager !== 'undefined') {
+        ChatManager.sendProgrammaticMessage(message);
+    }
+};
 
 // Error handling
 window.addEventListener("error", e => {
