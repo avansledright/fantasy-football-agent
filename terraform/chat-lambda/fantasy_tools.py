@@ -120,6 +120,7 @@ class FantasyFootballTools:
             recommendations = []
             
             for player in waiver_players:
+                logger.info(f"Player_name == {player['player_name']}")
                 player_stats = self.get_player_stats(player['player_name'])
                 
                 if player_stats and not player_stats.get('error'):

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from boto3.dynamodb.conditions import Key, Attr
 import os
-from utils import normalize_position
+from utils import normalize_position, convert_nfl_defense_name
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +61,12 @@ class DynamoDBClient:
             return None
     
     def get_player_stats(self, player_id: str) -> Optional[Dict[str, Any]]:
+        logger.info(f"Original player_id is {player_id}")
         """Get player statistics and projections"""
         try:
+            if "D/ST" in player_id:
+                logger.info(f"Found DST in player_id {player_id}")
+                player_id = convert_nfl_defense_name(player_id)
             response = self.players_table.get_item(
                 Key={'player_id': player_id}
             )
@@ -94,9 +98,11 @@ class DynamoDBClient:
         """Get waiver wire players with optional position filter - ultra optimized"""
         try:
             if position:
-
+                
                 # FAST PATH: Use GSI query when position is specified
                 normalized_pos = normalize_position(position)
+                if normalized_pos == "DST": # Temporary fix for position not matching
+                    normalized_pos = "D/ST"
                 logger.info(f"Using GSI query for position: {normalized_pos}")
                 
                 response = self.waiver_table.query(
@@ -118,6 +124,7 @@ class DynamoDBClient:
                 )
             
             items = response.get('Items', [])
+            logger.info(f"Items found: {items}")
             
             # Sort by current week projection if requested (client-side optimization)
             if sort_by_projection and items:
