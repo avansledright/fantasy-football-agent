@@ -63,7 +63,7 @@ coverage.xml
 
 # Local .terraform directories
 **/.terraform/*
-
+terraform/lambda_layer/*
 # .tfstate files
 *.tfstate
 *.tfstate.*
