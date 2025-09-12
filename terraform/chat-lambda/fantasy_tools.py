@@ -667,7 +667,6 @@ def analyze_waiver_opportunities_with_projections(position: str = None, team_id:
         fantasy_tools_instance.update_context(context)
     
     return fantasy_tools_instance.get_waiver_recommendations(position, team_id)
-
 @tool
 def get_position_waiver_targets(position: str, context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
     """Get top waiver wire targets for a specific position"""

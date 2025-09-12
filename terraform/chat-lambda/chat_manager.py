@@ -29,31 +29,33 @@ logger = logging.getLogger(__name__)
 SYSTEM_PROMPT = """You are a Fantasy Football AI Coach assistant. You help users make informed decisions about their fantasy football teams using real data and analysis.
 
 Your capabilities include:
-- Analyzing team rosters and player performance
+- Analyzing team rosters and player performance  
 - Providing start/sit recommendations
-- Suggesting waiver wire pickups
+- Suggesting waiver wire pickups and comparing them to current roster
 - Comparing player matchups
 - Optimizing lineups
 - Tracking injury reports
 - Analyzing historical trends and projections
 
-Always provide specific, data-driven advice when possible. Use the available tools to access current roster information, player stats, projections, and waiver wire data. Be conversational but informative, and always explain your reasoning.
+You have access to the user's current roster information in your context. When making waiver wire recommendations, always compare against their current players to suggest specific adds/drops.
+
+Always provide specific, data-driven advice when possible. Use the available tools to access player stats, projections, and waiver wire data. Be conversational but informative, and always explain your reasoning.
 
 When discussing players, include relevant context like:
 - Recent performance trends
-- Matchup difficulty
+- Matchup difficulty  
 - Injury status
 - Projected points
 - Ownership percentages (for waiver pickups)
-
-If you need specific data to answer a question, use the appropriate tools to gather that information first.
+- How they compare to current roster players
 
 Key Guidelines:
-1. Always use tools when you need specific player data, roster information, or waiver wire analysis
-2. Provide actionable recommendations with clear reasoning
-3. Consider both short-term (weekly) and long-term (season-long) implications
-4. Be honest about uncertainty when projections are unclear
-5. Keep responses focused and practical for fantasy managers
+1. Use the current roster information provided in your context - no need to call tools for roster data
+2. Always compare waiver options against current roster players
+3. Provide actionable recommendations with clear reasoning
+4. Consider both short-term (weekly) and long-term (season-long) implications
+5. Be honest about uncertainty when projections are unclear
+6. Keep responses focused and practical for fantasy managers
 """
 
 class ChatManager:
@@ -152,16 +154,44 @@ class ChatManager:
         week = context.get('week', 'current week')
         league_name = context.get('league_name', 'your league')
         
+        # Extract current roster information from context
+        roster_info = ""
+        if context.get('current_team', {}).get('players'):
+            players = context['current_team']['players']
+            
+            # Organize by position and status
+            starters = [p for p in players if p.get('status') == 'starter']
+            bench = [p for p in players if p.get('status') == 'bench']
+            
+            roster_info = f"""
+    Current Roster Information:
+    STARTERS:
+    """
+            for player in starters:
+                roster_info += f"- {player.get('name')} ({player.get('position')}) - {player.get('team')} - Slot: {player.get('slot')} - Status: {player.get('injury_status')}\n"
+            
+            roster_info += "\nBENCH:\n"
+            for player in bench:
+                roster_info += f"- {player.get('name')} ({player.get('position')}) - {player.get('team')} - Status: {player.get('injury_status')}\n"
+
         enhanced_prompt = f"""{SYSTEM_PROMPT}
 
-Current Context:
-- Team ID: {team_id}
-- Week: {week}
-- League: {league_name}
-- Season: 2025
+    Current Context:
+    - Team ID: {team_id}
+    - Week: {week}
+    - League: {league_name}
+    - Season: 2025
 
-When providing advice, always consider the user's specific team context and the current week of the season.
-"""
+    {roster_info}
+
+    IMPORTANT: You have direct access to the user's current roster information above. Use this roster data to make comparisons with waiver wire recommendations. You do NOT need to call additional tools to get roster information - it's provided in your context.
+
+    When providing waiver wire advice, compare the available players against the current roster players shown above, especially focusing on:
+    1. Bench players who could be dropped
+    2. Positional needs based on current starters
+    3. Injury replacements needed
+    4. Upgrade opportunities over current players
+    """
         return enhanced_prompt
     def _prepare_tool_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare context for tool usage"""
@@ -207,6 +237,11 @@ When providing advice, always consider the user's specific team context and the 
             
             # Get the latest user message
             user_message = conversation[-1]['content']
+            
+            # Add context information to the user message if it contains roster references
+            if any(word in user_message.lower() for word in ['compare', 'roster', 'lineup', 'current', 'my team']):
+                context_note = f"\n\n[Context: User has team {context.get('team_id')} in week {context.get('week')}. Current roster information is provided in the system prompt above.]"
+                user_message += context_note
             
             # Generate response using Strands Agent
             response = self.agent(user_message)
