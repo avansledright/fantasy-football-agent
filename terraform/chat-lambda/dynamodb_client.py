@@ -94,51 +94,83 @@ class DynamoDBClient:
             return []
     
     def get_waiver_wire_players(self, position: Optional[str] = None, min_ownership: float = 0, max_ownership: float = 50, 
-                          limit: int = 500, sort_by_projection: bool = True, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """Get waiver wire players with optional position filter - ultra optimized"""
+                          limit: Optional[int] = None, sort_by_projection: bool = True, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+        """Get waiver wire players with optional position filter - returns ALL matching players unless limit specified"""
         try:
-            if position:
-                
-                # FAST PATH: Use GSI query when position is specified
-                normalized_pos = normalize_position(position)
-                if normalized_pos == "DST": # Temporary fix for position not matching
-                    normalized_pos = "D/ST"
-                logger.info(f"Using GSI query for position: {normalized_pos}")
-                
-                response = self.waiver_table.query(
-                    IndexName='position-index',
-                    KeyConditionExpression=Key('position').eq(normalized_pos),
-                    FilterExpression=Attr('percent_owned').between(min_ownership, max_ownership),
-                    ProjectionExpression="player_season, player_name, #pos, team, injury_status, percent_owned, weekly_projections",
-                    ExpressionAttributeNames={"#pos": "position"},
-                    Limit=limit * 2  # Get more than needed for better sorting
-                )
-            else:
-                # SLOWER PATH: Scan when no position specified
-                logger.info("Using table scan (no position filter)")
-                response = self.waiver_table.scan(
-                    FilterExpression=Attr("percent_owned").between(min_ownership, max_ownership),
-                    ProjectionExpression="player_season, player_name, #pos, team, injury_status, percent_owned, weekly_projections",
-                    ExpressionAttributeNames={"#pos": "position"},
-                    Limit=limit * 2
-                )
+            all_items = []
+            last_evaluated_key = None
             
-            items = response.get('Items', [])
-            logger.info(f"Items found: {items}")
+            # Base parameters for query/scan
+            base_params = {
+                "FilterExpression": Attr('percent_owned').between(min_ownership, max_ownership),
+                "ProjectionExpression": "player_season, player_name, #pos, team, injury_status, percent_owned, weekly_projections",
+                "ExpressionAttributeNames": {"#pos": "position"}
+            }
             
-            # Sort by current week projection if requested (client-side optimization)
-            if sort_by_projection and items:
+            while True:
+                if position:
+                    # FAST PATH: Use GSI query when position is specified
+                    normalized_pos = normalize_position(position)
+                    if normalized_pos == "DST":  # Temporary fix for position not matching
+                        normalized_pos = "D/ST"
+                    logger.info(f"Using GSI query for position: {normalized_pos}")
+                    
+                    query_params = {
+                        **base_params,
+                        "IndexName": 'position-index',
+                        "KeyConditionExpression": Key('position').eq(normalized_pos)
+                    }
+                    
+                    if last_evaluated_key:
+                        query_params["ExclusiveStartKey"] = last_evaluated_key
+                        
+                    response = self.waiver_table.query(**query_params)
+                else:
+                    # SLOWER PATH: Scan when no position specified
+                    logger.info("Using table scan (no position filter)")
+                    
+                    scan_params = base_params.copy()
+                    if last_evaluated_key:
+                        scan_params["ExclusiveStartKey"] = last_evaluated_key
+                        
+                    response = self.waiver_table.scan(**scan_params)
+                
+                # Add items from this batch
+                batch_items = response.get('Items', [])
+                all_items.extend(batch_items)
+                
+                logger.info(f"Batch retrieved {len(batch_items)} items. Total so far: {len(all_items)}")
+                
+                # Check if we have more data to fetch
+                last_evaluated_key = response.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    break
+                    
+                # Optional: If limit is specified and we have enough items, break early
+                # (though we'll still need to sort first if sort_by_projection is True)
+                if limit and not sort_by_projection and len(all_items) >= limit:
+                    break
+            
+            logger.info(f"Total items found: {len(all_items)}")
+            
+            # Sort by current week projection if requested
+            if sort_by_projection and all_items:
                 current_week = self._get_current_week(context)
-                items.sort(
+                all_items.sort(
                     key=lambda x: x.get('weekly_projections', {}).get(str(current_week), 0),
                     reverse=True
                 )
             
-            # Return only the requested limit
-            result = items[:limit]
-            logger.info(f"Found {len(result)} waiver wire players (position: {position or 'all'}, ownership: {min_ownership}-{max_ownership}%)")
+            # Apply limit if specified
+            if limit:
+                result = all_items[:limit]
+            else:
+                result = all_items
+                
+            logger.info(f"Returning {len(result)} waiver wire players (position: {position or 'all'}, ownership: {min_ownership}-{max_ownership}%)")
+            logger.info(f"Waiver Players: {result}")
             return result
-        
+            
         except Exception as e:
             logger.error(f"Error getting waiver wire players: {str(e)}")
             return []

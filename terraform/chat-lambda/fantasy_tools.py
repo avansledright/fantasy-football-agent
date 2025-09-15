@@ -112,7 +112,7 @@ class FantasyFootballTools:
             waiver_players = self.db.get_waiver_wire_players(
                 position=position,
                 min_ownership=0,
-                max_ownership=50,
+                max_ownership=80,
                 context=self.current_context
             )
             
@@ -393,15 +393,15 @@ class FantasyFootballTools:
             score += 2
         
         # Penalty for high ownership
-        ownership_penalty = float(waiver_player['percent_owned']) / 10  # Convert to float
-        score -= ownership_penalty
+        #ownership_penalty = float(waiver_player['percent_owned']) / 10  # Convert to float
+        #score -= ownership_penalty
         
         # Injury status consideration
         if waiver_player.get('injury_status') in ['QUESTIONABLE', 'DOUBTFUL']:
             score -= 1
         elif waiver_player.get('injury_status') == 'OUT':
             score -= 3
-        
+        print(f"Player: {waiver_player['player_name']} score = {score}")
         return max(0, score)
     
     def _get_current_week(self) -> int:

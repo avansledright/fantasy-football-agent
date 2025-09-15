@@ -41,6 +41,124 @@ def convert_floats_to_decimal(obj):
     else:
         return obj
 
+def get_rostered_players(roster_table_name):
+    """
+    Fetches all team rosters and returns a set of rostered player names.
+    
+    Args:
+        roster_table_name (str): Name of the DynamoDB table containing team rosters
+        
+    Returns:
+        set: Set of player names that are currently rostered
+    """
+    dynamodb = get_dynamodb_resource()
+    if not dynamodb:
+        print("Could not get DynamoDB resource for roster data.")
+        return set()
+
+    table = dynamodb.Table(roster_table_name)
+    rostered_players = set()
+    
+    try:
+        print(f"Fetching team rosters from table '{roster_table_name}'...")
+        
+        # Scan the entire table to get all teams
+        response = table.scan()
+        
+        while True:
+            # Process items from current page
+            for team_item in response.get('Items', []):
+                players = team_item.get('players', [])
+                
+                for player in players:
+                    player_name = player.get('name')
+                    if player_name:
+                        # Normalize player name for consistent matching
+                        normalized_name = normalize_rostered_player_name(player_name)
+                        rostered_players.add(normalized_name)
+            
+            # Check if there are more pages
+            if 'LastEvaluatedKey' not in response:
+                break
+                
+            # Get next page
+            response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        
+        print(f"Found {len(rostered_players)} rostered players across all teams.")
+        return rostered_players
+        
+    except Exception as e:
+        print(f"Error fetching roster data: {e}")
+        return set()
+
+def normalize_rostered_player_name(player_name):
+    """
+    Normalize rostered player names for consistent matching with waiver players.
+    
+    Args:
+        player_name (str): Player name from roster data
+        
+    Returns:
+        str: Normalized player name
+    """
+    # Remove extra whitespace
+    name = " ".join(player_name.split())
+    
+    # Handle D/ST names - remove #DST suffix if present
+    if name.endswith("#DST"):
+        name = name.replace("#DST", "")
+    
+    # Handle D/ST variations
+    if " D/ST" in name:
+        name = name.replace(" D/ST", "")
+    
+    # Convert to lowercase for case-insensitive matching
+    return name.lower().strip()
+
+def is_player_rostered(player_name, position, rostered_players):
+    """
+    Check if a player is already rostered by comparing against the rostered players set.
+    
+    Args:
+        player_name (str): Player name from waiver wire
+        position (str): Player position
+        rostered_players (set): Set of normalized rostered player names
+        
+    Returns:
+        bool: True if player is already rostered, False otherwise
+    """
+    # Normalize the waiver player name
+    normalized_name = normalize_rostered_player_name(player_name)
+    
+    # Direct match
+    if normalized_name in rostered_players:
+        return True
+    
+    # For D/ST, try different variations
+    if position == "D/ST":
+        # Try just the team name without D/ST
+        team_name_only = normalized_name.replace(" d/st", "").replace("#dst", "").strip()
+        if team_name_only in rostered_players:
+            return True
+        
+        # Try with team abbreviations for D/ST
+        for team_abbr in ["ATL", "BUF", "CHI", "CIN", "CLE", "DAL", "DEN", "DET",
+                         "GB", "TEN", "IND", "KC", "LV", "LAR", "MIA", "MIN",
+                         "NE", "NO", "NYG", "NYJ", "PHI", "ARI", "PIT", "LAC",
+                         "SF", "SEA", "TB", "WAS", "CAR", "JAX", "BAL", "HOU"]:
+            if team_abbr.lower() in normalized_name:
+                # Check if this team's D/ST is rostered
+                dst_variations = [
+                    f"{team_abbr.lower()}",
+                    f"{team_abbr.lower()} d/st",
+                    f"{team_abbr.lower()}#dst"
+                ]
+                for variation in dst_variations:
+                    if variation in rostered_players:
+                        return True
+    
+    return False
+
 def store_players_in_dynamodb(dynamodb_items, table_name):
     dynamodb = get_dynamodb_resource()
     if not dynamodb:
@@ -123,7 +241,7 @@ def get_fantasypros_projections(position, week, max_retries=3):
         print(f"Unknown position: {position}")
         return {}
     
-    url = f"https://www.fantasypros.com/nfl/projections/{fp_position}.php?week={week}"
+    url = f"https://www.fantasypros.com/nfl/projections/{fp_position}.php?week={week}&scoring=PPR"
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -370,20 +488,22 @@ def match_fantasypros_projection(player_name, position, fantasypros_data):
     
     return {}
 
-def transform_player_data(players_list, season_id, fantasypros_projections):
+def transform_player_data(players_list, season_id, fantasypros_projections, rostered_players):
     """
     Transforms a list of raw player data into a clean list of DynamoDB items.
-    Now includes FantasyPros projections.
+    Now includes FantasyPros projections and filters out rostered players.
     
     Args:
         players_list (list): A list of raw player data from the API.
         season_id (str): The current fantasy football season year.
         fantasypros_projections (dict): FantasyPros projections by position
+        rostered_players (set): Set of rostered player names to exclude
         
     Returns:
         list: A list of dictionaries formatted for DynamoDB.
     """
     transformed_list = []
+    rostered_count = 0
     
     print(f"Processing {len(players_list)} players...")
 
@@ -415,6 +535,11 @@ def transform_player_data(players_list, season_id, fantasypros_projections):
         # Skip certain positions if desired (like kickers, defense)
         skip_positions = []  # Add positions to skip, e.g., ["K", "D/ST"]
         if position in skip_positions:
+            continue
+        
+        # Check if player is already rostered - SKIP if they are
+        if is_player_rostered(player_name, position, rostered_players):
+            rostered_count += 1
             continue
         
         # Get FantasyPros projections for this player
@@ -461,6 +586,7 @@ def transform_player_data(players_list, season_id, fantasypros_projections):
         transformed_list.append(dynamodb_item)
         
     print(f"Transformed {len(transformed_list)} available players for DynamoDB.")
+    print(f"Filtered out {rostered_count} players who are already rostered.")
     return transformed_list
 
 def filter_relevant_players(transformed_players):
@@ -483,7 +609,7 @@ def filter_relevant_players(transformed_players):
             
         # Keep players with some ownership or projections
         has_projections = len(weekly_projections) > 0
-        has_ownership = percent_owned > Decimal('0.5')
+        has_ownership = percent_owned > Decimal('0.6')
         
         # Keep skill position players with minimal activity
         skill_positions = ["QB", "RB", "WR", "TE"]
@@ -504,21 +630,28 @@ def lambda_handler(event, context):
     LEAGUE_ID = os.environ.get("LEAGUE_ID")
     SEASON_ID = os.environ.get("SEASON_ID")
     PLAYER_TABLE_NAME = os.environ.get("PLAYER_TABLE_NAME")
+    ROSTER_TABLE_NAME = os.environ.get("ROSTER_TABLE_NAME")
     
-    if not all([LEAGUE_ID, SEASON_ID, PLAYER_TABLE_NAME]):
+    if not all([LEAGUE_ID, SEASON_ID, PLAYER_TABLE_NAME, ROSTER_TABLE_NAME]):
         print("Missing required environment variables. Exiting.")
         return {
             "statusCode": 500,
             "body": json.dumps("Missing environment variables.")
         }
     
-    print("Starting ESPN Fantasy Football waiver wire script with FantasyPros projections.")
+    print("Starting ESPN Fantasy Football waiver wire script with FantasyPros projections and roster filtering.")
+    
+    # Get rostered players to filter out
+    print("Fetching current team rosters...")
+    rostered_players = get_rostered_players(ROSTER_TABLE_NAME)
+    if not rostered_players:
+        print("Warning: No rostered players found. Continuing without roster filtering.")
     
     # Get FantasyPros projections for all positions
     print("Fetching FantasyPros projections...")
     fantasypros_projections = {}
     
-    positions_to_fetch = ["QB", "RB", "WR", "TE", "D/ST"]  # Add "K" if needed
+    positions_to_fetch = ["QB", "RB", "WR", "TE", "D/ST", "K"]
     
     # Determine which weeks to fetch (you may want to make this configurable)
     current_week = int(os.environ.get("CURRENT_WEEK", "1"))
@@ -546,8 +679,8 @@ def lambda_handler(event, context):
             "body": json.dumps("Failed to retrieve player data.")
         }
     
-    # Transform the data with FantasyPros projections
-    transformed_players = transform_player_data(raw_players, SEASON_ID, fantasypros_projections)
+    # Transform the data with FantasyPros projections and roster filtering
+    transformed_players = transform_player_data(raw_players, SEASON_ID, fantasypros_projections, rostered_players)
     
     # Filter to most relevant players
     filtered_players = filter_relevant_players(transformed_players)
@@ -558,7 +691,7 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": json.dumps("No relevant players to store.")
         }
-    print(filtered_players)
+    
     # Store in DynamoDB
     store_players_in_dynamodb(filtered_players, PLAYER_TABLE_NAME)
     
@@ -566,5 +699,5 @@ def lambda_handler(event, context):
     
     return {
         "statusCode": 200,
-        "body": json.dumps(f"Successfully processed and stored {len(filtered_players)} players with FantasyPros projections.")
+        "body": json.dumps(f"Successfully processed and stored {len(filtered_players)} players with FantasyPros projections (filtered out rostered players).")
     }

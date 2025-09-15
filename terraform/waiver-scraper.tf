@@ -79,6 +79,7 @@ resource "aws_lambda_function" "waiver_wire_lambda" {
       PLAYER_TABLE_NAME = aws_dynamodb_table.waiver_table.name
       ESPN_S2           = var.espn_s2_value
       SWID              = var.espn_swid
+      ROSTER_TABLE_NAME = aws_dynamodb_table.fantasy_football_team_roster.name
     }
   }
 
