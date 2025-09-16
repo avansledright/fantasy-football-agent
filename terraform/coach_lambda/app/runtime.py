@@ -43,6 +43,8 @@ TEAM ROSTER:
 
 If the team roster contains players with below 10 points projected we should be considering alternative players through waiver acquisition
 
+If a player is "Injured Reserved" or "IR" they cannot be placed on the active roster.
+
 COMPREHENSIVE PLAYER DATA:
 {player_data_context}
 

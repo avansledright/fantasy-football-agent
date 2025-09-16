@@ -9,7 +9,7 @@ import re
 from decimal import Decimal, InvalidOperation
 import os
 from typing import Dict, List, Optional
-
+from utils import nfl_teams
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -62,7 +62,7 @@ def lambda_handler(event, context):
             if week_status == 'completed':
                 logger.info(f"Processing {position} stats for week {current_week} ({week_status})...")
                 players_data = scrape_fantasypros_stats(position, current_week)
-
+                logger.info(f"Sample Data after stat scrape: {players_data[1]}")
                 if players_data:
                     update_player_stats_in_consolidated_table(players_data, current_week)
                     total_players_processed += len(players_data)
@@ -387,8 +387,11 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
 
                 # For DST, ensure same naming convention as stats scraper
                 if position == "DST":
+                    logger.info(f"PARSED: {parsed}")
+                    parsed['player_name'] = parsed['player_name'].replace(" DST", "")
+                    logger.info(f"Found DST parsed name == {parsed['player_name']}")
                     if parsed.get('team') and parsed['team'] != "UNK":
-                        parsed['player_name'] = f"{parsed['team']} DST"
+                        parsed['player_name'] = f"{parsed['team']}"
 
                 # fantasy_points from parse_player_row is already Decimal when possible; ensure type
                 fpts = parsed.get('fantasy_points', Decimal('0'))
@@ -470,9 +473,6 @@ def parse_player_row(row, position: str, week: int, player_idx: Optional[int], f
                 player_cell_text = cells[-1].get_text(strip=True)
             else:
                 player_cell_text = cells[player_idx].get_text(" ", strip=True)
-
-        # Player name and team extraction -- examples:
-        # "Javonte Williams (DAL)" or "Saquon Barkley (PHI)" or "Buffalo Bills (BUF)" for DST
         player_name = player_cell_text
         team = "UNK"
 
@@ -499,10 +499,10 @@ def parse_player_row(row, position: str, week: int, player_idx: Optional[int], f
         if position == "DST":
             # If team is known, create DST name
             if team != "UNK":
-                player_name = f"{team} DST"
+                player_name = f"{team}"
             else:
                 # fallback: use whatever we parsed
-                player_name = f"{player_name} DST"
+                player_name = f"{player_name}"
 
         # Extract fantasy points from fpts_idx
         fantasy_points = Decimal('0')
@@ -605,6 +605,9 @@ def update_player_stats_in_consolidated_table(players_data: List[Dict], week: in
 
             with table.batch_writer() as batch_writer:
                 for player_data in batch:
+                    if player_data['position'] == "DST":
+                        player_data['player_name'] = nfl_teams[player_data['player_name']]
+                        logger.info(f"Found DST. New player name = {player_data['player_name']}")
                     player_name = player_data['player_name']
                     position = player_data['position']
                     player_id = f"{player_name}#{position}"

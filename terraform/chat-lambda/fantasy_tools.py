@@ -7,7 +7,7 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from strands import tool
-
+from utils import convert_nfl_defense_name
 logger = logging.getLogger(__name__)
 
 class FantasyFootballTools:
@@ -20,6 +20,32 @@ class FantasyFootballTools:
     def update_context(self, context: Dict[str, Any]):
         """Update the current context for week-aware operations"""
         self.current_context = context
+    def _get_weekly_projection(self, player_stats: Dict, current_week: int = None) -> float:
+        """Extract weekly projection from player stats"""
+        projections = player_stats.get('projections', {})
+        
+        # Get the year's projections (assuming 2025 for now)
+        year_projections = projections.get('2025', {})
+        weekly_projections = year_projections.get('weekly', {})
+        
+        if not weekly_projections:
+            # Fallback to season total divided by 17 weeks if no weekly data
+            season_total = float(year_projections.get('FPTS', 0))
+            return season_total / 17 if season_total > 0 else 0
+        
+        # If current_week is specified, try to get that week's projection
+        if current_week and str(current_week) in weekly_projections:
+            return float(weekly_projections[str(current_week)].get('fantasy_points', 0))
+        
+        # Otherwise, get the most recent week's projection
+        available_weeks = [int(week) for week in weekly_projections.keys() if week.isdigit()]
+        if available_weeks:
+            latest_week = max(available_weeks)
+            return float(weekly_projections[str(latest_week)].get('fantasy_points', 0))
+        
+        # Final fallback to season average
+        season_total = float(year_projections.get('FPTS', 0))
+        return season_total / 17 if season_total > 0 else 0
     def get_team_roster(self, team_id: str) -> Dict[str, Any]:
         """Get detailed team roster information"""
         try:
@@ -62,6 +88,9 @@ class FantasyFootballTools:
         """Get comprehensive player statistics"""
         try:
             # Search for player by name
+            if "DST" in player_name:
+                logger.info(f"Found defense: {player_name}")
+                player_name = player_name.replace("#DST", "")
             players = self.db.search_players_by_name(player_name)
             
             if not players:
@@ -102,6 +131,7 @@ class FantasyFootballTools:
     def get_waiver_recommendations(self, position: str = None, team_id: str = None) -> List[Dict[str, Any]]:
         """Get waiver wire pickup recommendations"""
         try:
+            current_week = self._get_current_week()
             # Get team needs if team_id provided
             team_needs = []
             if team_id:
@@ -121,6 +151,9 @@ class FantasyFootballTools:
             
             for player in waiver_players:
                 logger.info(f"Player_name == {player['player_name']}")
+                if player['position'] == "D/ST":
+                    player['player_name'] = convert_nfl_defense_name(player['player_name'])
+                    logger.info(f"New player_name == {player['player_name']}")
                 player_stats = self.get_player_stats(player['player_name'])
                 
                 if player_stats and not player_stats.get('error'):
@@ -131,15 +164,15 @@ class FantasyFootballTools:
                         "ownership_percentage": player['percent_owned'],
                         "injury_status": player.get('injury_status', 'UNKNOWN'),
                         "weekly_projections": player.get('weekly_projections', {}),
-                        "season_projection": player_stats.get('projections', {}).get('MISC_FPTS', 0),
-                        "recommendation_score": self._calculate_recommendation_score(player, player_stats, team_needs)
+                        "season_projection": self._get_weekly_projection(player_stats, current_week),
+                        "recommendation_score": self._calculate_recommendation_score(player, player_stats, team_needs, current_week)
                     }
                     
                     recommendations.append(recommendation)
             
             # Sort by recommendation score
             recommendations.sort(key=lambda x: x['recommendation_score'], reverse=True)
-            
+            logger.info(f"Recommendations: {recommendations[:15]}")
             return recommendations[:15]  # Return top 15 recommendations
             
         except Exception as e:
@@ -380,12 +413,13 @@ class FantasyFootballTools:
         
         return needs
     
-    def _calculate_recommendation_score(self, waiver_player: Dict, player_stats: Dict, team_needs: List[str]) -> float:
+    def _calculate_recommendation_score(self, waiver_player: Dict, player_stats: Dict, team_needs: List[str], current_week: int = None) -> float:
         """Calculate recommendation score for waiver player"""
         score = 0
         
         # Base score from projections
-        projected_points = float(player_stats.get('projections', {}).get('MISC_FPTS', 0))  # Convert to float
+        projected_points = self._get_weekly_projection(player_stats, current_week)
+        #projected_points = float(player_stats.get('projections', {}).get('MISC_FPTS', 0))  # Convert to float
         score += projected_points / 20  # Normalize
         
         # Bonus for team needs

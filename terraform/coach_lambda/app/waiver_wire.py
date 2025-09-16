@@ -371,7 +371,7 @@ def _get_position_min_points(position: str, priority: str) -> float:
         "QB": 12.0,
         "RB": 8.0, 
         "WR": 8.0,
-        "TE": 5.0,  # Lower for TEs
+        "TE": 8.0,  # Lower for TEs
         "K": 4.0,
         "DST": 5.0
     }
@@ -432,7 +432,7 @@ def _calculate_smart_recommendation_strength(
         return "Must Add"
     elif priority == "HIGH" and projected >= 6:
         return "Strongly Recommended"
-    elif priority in ["HIGH", "MEDIUM"] and projected >= 8 and ownership < 60:
+    elif priority in ["HIGH", "MEDIUM"] and projected >= 8 and ownership < 90:
         return "Recommended"
     elif projected >= 10:
         return "Good Value"
@@ -482,11 +482,10 @@ def _generate_smart_analysis(
 def _calculate_upside_score(projected: float, ownership: float, season_proj: float, historical: float) -> float:
     """Calculate upside score for waiver targets."""
     projection_score = projected * 0.4
-    ownership_score = (100 - ownership) * 0.3 / 100
     season_score = (season_proj / 17) * 0.2 if season_proj > 0 else 0
     historical_score = historical * 0.1 if historical > 0 else 0
     
-    return round(projection_score + ownership_score + season_score + historical_score, 2)
+    return round(projection_score + season_score + historical_score, 2)
 
 def _classify_target_type(ownership: float, upside_score: float) -> str:
     """Classify the type of waiver target."""
