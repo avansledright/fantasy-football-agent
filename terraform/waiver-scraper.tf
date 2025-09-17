@@ -54,7 +54,8 @@ resource "aws_iam_role_policy" "waiver_lambda_dynamodb_policy" {
         ]
         Resource = [
           "${aws_dynamodb_table.waiver_table.arn}",
-          "${aws_dynamodb_table.waiver_table.arn}/index/*"
+          "${aws_dynamodb_table.waiver_table.arn}/index/*",
+          "${aws_dynamodb_table.fantasy_football_team_roster.arn}"
         ]
       }
     ]

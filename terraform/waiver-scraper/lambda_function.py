@@ -435,6 +435,7 @@ def get_position_name(position_id):
     """
     Maps ESPN position IDs to position abbreviations.
     """
+    
     position_map = {
         0: "QB", 1: "TQB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 
         16: "D/ST", 17: "K", 23: "FLEX"
@@ -612,7 +613,7 @@ def filter_relevant_players(transformed_players):
         has_ownership = percent_owned > Decimal('0.6')
         
         # Keep skill position players with minimal activity
-        skill_positions = ["QB", "RB", "WR", "TE"]
+        skill_positions = ["QB", "RB", "WR", "TE", "K"]
         if position in skill_positions and (has_projections or has_ownership):
             filtered_players.append(player)
         # Keep D/ST with some ownership

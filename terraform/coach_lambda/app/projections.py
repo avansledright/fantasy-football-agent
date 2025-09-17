@@ -94,6 +94,11 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
     history_2024 = extract_2024_history(player_data)
     current_2025 = extract_current_stats(player_data)
     
+    # Check if player has no 2025 projections
+    if not projections_2025:
+        print(f"WARNING: No 2025 projections found for {player_name} - returning 0.0")
+        return 0.0
+    
     # FIRST: Check for specific weekly projection
     weekly_projections = projections_2025.get("weekly", {})
     if str(week) in weekly_projections:
@@ -110,14 +115,14 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
     
     # Recent performance from 2024 - convert Decimal to float
     historical_avg = float(history_2024.get("recent4_avg", 0))
-    print(f"  2024 recent avg: {historical_avg}")
+    print(f"2024 recent avg: {historical_avg}")
     
     # Current 2025 performance - convert Decimal to float
     current_weeks = current_2025.get("weeks", [])
     current_avg = 0
     if current_weeks:
         current_avg = sum(float(w.get("fantasy_points", 0)) for w in current_weeks) / len(current_weeks)
-    print(f"  2025 current avg: {current_avg} from {len(current_weeks)} weeks")
+    print(f"2025 current avg: {current_avg} from {len(current_weeks)} weeks")
     
     # Weighted calculation
     # 50% season projection, 30% 2024 history, 20% current 2025 performance
@@ -133,7 +138,7 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
         weights["current"] * current_avg
     )
     
-    print(f"  Raw projection: {projection}")
+    print(f"Raw projection: {projection}")
     
     # Apply position-based adjustments
     position = player_data.get("position", "")
@@ -143,7 +148,7 @@ def _calculate_weekly_projection(player_data: Dict[str, Any], week: int) -> floa
     
     # Ensure minimum projection
     final_projection = max(round(projection, 1), 3.0)
-    print(f"  Final projection: {final_projection}")
+    print(f"Final projection: {final_projection}")
     
     return final_projection
 

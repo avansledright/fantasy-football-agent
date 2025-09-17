@@ -23,15 +23,9 @@ class FantasyFootballTools:
     def _get_weekly_projection(self, player_stats: Dict, current_week: int = None) -> float:
         """Extract weekly projection from player stats"""
         projections = player_stats.get('projections', {})
-        
         # Get the year's projections (assuming 2025 for now)
-        year_projections = projections.get('2025', {})
-        weekly_projections = year_projections.get('weekly', {})
-        
-        if not weekly_projections:
-            # Fallback to season total divided by 17 weeks if no weekly data
-            season_total = float(year_projections.get('FPTS', 0))
-            return season_total / 17 if season_total > 0 else 0
+        weekly_projections = projections.get('weekly', {})
+        logger.info(weekly_projections)
         
         # If current_week is specified, try to get that week's projection
         if current_week and str(current_week) in weekly_projections:
@@ -44,8 +38,7 @@ class FantasyFootballTools:
             return float(weekly_projections[str(latest_week)].get('fantasy_points', 0))
         
         # Final fallback to season average
-        season_total = float(year_projections.get('FPTS', 0))
-        return season_total / 17 if season_total > 0 else 0
+        return 0
     def get_team_roster(self, team_id: str) -> Dict[str, Any]:
         """Get detailed team roster information"""
         try:
@@ -419,13 +412,14 @@ class FantasyFootballTools:
         
         # Base score from projections
         projected_points = self._get_weekly_projection(player_stats, current_week)
+        logger.info(f"Projected points: {projected_points}")
         #projected_points = float(player_stats.get('projections', {}).get('MISC_FPTS', 0))  # Convert to float
         score += projected_points / 20  # Normalize
-        
+        logger.info(f"Updated score: {score}")
         # Bonus for team needs
         if waiver_player['position'] in team_needs:
             score += 2
-        
+        logger.info(f"Updated score: {score}")
         # Penalty for high ownership
         #ownership_penalty = float(waiver_player['percent_owned']) / 10  # Convert to float
         #score -= ownership_penalty
@@ -433,8 +427,10 @@ class FantasyFootballTools:
         # Injury status consideration
         if waiver_player.get('injury_status') in ['QUESTIONABLE', 'DOUBTFUL']:
             score -= 1
+            logger.info(f"Updated score: {score}")
         elif waiver_player.get('injury_status') == 'OUT':
             score -= 3
+            logger.info(f"Updated score: {score}")
         print(f"Player: {waiver_player['player_name']} score = {score}")
         return max(0, score)
     
