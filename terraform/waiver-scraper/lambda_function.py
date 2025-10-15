@@ -341,7 +341,7 @@ def get_all_weekly_projections(position, weeks_to_fetch=None):
         dict: Nested dictionary {player_name: {week: projected_points}}
     """
     if weeks_to_fetch is None:
-        weeks_to_fetch = list(range(1, 19))  # Weeks 1-18
+        weeks_to_fetch = list(range(7, 19))  # Weeks 1-18
     
     all_projections = {}
     
@@ -437,7 +437,7 @@ def get_position_name(position_id):
     """
     
     position_map = {
-        0: "QB", 1: "TQB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 
+        0: "QB", 1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 
         16: "D/ST", 17: "K", 23: "FLEX"
     }
     return position_map.get(position_id, "UNKNOWN")
@@ -509,6 +509,7 @@ def transform_player_data(players_list, season_id, fantasypros_projections, rost
     print(f"Processing {len(players_list)} players...")
 
     for player_entry in players_list:
+        #print(f"Player to transform == {player_entry}")
         # Check if player is available (not on a team)
         on_team_id = player_entry.get("onTeamId", 0)
         if on_team_id != 0:  # Player is on a team, skip
@@ -614,7 +615,10 @@ def filter_relevant_players(transformed_players):
         
         # Keep skill position players with minimal activity
         skill_positions = ["QB", "RB", "WR", "TE", "K"]
-        if position in skill_positions and (has_projections or has_ownership):
+        if position == "QB" or position == "TQB":
+            print(f"Adding QB {position} to the list of players.")
+            filtered_players.append(player)
+        elif position in skill_positions and (has_projections or has_ownership):
             filtered_players.append(player)
         # Keep D/ST with some ownership
         elif position == "D/ST" and (has_ownership or has_projections):
@@ -655,7 +659,7 @@ def lambda_handler(event, context):
     positions_to_fetch = ["QB", "RB", "WR", "TE", "D/ST", "K"]
     
     # Determine which weeks to fetch (you may want to make this configurable)
-    current_week = int(os.environ.get("CURRENT_WEEK", "1"))
+    current_week = int(os.environ.get("CURRENT_WEEK", "7"))
     weeks_ahead = int(os.environ.get("WEEKS_AHEAD", "17"))  # How many weeks ahead to project
     weeks_to_fetch = list(range(current_week, min(current_week + weeks_ahead, 19)))
     

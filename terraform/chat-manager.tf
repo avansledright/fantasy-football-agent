@@ -88,7 +88,8 @@ resource "aws_iam_role_policy" "lambda_policy_chat" {
         Effect = "Allow"
         Action = [
           "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream"
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:*"
         ]
         Resource = "*"
       },

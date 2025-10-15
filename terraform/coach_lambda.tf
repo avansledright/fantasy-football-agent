@@ -40,7 +40,8 @@ resource "aws_iam_policy" "coach_lambda_extra_policy" {
         Effect = "Allow"
         Action = [
           "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream"
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:*"
         ]
         Resource = "*"
       }

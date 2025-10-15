@@ -28,7 +28,8 @@ resource "aws_iam_policy" "bedrock_access" {
         Effect = "Allow"
         Action = [
           "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream"
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:*"
         ]
         Resource = "*"
       }
@@ -65,32 +66,6 @@ resource "aws_iam_policy" "dynamodb_access" {
   })
 }
 
-resource "aws_iam_policy" "cost_explorer_access" {
-  name        = "${var.agent_name}-cost-explorer-policy"
-  description = "Allow access to Amazon Cost Explorer for Strands Agent"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ce:GetCostAndUsage",
-          "ce:GetDimensionValues",
-          "ce:GetReservationCoverage",
-          "ce:GetReservationPurchaseRecommendation",
-          "ce:GetReservationUtilization",
-          "ce:GetSavingsPlansUtilization",
-          "ce:GetUsageReport",
-          "ce:DescribeCostCategoryDefinition",
-          "ce:GetCostCategories"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
 # Attach policies to Lambda role
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
@@ -103,11 +78,6 @@ resource "aws_iam_role_policy_attachment" "read_only" {
 }
 
 resource "aws_iam_role_policy_attachment" "bedrock_access" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.bedrock_access.arn
-}
-
-resource "aws_iam_role_policy_attachment" "cost_explorer_access" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.bedrock_access.arn
 }

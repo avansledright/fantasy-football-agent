@@ -179,7 +179,8 @@ def scrape_fantasypros_stats(position: str, week: int) -> List[Dict]:
         # Always include week and PPR scoring
         params = {
             'week': week,
-            'scoring': 'PPR'
+            'scoring': 'PPR',
+            'range': 'week'
         }
 
         logger.info(f"Scraping stats URL: {url} with params: {params}")

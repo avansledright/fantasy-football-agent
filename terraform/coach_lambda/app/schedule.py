@@ -124,6 +124,8 @@ matchups_by_week = {
         "PIT": "CIN",  # Thursday
         "LAR": "JAX",  # Sunday (London)
         "NE": "TEN",
+        "BUF": "BYE",
+        "BAL": "BYE",
         "MIA": "CLE",
         "LV": "KC",
         "CAR": "NYJ",

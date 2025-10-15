@@ -74,6 +74,7 @@ Your task: Optimize the lineup for week {week} using:
 8. For waiver suggestions be sure to analyze their past performance against their opponents
 9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
 10. For the OP position. Be sure to give a detailed explanation as to your selection. Typically this is a place to gain a competitive edge given that it can be any of QB/RB/WR/TE positions. 
+11. If a player is on a BYE week they cannot be considered for the starting lineup
 
 FOR DEFENSE:
 Because week to week matchups are always exploitable, identify the best defensive matchups for the week. Return them as part of your explanations. Highlight it in another heading section and include the teams that could be good picks from waivers.

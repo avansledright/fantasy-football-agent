@@ -58,7 +58,8 @@ def create_unified_projections(
                         opponent = away_team
                         is_home = True  # Home team
                         break
-        
+        if opponent == "":
+            opponent = "BYE"
         print(f"Opponent is: {opponent} and {team} is home? {is_home}")
         # Create projection entry
         projection_entry = {
