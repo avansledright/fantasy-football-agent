@@ -119,3 +119,15 @@ variable "espn_s2_value" {
   type        = string
   description = "ESPN S2 value"
 }
+
+variable "collection_name" {
+  description = "A unique name for the OpenSearch Serverless collection."
+  type        = string
+  default     = "fantasy-football-kb"
+}
+
+variable "fantasy_football_player_data_table_name" {
+  description = "Value for the new consolidated player data table"
+  type = string
+  default = "fantasy-football-players-updated"
+}

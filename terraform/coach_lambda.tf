@@ -25,15 +25,21 @@ resource "aws_iam_policy" "coach_lambda_extra_policy" {
       {
         Effect = "Allow"
         Action = [
+          "dynamodb:PutItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:UpdateItem",
           "dynamodb:GetItem",
           "dynamodb:Query",
           "dynamodb:Scan",
+          "dynamodb:DeleteItem",
           "dynamodb:BatchGetItem"
         ]
         Resource = [
-          "${aws_dynamodb_table.fantasy_football_team_roster.arn}",
           "${aws_dynamodb_table.waiver_table.arn}",
-          "${aws_dynamodb_table.fantasy_football_players.arn}",
+          "${aws_dynamodb_table.waiver_table.arn}/index/*",
+          "${aws_dynamodb_table.fantasy_football_team_roster.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}/index/*"
         ]
       },
       {
@@ -41,7 +47,9 @@ resource "aws_iam_policy" "coach_lambda_extra_policy" {
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
-          "bedrock:*"
+          "bedrock:*",
+          "aws-marketplace:ViewSubscriptions",
+          "aws-marketplace:Subscribe"
         ]
         Resource = "*"
       }
@@ -74,10 +82,10 @@ resource "aws_lambda_function" "coach" {
   ]
   environment {
     variables = {
-      BEDROCK_MODEL_ID     = "us.anthropic.claude-sonnet-4-20250514-v1:0"
-      PLAYERS_TABLE      = aws_dynamodb_table.fantasy_football_players.name
+      BEDROCK_MODEL_ID     = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+      PLAYERS_TABLE      = aws_dynamodb_table.fantasy_football_player_data.name
       DDB_TABLE_ROSTER     = aws_dynamodb_table.fantasy_football_team_roster.name
-      WAIVER_TABLE = aws_dynamodb_table.waiver_table.name
+      #WAIVER_TABLE = aws_dynamodb_table.waiver_table.name
       DEFAULT_TEAM_ID      = "7"
       SCORING              = "PPR"
       LINEUP_SLOTS         = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"

@@ -1,20 +1,21 @@
 # app/lineup.py
 """
-Streamlined lineup optimization using unified player data.
+Streamlined lineup optimization using unified player data with NEW structure.
+UPDATED for seasons.{year}.* paths
 """
 
 import json
 from typing import Dict, List, Any, Optional
 from strands import tool
 from app.utils import fits_lineup_slot, normalize_player_name, calculate_adjusted_score
-from app.player_data import load_roster_player_data, extract_2024_history, extract_2025_projections
+from app.player_data import load_roster_player_data, extract_2024_history, extract_2025_projections, extract_injury_and_ownership
 
 def build_candidates(
     roster_players: List[Dict[str, Any]], 
     projections_data: Dict[str, Any],
     unified_data: Dict[str, Dict[str, Any]]
 ) -> List[Dict[str, Any]]:
-    """Build candidate list with comprehensive scoring."""
+    """Build candidate list with comprehensive scoring using NEW structure."""
     
     # Index projections by player name
     proj_index = {}
@@ -40,24 +41,31 @@ def build_candidates(
         proj = proj_index.get(norm_name, {})
         weekly_proj = float(proj.get("projected", 0))
         
-        # Get unified data
+        # Get unified data (NEW structure)
         player_data = unified_data.get(name, {})
         
-        # Extract relevant metrics
+        # Extract relevant metrics from NEW structure
         season_proj_total = 0
         recent_avg = 0
+        injury_status = "Healthy"
         
         if player_data:
+            # NEW: extract from seasons.2025.season_projections
             projections_2025 = extract_2025_projections(player_data)
             season_proj_total = projections_2025.get("MISC_FPTS", 0)
             
+            # NEW: extract from seasons.2024.weekly_stats
             history_2024 = extract_2024_history(player_data)
             recent_avg = history_2024.get("recent4_avg", 0)
+            
+            # NEW: extract from seasons.2025.injury_status
+            injury_ownership = extract_injury_and_ownership(player_data)
+            injury_status = injury_ownership.get("injury_status", "Healthy")
         
-        # Calculate scores
+        # Calculate scores with injury adjustment
         season_proj_per_game = season_proj_total / 17 if season_proj_total > 0 else 0
         adjusted_score, confidence = calculate_adjusted_score(
-            weekly_proj, season_proj_per_game, recent_avg
+            weekly_proj, season_proj_per_game, recent_avg, injury_status
         )
         
         candidates.append({
@@ -68,7 +76,8 @@ def build_candidates(
             "season_total": season_proj_total,
             "recent_avg": recent_avg,
             "adjusted": adjusted_score,
-            "confidence": confidence
+            "confidence": confidence,
+            "injury_status": injury_status
         })
     
     return candidates
@@ -112,7 +121,8 @@ def optimize_lineup(
             "position": pick["position"],
             "projected": pick["projected"],
             "adjusted": pick["adjusted"],
-            "confidence": pick["confidence"]
+            "confidence": pick["confidence"],
+            "injury_status": pick.get("injury_status", "Healthy")
         })
     
     # Remaining players for bench
@@ -135,7 +145,7 @@ def choose_optimal_lineup(
     roster: Any,
     projections: Any,
 ) -> Dict[str, Any]:
-    """Choose optimal lineup with streamlined logic."""
+    """Choose optimal lineup with streamlined logic using NEW structure."""
     
     # Parse inputs
     if isinstance(roster, str):
@@ -145,7 +155,7 @@ def choose_optimal_lineup(
     
     roster_players = roster.get("players", [])
     
-    # Load comprehensive data from unified table
+    # Load comprehensive data from unified table (NEW structure)
     unified_data = load_roster_player_data(roster_players)
     
     # Build candidates with enhanced scoring
@@ -160,11 +170,11 @@ def optimize_lineup_direct(
     lineup_slots: List[str],
     roster_players: List[Dict[str, Any]],
     projections_data: Dict[str, Any],
-    histories_data: Dict[str, Any] = None  # Not used
+    histories_data: Dict[str, Any] = None  # Not used with unified table
 ) -> Dict[str, Any]:
-    """Direct optimization function for ultra-fast mode."""
+    """Direct optimization function for ultra-fast mode using NEW structure."""
     
-    # Load unified data
+    # Load unified data (NEW structure)
     unified_data = load_roster_player_data(roster_players)
     
     # Build candidates

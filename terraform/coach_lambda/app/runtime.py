@@ -1,6 +1,7 @@
 # app/runtime.py
 """
-Streamlined runtime using unified player data table.
+Streamlined runtime using unified player data table with NEW seasons.{year}.* structure.
+UPDATED for fantasy-football-players-updated table
 """
 
 import os
@@ -16,16 +17,17 @@ from app.waiver_wire import get_position_waiver_targets, analyze_waiver_opportun
 from app.example_output import EXAMPLE_OUTPUT
 
 def build_agent_with_precomputed_lineup(team_id: str, week: int, lineup_slots: list) -> Agent:
-    """Build agent with comprehensive unified table data."""
+    """Build agent with comprehensive unified table data using NEW structure."""
     
     print(f"Loading roster for team {team_id}...")
     roster = load_team_roster(team_id)
-    print(f"Loading comprehensive player data from unified table...")
+    
+    print(f"Loading comprehensive player data from unified table (NEW structure)...")
     roster_players = roster.get("players", [])
     print(f"PLAYERS: {roster_players}")
     unified_player_data = load_roster_player_data(roster_players)
     
-    print(f"Creating unified weekly projections for week {week}...")
+    print(f"Creating unified weekly projections for week {week} (NEW structure)...")
     projections_data = create_unified_projections(roster_players, week)
     projections_json = json.dumps(projections_data)
     
@@ -45,29 +47,29 @@ If the team roster contains players with below 10 points projected we should be 
 
 If a player is "Injured Reserved" or "IR" they cannot be placed on the active roster.
 
-COMPREHENSIVE PLAYER DATA:
+COMPREHENSIVE PLAYER DATA (NEW Structure - seasons.{{year}}.*):
 {player_data_context}
 
 WEEKLY MATCHUPS: 
 {weekly_matchups}
 
-WEEKLY PROJECTIONS (Unified Data):
+WEEKLY PROJECTIONS (Unified Data from NEW Structure):
 {projections_json}
 
 You have access to advanced analysis tools:
 
-- analyze_player_performance: Get comprehensive analysis for individual players
-- compare_roster_players: Compare multiple players across different metrics  
+- analyze_player_performance: Get comprehensive analysis for individual players using NEW structure
+- compare_roster_players: Compare multiple players across different metrics from NEW structure
 - analyze_roster_needs_for_waivers: Analyze your roster construction to identify positional needs based on league requirements
 - should_target_position_for_waiver: Check if a specific position should be targeted for waiver pickup
-- get_position_waiver_targets(position, week={week}, min_points=5.0, max_ownership=25.0) - Get specific waiver targets for a position with low ownership
-- analyze_waiver_opportunities_with_projections(current_roster, external_projections, week={week}) - Smart waiver analysis considering roster construction
+- get_position_waiver_targets(position, week={week}, min_points=5.0, max_ownership=25.0) - Get specific waiver targets from unified table
+- analyze_waiver_opportunities_with_projections(current_roster, external_projections, week={week}) - Smart waiver analysis using unified table
 
 Your task: Optimize the lineup for week {week} using:
-1. 2024 historical performance data
-2. 2025 season projections 
-3. Current 2025 weekly performance
-4. Unified weekly projections from comprehensive data
+1. 2024 historical performance data (from seasons.2024.weekly_stats)
+2. 2025 season projections (from seasons.2025.season_projections)
+3. Current 2025 weekly performance (from seasons.2025.weekly_stats)
+4. Unified weekly projections from comprehensive data (seasons.2025.weekly_projections)
 5. Team matchups and game context - be sure to analyze performance against the opponent
 6. ROSTER CONSTRUCTION ANALYSIS - Use analyze_roster_needs_for_waivers to identify which positions need help
 7. SMART WAIVER RECOMMENDATIONS - Only suggest waivers for positions that need depth based on league requirements
@@ -75,6 +77,7 @@ Your task: Optimize the lineup for week {week} using:
 9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
 10. For the OP position. Be sure to give a detailed explanation as to your selection. Typically this is a place to gain a competitive edge given that it can be any of QB/RB/WR/TE positions. 
 11. If a player is on a BYE week they cannot be considered for the starting lineup
+12. INJURY AWARENESS - Players with injury status from seasons.2025.injury_status are automatically adjusted in scoring
 
 FOR DEFENSE:
 Because week to week matchups are always exploitable, identify the best defensive matchups for the week. Return them as part of your explanations. Highlight it in another heading section and include the teams that could be good picks from waivers.
@@ -99,7 +102,7 @@ For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
 
     bedrock_model = BedrockModel(
         model_id=os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-sonnet-4-20250514-v1:0"),
-        max_tokens=3000,
+        max_tokens=5000,
         temperature=0.0,
         stream=False
     )
@@ -116,15 +119,15 @@ For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
     return agent
 
 def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
-    """Ultra-fast optimization using direct computation with unified data."""
+    """Ultra-fast optimization using direct computation with unified data (NEW structure)."""
     
-    print(f"Ultra-fast mode: Direct optimization with unified data...")
+    print(f"Ultra-fast mode: Direct optimization with unified data (NEW structure)...")
     
     roster = load_team_roster(team_id)
     roster_players = roster.get("players", [])
     
-    # Get unified projections instead of external
-    print(f"Creating unified projections for week {week}...")
+    # Get unified projections from NEW structure
+    print(f"Creating unified projections for week {week} (NEW structure)...")
     projections_data = create_unified_projections(roster_players, week)
     
     # Direct optimization
@@ -137,9 +140,12 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
     # Enhanced explanation
     total_projections = sum(len(players) for players in projections_data.values())
     result["explanations"] = (
-        f"Week {week} lineup optimized using comprehensive unified data: "
-        f"unified weekly projections ({total_projections} players), 2025 season projections, 2024 historical performance, "
-        f"and confidence-weighted scoring. Filled {result.get('debug_info', {}).get('lineup_filled', 0)} slots "
+        f"Week {week} lineup optimized using comprehensive unified data (NEW structure): "
+        f"unified weekly projections from seasons.2025.weekly_projections ({total_projections} players), "
+        f"2025 season projections from seasons.2025.season_projections, "
+        f"2024 historical performance from seasons.2024.weekly_stats, "
+        f"and confidence-weighted scoring with injury adjustments. "
+        f"Filled {result.get('debug_info', {}).get('lineup_filled', 0)} slots "
         f"with average confidence of {result.get('debug_info', {}).get('avg_confidence', 0)}."
     )
     
@@ -147,5 +153,5 @@ def build_agent_ultra_fast(team_id: str, week: int, lineup_slots: list) -> dict:
 
 # Backward compatibility
 def build_agent(team_id: str, week: int, lineup_slots) -> Agent:
-    """Backward compatible agent builder."""
+    """Backward compatible agent builder using NEW structure."""
     return build_agent_with_precomputed_lineup(team_id, week, lineup_slots)

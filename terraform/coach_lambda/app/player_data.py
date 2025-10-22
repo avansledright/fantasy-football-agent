@@ -1,6 +1,7 @@
 # app/player_data.py
 """
-Streamlined player data access for the unified fantasy-football-players table.
+Streamlined player data access for the unified fantasy-football-players-updated table.
+UPDATED for seasons.{year}.* structure
 """
 
 import os
@@ -11,7 +12,7 @@ from strands import tool
 from app.utils import generate_player_id_candidates, normalize_player_name
 
 DDB = boto3.resource("dynamodb")
-PLAYERS_TABLE = os.environ.get("PLAYERS_TABLE", "fantasy-football-players")
+PLAYERS_TABLE = os.environ.get("PLAYERS_TABLE", "fantasy-football-players-updated")
 
 def get_players_batch(player_ids: List[str]) -> Dict[str, Dict[str, Any]]:
     """Efficiently load multiple players using batch_get_item."""
@@ -68,9 +69,11 @@ def get_player_by_name(player_name: str) -> Optional[Dict[str, Any]]:
     return None
 
 def extract_2024_history(player_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract and format 2024 historical data."""
-    historical = player_data.get("historical_seasons", {}).get("2024", {})
-    weekly_stats = historical.get("weekly_stats", {})
+    """Extract and format 2024 historical data from new structure."""
+    # NEW: seasons.2024.weekly_stats instead of historical_seasons.2024.weekly_stats
+    seasons = player_data.get("seasons", {})
+    season_2024 = seasons.get("2024", {})
+    weekly_stats = season_2024.get("weekly_stats", {})
     
     if not weekly_stats:
         return {"all": [], "recent4_avg": 0.0, "vs_opp_avg": None}
@@ -82,7 +85,7 @@ def extract_2024_history(player_data: Dict[str, Any]) -> Dict[str, Any]:
             week_num = int(week_str)
             all_weeks.append({
                 "week": week_num,
-                "fantasy_points": float(week_data.get("fantasy_points", 0)),  # Convert to float
+                "fantasy_points": float(week_data.get("fantasy_points", 0)),
                 "opponent": week_data.get("opponent", "")
             })
         except (ValueError, TypeError):
@@ -99,15 +102,37 @@ def extract_2024_history(player_data: Dict[str, Any]) -> Dict[str, Any]:
     return {"all": all_weeks, "recent4_avg": recent4_avg, "vs_opp_avg": None}
 
 def extract_2025_projections(player_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract 2025 season projections."""
-    return player_data.get("projections", {}).get("2025", {})
+    """Extract 2025 season projections from new structure."""
+    # NEW: Check both seasons.2025.season_projections and old projections.2025 for compatibility
+    seasons = player_data.get("seasons", {})
+    season_2025 = seasons.get("2025", {})
+    
+    # Try new location first
+    season_projections = season_2025.get("season_projections", {})
+    if season_projections:
+        return season_projections
+    
+    # Fallback to old location for backward compatibility during migration
+    old_projections = player_data.get("projections", {}).get("2025", {})
+    return old_projections
+
+def extract_2025_weekly_projections(player_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract 2025 weekly projections from new structure."""
+    # NEW: seasons.2025.weekly_projections instead of projections.2025.weekly
+    seasons = player_data.get("seasons", {})
+    season_2025 = seasons.get("2025", {})
+    weekly_projections = season_2025.get("weekly_projections", {})
+    return weekly_projections
 
 def extract_current_stats(player_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract 2025 current season stats."""
-    current_stats = player_data.get("current_season_stats", {}).get("2025", {})
+    """Extract 2025 current season stats from new structure."""
+    # NEW: seasons.2025.weekly_stats instead of current_season_stats.2025
+    seasons = player_data.get("seasons", {})
+    season_2025 = seasons.get("2025", {})
+    weekly_stats = season_2025.get("weekly_stats", {})
     
     all_weeks = []
-    for week_str, week_data in current_stats.items():
+    for week_str, week_data in weekly_stats.items():
         try:
             week_num = int(week_str)
             all_weeks.append({
@@ -120,6 +145,17 @@ def extract_current_stats(player_data: Dict[str, Any]) -> Dict[str, Any]:
             continue
     
     return {"weeks": sorted(all_weeks, key=lambda x: x["week"])}
+
+def extract_injury_and_ownership(player_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract injury status and ownership from new structure."""
+    # NEW: seasons.2025.injury_status and seasons.2025.percent_owned
+    seasons = player_data.get("seasons", {})
+    season_2025 = seasons.get("2025", {})
+    
+    return {
+        "injury_status": season_2025.get("injury_status", "Healthy"),
+        "percent_owned": float(season_2025.get("percent_owned", 0.0))
+    }
 
 def load_roster_player_data(roster_players: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     """Load comprehensive data for all roster players."""
@@ -155,7 +191,7 @@ def format_player_histories(all_data: Dict[str, Dict[str, Any]]) -> str:
     if not all_data:
         return "No player data available."
     
-    formatted = "COMPREHENSIVE PLAYER DATA (Unified Table):\n\n"
+    formatted = "COMPREHENSIVE PLAYER DATA (Unified Table - New Structure):\n\n"
     
     for player_name, player_data in all_data.items():
         if not player_data:
@@ -176,16 +212,22 @@ def format_player_histories(all_data: Dict[str, Dict[str, Any]]) -> str:
         current_games = len(current["weeks"])
         current_summary = f"2025: {current_games} games played"
         
+        # Injury and ownership
+        injury_ownership = extract_injury_and_ownership(player_data)
+        injury_status = injury_ownership["injury_status"]
+        ownership = injury_ownership["percent_owned"]
+        
         formatted += f"{player_name}:\n"
         formatted += f"  • {history_summary}\n"
         formatted += f"  • {proj_summary}\n" 
-        formatted += f"  • {current_summary}\n\n"
+        formatted += f"  • {current_summary}\n"
+        formatted += f"  • Injury: {injury_status}, Owned: {ownership:.1f}%\n\n"
     
     return formatted.strip()
 
 @tool
 def analyze_player_performance(player_name: str, weeks_back: int = 4) -> Dict[str, Any]:
-    """Comprehensive player performance analysis using unified data."""
+    """Comprehensive player performance analysis using unified data with new structure."""
     player_data = get_player_by_name(player_name)
     
     if not player_data:
@@ -195,10 +237,11 @@ def analyze_player_performance(player_name: str, weeks_back: int = 4) -> Dict[st
             "analysis": "No data available"
         }
     
-    # Extract all data types
+    # Extract all data types from new structure
     history_2024 = extract_2024_history(player_data)
     projections_2025 = extract_2025_projections(player_data)
     current_2025 = extract_current_stats(player_data)
+    injury_ownership = extract_injury_and_ownership(player_data)
     
     # Calculate recent performance
     recent_weeks = current_2025["weeks"][-weeks_back:] if current_2025["weeks"] else []
@@ -214,8 +257,10 @@ def analyze_player_performance(player_name: str, weeks_back: int = 4) -> Dict[st
         "2025_recent_avg": recent_avg,
         "2025_games_played": len(current_2025["weeks"]),
         "2025_projected_points": projections_2025.get("MISC_FPTS", 0),
+        "injury_status": injury_ownership["injury_status"],
+        "ownership_pct": injury_ownership["percent_owned"],
         "recent_games": recent_weeks,
-        "analysis": f"{player_name}: Recent avg {recent_avg}, 2024 avg {history_2024['recent4_avg']}, projected {projections_2025.get('MISC_FPTS', 0)}"
+        "analysis": f"{player_name}: Recent avg {recent_avg}, 2024 avg {history_2024['recent4_avg']}, projected {projections_2025.get('MISC_FPTS', 0)}, {injury_ownership['injury_status']}"
     }
 
 @tool  
@@ -318,6 +363,7 @@ def _get_injury_severity(injury_status: str) -> str:
     """Get injury severity level."""
     severity_map = {
         "Healthy": "None",
+        "ACTIVE": "None",
         "Questionable": "Low",
         "Doubtful": "High", 
         "Out": "Critical",

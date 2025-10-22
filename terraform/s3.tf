@@ -7,6 +7,18 @@ resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
+resource "aws_s3_bucket" "knowledge_base" {
+  bucket        = "${var.agent_name}-knowledge-base-${random_id.bucket_suffix.hex}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_versioning" "knowledge_base" {
+  bucket = aws_s3_bucket.knowledge_base.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_versioning" "lambda_artifacts" {
   bucket = aws_s3_bucket.lambda_artifacts.id
   versioning_configuration {

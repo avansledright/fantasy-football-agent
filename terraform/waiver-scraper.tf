@@ -55,7 +55,9 @@ resource "aws_iam_role_policy" "waiver_lambda_dynamodb_policy" {
         Resource = [
           "${aws_dynamodb_table.waiver_table.arn}",
           "${aws_dynamodb_table.waiver_table.arn}/index/*",
-          "${aws_dynamodb_table.fantasy_football_team_roster.arn}"
+          "${aws_dynamodb_table.fantasy_football_team_roster.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}/index/*"
         ]
       }
     ]
@@ -77,10 +79,13 @@ resource "aws_lambda_function" "waiver_wire_lambda" {
     variables = {
       LEAGUE_ID         = var.espn_league_id
       SEASON_ID         = "2025"
-      PLAYER_TABLE_NAME = aws_dynamodb_table.waiver_table.name
+      PLAYER_TABLE_NAME = aws_dynamodb_table.fantasy_football_player_data.name
       ESPN_S2           = var.espn_s2_value
       SWID              = var.espn_swid
       ROSTER_TABLE_NAME = aws_dynamodb_table.fantasy_football_team_roster.name
+      CURRENT_WEEK = "8"
+      WEEKS_AHEAD = "11"
+
     }
   }
 

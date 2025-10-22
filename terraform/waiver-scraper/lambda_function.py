@@ -159,24 +159,149 @@ def is_player_rostered(player_name, position, rostered_players):
     
     return False
 
-def store_players_in_dynamodb(dynamodb_items, table_name):
+def update_player_in_dynamodb(player_data, table_name, season_id):
+    """
+    Updates a single player record in DynamoDB using the new consolidated structure.
+    Uses UPDATE expression to merge data into seasons.{year}.* instead of overwriting.
+    
+    Args:
+        player_data (dict): Player data to update
+        table_name (str): DynamoDB table name
+        season_id (str): Current season year
+    """
     dynamodb = get_dynamodb_resource()
     if not dynamodb:
         print("Could not get DynamoDB resource.")
-        return
+        return False
 
     table = dynamodb.Table(table_name)
     
     try:
-        print(f"Starting batch write to DynamoDB table '{table_name}'.")
-        with table.batch_writer() as batch:
-            for item in dynamodb_items:
-                # Convert floats to Decimals for DynamoDB compatibility
-                converted_item = convert_floats_to_decimal(item)
-                batch.put_item(Item=converted_item)
-        print(f"Successfully stored {len(dynamodb_items)} players in DynamoDB.")
+        player_id = player_data['player_id']
+        
+        # Build update expression for nested season data
+        update_expression_parts = []
+        expression_attribute_names = {}
+        expression_attribute_values = {}
+        
+        # Set root-level fields (only if creating new record)
+        update_expression_parts.append("SET #player_name = if_not_exists(#player_name, :player_name)")
+        update_expression_parts.append("#position = if_not_exists(#position, :position)")
+        update_expression_parts.append("#updated_at = :updated_at")
+        
+        expression_attribute_names['#player_name'] = 'player_name'
+        expression_attribute_names['#position'] = 'position'
+        expression_attribute_names['#updated_at'] = 'updated_at'
+        
+        expression_attribute_values[':player_name'] = player_data['player_name']
+        expression_attribute_values[':position'] = player_data['position']
+        expression_attribute_values[':updated_at'] = player_data['updated_at']
+        
+        # Add ESPN player ID if present
+        if 'espn_player_id' in player_data:
+            update_expression_parts.append("#espn_player_id = if_not_exists(#espn_player_id, :espn_player_id)")
+            expression_attribute_names['#espn_player_id'] = 'espn_player_id'
+            expression_attribute_values[':espn_player_id'] = player_data['espn_player_id']
+        
+        # Update season-specific data under seasons.{year}
+        season_path = f"#seasons.#{season_id}"
+        expression_attribute_names['#seasons'] = 'seasons'
+        expression_attribute_names[f'#{season_id}'] = season_id
+        
+        # Team info
+        if 'team' in player_data:
+            update_expression_parts.append(f"{season_path}.#team = :team")
+            expression_attribute_names['#team'] = 'team'
+            expression_attribute_values[':team'] = player_data['team']
+        
+        if 'pro_team_id' in player_data:
+            update_expression_parts.append(f"{season_path}.#pro_team_id = :pro_team_id")
+            expression_attribute_names['#pro_team_id'] = 'pro_team_id'
+            expression_attribute_values[':pro_team_id'] = player_data['pro_team_id']
+        
+        if 'jersey_number' in player_data:
+            update_expression_parts.append(f"{season_path}.#jersey_number = :jersey_number")
+            expression_attribute_names['#jersey_number'] = 'jersey_number'
+            expression_attribute_values[':jersey_number'] = player_data['jersey_number']
+        
+        # Injury status
+        if 'injury_status' in player_data:
+            update_expression_parts.append(f"{season_path}.#injury_status = :injury_status")
+            expression_attribute_names['#injury_status'] = 'injury_status'
+            expression_attribute_values[':injury_status'] = player_data['injury_status']
+        
+        # Ownership percentage
+        if 'percent_owned' in player_data:
+            update_expression_parts.append(f"{season_path}.#percent_owned = :percent_owned")
+            expression_attribute_names['#percent_owned'] = 'percent_owned'
+            expression_attribute_values[':percent_owned'] = player_data['percent_owned']
+        
+        # Weekly projections
+        if 'weekly_projections' in player_data and player_data['weekly_projections']:
+            update_expression_parts.append(f"{season_path}.#weekly_projections = :weekly_projections")
+            expression_attribute_names['#weekly_projections'] = 'weekly_projections'
+            expression_attribute_values[':weekly_projections'] = player_data['weekly_projections']
+        
+        # Weekly outlooks
+        if 'weekly_outlooks' in player_data and player_data['weekly_outlooks']:
+            update_expression_parts.append(f"{season_path}.#weekly_outlooks = :weekly_outlooks")
+            expression_attribute_names['#weekly_outlooks'] = 'weekly_outlooks'
+            expression_attribute_values[':weekly_outlooks'] = player_data['weekly_outlooks']
+        
+        # Season outlook (if present)
+        if 'season_outlook' in player_data:
+            update_expression_parts.append(f"{season_path}.#season_outlook = :season_outlook")
+            expression_attribute_names['#season_outlook'] = 'season_outlook'
+            expression_attribute_values[':season_outlook'] = player_data['season_outlook']
+        
+        # Combine all update expression parts
+        update_expression = ", ".join(update_expression_parts)
+        
+        # Execute update
+        table.update_item(
+            Key={'player_id': player_id},
+            UpdateExpression=update_expression,
+            ExpressionAttributeNames=expression_attribute_names,
+            ExpressionAttributeValues=expression_attribute_values
+        )
+        
+        return True
+        
     except Exception as e:
-        print(f"Error storing data in DynamoDB: {e}")
+        print(f"Error updating player {player_data.get('player_id', 'unknown')}: {e}")
+        return False
+
+def store_players_in_dynamodb(dynamodb_items, table_name, season_id):
+    """
+    Stores players in DynamoDB using the new consolidated structure.
+    Uses UPDATE operations to merge with existing data.
+    
+    Args:
+        dynamodb_items (list): List of player data dictionaries
+        table_name (str): DynamoDB table name
+        season_id (str): Current season year
+    """
+    print(f"Starting updates to DynamoDB table '{table_name}'.")
+    
+    success_count = 0
+    error_count = 0
+    
+    for item in dynamodb_items:
+        # Convert floats to Decimals for DynamoDB compatibility
+        converted_item = convert_floats_to_decimal(item)
+        
+        if update_player_in_dynamodb(converted_item, table_name, season_id):
+            success_count += 1
+        else:
+            error_count += 1
+        
+        # Small delay to avoid throttling
+        if (success_count + error_count) % 25 == 0:
+            time.sleep(0.1)
+    
+    print(f"Successfully updated {success_count} players in DynamoDB.")
+    if error_count > 0:
+        print(f"Failed to update {error_count} players.")
 
 # ==============================================================================
 # FANTASYPROS SCRAPING FUNCTIONS
@@ -492,7 +617,7 @@ def match_fantasypros_projection(player_name, position, fantasypros_data):
 def transform_player_data(players_list, season_id, fantasypros_projections, rostered_players):
     """
     Transforms a list of raw player data into a clean list of DynamoDB items.
-    Now includes FantasyPros projections and filters out rostered players.
+    Now uses the new consolidated table structure with player_id format.
     
     Args:
         players_list (list): A list of raw player data from the API.
@@ -509,7 +634,6 @@ def transform_player_data(players_list, season_id, fantasypros_projections, rost
     print(f"Processing {len(players_list)} players...")
 
     for player_entry in players_list:
-        #print(f"Player to transform == {player_entry}")
         # Check if player is available (not on a team)
         on_team_id = player_entry.get("onTeamId", 0)
         if on_team_id != 0:  # Player is on a team, skip
@@ -555,15 +679,14 @@ def transform_player_data(players_list, season_id, fantasypros_projections, rost
         ownership = player_info.get("ownership", {})
         percent_owned = ownership.get("percentOwned", 0)
         
-        # Create primary key matching your stat table format
-        player_season_key = f"{player_name}#{season_id}"
+        # Create player_id in the format "Player Name#Position"
+        player_id = f"{player_name}#{position}"
         
-        # Create DynamoDB item
+        # Create DynamoDB item for new consolidated structure
         dynamodb_item = {
-            "player_season": player_season_key,
+            "player_id": player_id,
             "player_name": player_name,
             "position": position,
-            "season": int(season_id),
             "team": team,
             "updated_at": datetime.utcnow().isoformat(),
             "weekly_projections": weekly_projections,
@@ -645,6 +768,8 @@ def lambda_handler(event, context):
         }
     
     print("Starting ESPN Fantasy Football waiver wire script with FantasyPros projections and roster filtering.")
+    print(f"Writing to consolidated table: {PLAYER_TABLE_NAME}")
+    print(f"Season data will be stored under seasons.{SEASON_ID}")
     
     # Get rostered players to filter out
     print("Fetching current team rosters...")
@@ -697,12 +822,12 @@ def lambda_handler(event, context):
             "body": json.dumps("No relevant players to store.")
         }
     
-    # Store in DynamoDB
-    store_players_in_dynamodb(filtered_players, PLAYER_TABLE_NAME)
+    # Store in DynamoDB using UPDATE operations to merge with existing data
+    store_players_in_dynamodb(filtered_players, PLAYER_TABLE_NAME, SEASON_ID)
     
     print("Script finished.")
     
     return {
         "statusCode": 200,
-        "body": json.dumps(f"Successfully processed and stored {len(filtered_players)} players with FantasyPros projections (filtered out rostered players).")
+        "body": json.dumps(f"Successfully processed and updated {len(filtered_players)} players in consolidated table (filtered out rostered players).")
     }

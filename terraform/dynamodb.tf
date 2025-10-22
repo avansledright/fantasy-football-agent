@@ -16,7 +16,8 @@ resource "aws_dynamodb_table" "fantasy_football_team_roster" {
   server_side_encryption {
     enabled = true
   }
-
+  stream_enabled = true
+  stream_view_type  = "NEW_IMAGE"
   tags = {
     Project     = "fantasy-football"
     Environment = "prod"
@@ -50,6 +51,7 @@ resource "aws_dynamodb_table" "waiver_table" {
     attribute_name = "updated_at"
     enabled        = false
   }
+
 
   tags = {
     Name        = "fantasy-players-table"
@@ -90,5 +92,34 @@ resource "aws_dynamodb_table" "fantasy_football_players" {
 
   server_side_encryption {
     enabled = true
+  }
+}
+
+resource "aws_dynamodb_table" "fantasy_football_player_data" {
+  name         = var.fantasy_football_player_data_table_name
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "player_id"
+
+  attribute {
+    name = "player_id"
+    type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  server_side_encryption {
+    enabled = true
+  }
+
+  stream_enabled = true
+  stream_view_type  = "NEW_IMAGE"
+
+  tags = {
+    Project     = "fantasy-football"
+    Environment = "prod"
+    ManagedBy   = "terraform"
   }
 }

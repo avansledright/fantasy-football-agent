@@ -1,6 +1,7 @@
 """
 Fantasy Football Tools with Strands SDK Integration
 Implements specific fantasy football analysis tools
+UPDATED for fantasy-football-players-updated table with seasons.{year}.* structure
 """
 
 import logging
@@ -8,6 +9,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from strands import tool
 from utils import convert_nfl_defense_name
+
 logger = logging.getLogger(__name__)
 
 class FantasyFootballTools:
@@ -16,29 +18,51 @@ class FantasyFootballTools:
     def __init__(self, db_client):
         self.db = db_client
         self.current_context = {}
+        self.season_year = "2025"  # Current season
 
     def update_context(self, context: Dict[str, Any]):
         """Update the current context for week-aware operations"""
         self.current_context = context
+    
     def _get_weekly_projection(self, player_stats: Dict, current_week: int = None) -> float:
-        """Extract weekly projection from player stats"""
-        projections = player_stats.get('projections', {})
-        # Get the year's projections (assuming 2025 for now)
-        weekly_projections = projections.get('weekly', {})
-        logger.info(weekly_projections)
+        """Extract weekly projection from player stats using NEW structure
+        
+        NEW: seasons.{year}.weekly_projections.{week}
+        """
+        # Extract from NEW structure
+        seasons = player_stats.get('seasons', {})
+        season_data = seasons.get(self.season_year, {})
+        weekly_projections = season_data.get('weekly_projections', {})
+        
+        logger.info(f"Weekly projections: {weekly_projections}")
         
         # If current_week is specified, try to get that week's projection
         if current_week and str(current_week) in weekly_projections:
-            return float(weekly_projections[str(current_week)].get('fantasy_points', 0))
+            proj_value = weekly_projections[str(current_week)]
+            # Handle both direct numbers and objects with fantasy_points
+            if isinstance(proj_value, dict):
+                return float(proj_value.get('fantasy_points', 0))
+            else:
+                return float(proj_value)
         
         # Otherwise, get the most recent week's projection
-        available_weeks = [int(week) for week in weekly_projections.keys() if week.isdigit()]
+        available_weeks = [int(week) for week in weekly_projections.keys() if str(week).isdigit()]
         if available_weeks:
             latest_week = max(available_weeks)
-            return float(weekly_projections[str(latest_week)].get('fantasy_points', 0))
+            proj_value = weekly_projections[str(latest_week)]
+            if isinstance(proj_value, dict):
+                return float(proj_value.get('fantasy_points', 0))
+            else:
+                return float(proj_value)
         
         # Final fallback to season average
-        return 0
+        season_projections = season_data.get('season_projections', {})
+        season_total = float(season_projections.get('MISC_FPTS', 0))
+        if season_total > 0:
+            return round(season_total / 17, 1)  # Average per game
+        
+        return 0.0
+    
     def get_team_roster(self, team_id: str) -> Dict[str, Any]:
         """Get detailed team roster information"""
         try:
@@ -53,11 +77,19 @@ class FantasyFootballTools:
             for player in roster_data.get('players', []):
                 player_stats = self.db.get_player_stats(player['player_id'])
                 
-                enhanced_player = {
-                    **player,
-                    'stats': player_stats.get('current_season_stats', {}) if player_stats else {},
-                    'projections': player_stats.get('projections', {}) if player_stats else {}
-                }
+                if player_stats:
+                    # Extract from NEW structure
+                    seasons = player_stats.get('seasons', {})
+                    season_2025 = seasons.get(self.season_year, {})
+                    
+                    enhanced_player = {
+                        **player,
+                        'stats': season_2025.get('weekly_stats', {}),
+                        'projections': season_2025.get('season_projections', {}),
+                        'injury_status': season_2025.get('injury_status', 'UNKNOWN')
+                    }
+                else:
+                    enhanced_player = player
                 
                 enhanced_players.append(enhanced_player)
             
@@ -78,12 +110,13 @@ class FantasyFootballTools:
             return {"error": "Failed to retrieve team roster"}
     
     def get_player_stats(self, player_name: str, season: int = 2025) -> Dict[str, Any]:
-        """Get comprehensive player statistics"""
+        """Get comprehensive player statistics using NEW structure"""
         try:
             # Search for player by name
             if "DST" in player_name:
                 logger.info(f"Found defense: {player_name}")
                 player_name = player_name.replace("#DST", "")
+            
             players = self.db.search_players_by_name(player_name)
             
             if not players:
@@ -99,10 +132,17 @@ class FantasyFootballTools:
             if not player:
                 player = players[0]  # Use first match if no exact match
             
-            # Extract relevant stats
-            current_stats = player.get('current_season_stats', {}).get(str(season), {})
-            historical_stats = player.get('historical_seasons', {})
-            projections = player.get('projections', {}).get(str(season), {})
+            # Extract relevant stats from NEW structure
+            seasons = player.get('seasons', {})
+            season_str = str(season)
+            season_data = seasons.get(season_str, {})
+            
+            # Get 2024 historical data for context
+            season_2024 = seasons.get('2024', {})
+            
+            current_stats = season_data.get('weekly_stats', {})
+            season_projections = season_data.get('season_projections', {})
+            weekly_projections = season_data.get('weekly_projections', {})
             
             return {
                 "player_info": {
@@ -111,27 +151,33 @@ class FantasyFootballTools:
                     "player_id": player['player_id']
                 },
                 "current_season_stats": current_stats,
-                "historical_seasons": historical_stats,
-                "projections": projections,
+                "historical_seasons": {'2024': season_2024},  # Include 2024 for context
+                "projections": season_projections,
+                "weekly_projections": weekly_projections,
+                "injury_status": season_data.get('injury_status', 'UNKNOWN'),
+                "percent_owned": season_data.get('percent_owned', 0),
                 "recent_performance": self._get_recent_performance(current_stats),
-                "season_outlook": self._analyze_season_outlook(projections, historical_stats)
+                "season_outlook": self._analyze_season_outlook(season_projections, {'2024': season_2024})
             }
             
         except Exception as e:
             logger.error(f"Error getting player stats: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {"error": "Failed to retrieve player statistics"}
     
     def get_waiver_recommendations(self, position: str = None, team_id: str = None) -> List[Dict[str, Any]]:
         """Get waiver wire pickup recommendations"""
         try:
             current_week = self._get_current_week()
+            
             # Get team needs if team_id provided
             team_needs = []
             if team_id:
                 roster_data = self.get_team_roster(team_id)
                 team_needs = self._analyze_team_needs(roster_data)
             
-            # Get available players
+            # Get available players from unified table
             waiver_players = self.db.get_waiver_wire_players(
                 position=position,
                 min_ownership=0,
@@ -143,11 +189,15 @@ class FantasyFootballTools:
             recommendations = []
             
             for player in waiver_players:
-                logger.info(f"Player_name == {player['player_name']}")
+                logger.info(f"Processing waiver player: {player['player_name']}")
+                
                 if player['position'] == "D/ST":
-                    player['player_name'] = convert_nfl_defense_name(player['player_name'])
-                    logger.info(f"New player_name == {player['player_name']}")
-                player_stats = self.get_player_stats(player['player_name'])
+                    player_lookup_name = convert_nfl_defense_name(player['player_name'])
+                    logger.info(f"Defense converted: {player['player_name']} → {player_lookup_name}")
+                else:
+                    player_lookup_name = player['player_name']
+                
+                player_stats = self.get_player_stats(player_lookup_name)
                 
                 if player_stats and not player_stats.get('error'):
                     recommendation = {
@@ -158,18 +208,22 @@ class FantasyFootballTools:
                         "injury_status": player.get('injury_status', 'UNKNOWN'),
                         "weekly_projections": player.get('weekly_projections', {}),
                         "season_projection": self._get_weekly_projection(player_stats, current_week),
-                        "recommendation_score": self._calculate_recommendation_score(player, player_stats, team_needs, current_week)
+                        "recommendation_score": self._calculate_recommendation_score(
+                            player, player_stats, team_needs, current_week
+                        )
                     }
                     
                     recommendations.append(recommendation)
             
             # Sort by recommendation score
             recommendations.sort(key=lambda x: x['recommendation_score'], reverse=True)
-            logger.info(f"Recommendations: {recommendations[:15]}")
+            logger.info(f"Returning {len(recommendations[:15])} waiver recommendations")
             return recommendations[:15]  # Return top 15 recommendations
             
         except Exception as e:
             logger.error(f"Error getting waiver recommendations: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return [{"error": "Failed to get waiver recommendations"}]
     
     def compare_players(self, player1: str, player2: str, week: int = None) -> Dict[str, Any]:
@@ -186,28 +240,41 @@ class FantasyFootballTools:
             comparison = {
                 "players": {
                     "player1": {
-                        "name": player1_stats['player_info']['name'],
-                        "position": player1_stats['player_info']['position']
+                        "name": player1,
+                        "position": player1_stats['player_info']['position'],
+                        "projected_points": self._get_weekly_projection(player1_stats, current_week),
+                        "recent_performance": player1_stats['recent_performance'],
+                        "injury_status": player1_stats.get('injury_status', 'UNKNOWN')
                     },
                     "player2": {
-                        "name": player2_stats['player_info']['name'],
-                        "position": player2_stats['player_info']['position']
+                        "name": player2,
+                        "position": player2_stats['player_info']['position'],
+                        "projected_points": self._get_weekly_projection(player2_stats, current_week),
+                        "recent_performance": player2_stats['recent_performance'],
+                        "injury_status": player2_stats.get('injury_status', 'UNKNOWN')
                     }
                 },
-                "week_projection": {
-                    "player1": self._get_week_projection(player1_stats, current_week),
-                    "player2": self._get_week_projection(player2_stats, current_week)
-                },
-                "season_performance": {
-                    "player1": self._get_season_average(player1_stats),
-                    "player2": self._get_season_average(player2_stats)
-                },
-                "recent_trends": {
-                    "player1": self._get_recent_trend(player1_stats),
-                    "player2": self._get_recent_trend(player2_stats)
-                },
-                "recommendation": self._generate_start_sit_recommendation(player1_stats, player2_stats, current_week)
+                "recommendation": None,
+                "reasoning": []
             }
+            
+            # Determine recommendation
+            p1_proj = comparison['players']['player1']['projected_points']
+            p2_proj = comparison['players']['player2']['projected_points']
+            
+            if p1_proj > p2_proj:
+                comparison['recommendation'] = player1
+                comparison['reasoning'].append(f"{player1} has higher projected points ({p1_proj} vs {p2_proj})")
+            else:
+                comparison['recommendation'] = player2
+                comparison['reasoning'].append(f"{player2} has higher projected points ({p2_proj} vs {p1_proj})")
+            
+            # Consider injury status
+            if comparison['players']['player1']['injury_status'] not in ['ACTIVE', 'UNKNOWN']:
+                comparison['reasoning'].append(f"{player1} has injury concerns: {comparison['players']['player1']['injury_status']}")
+            
+            if comparison['players']['player2']['injury_status'] not in ['ACTIVE', 'UNKNOWN']:
+                comparison['reasoning'].append(f"{player2} has injury concerns: {comparison['players']['player2']['injury_status']}")
             
             return comparison
             
@@ -215,171 +282,105 @@ class FantasyFootballTools:
             logger.error(f"Error comparing players: {str(e)}")
             return {"error": "Failed to compare players"}
     
-    def get_matchup_analysis(self, team_id: str, week: int = None) -> Dict[str, Any]:
-        """Get matchup analysis for team players"""
-        try:
-            roster_data = self.get_team_roster(team_id)
-            
-            if roster_data.get('error'):
-                return roster_data
-            
-            current_week = week or self._get_current_week()
-            
-            matchup_analysis = {
-                "week": current_week,
-                "team_id": team_id,
-                "player_matchups": [],
-                "overall_outlook": {}
-            }
-            
-            good_matchups = 0
-            total_starters = 0
-            
-            for player in roster_data['players']:
-                if player['status'] == 'starter':
-                    total_starters += 1
-                    player_analysis = self._analyze_player_matchup(player, current_week)
-                    matchup_analysis["player_matchups"].append(player_analysis)
-                    
-                    if player_analysis.get('matchup_rating', 0) >= 7:
-                        good_matchups += 1
-            
-            matchup_analysis["overall_outlook"] = {
-                "favorable_matchups": good_matchups,
-                "total_starters": total_starters,
-                "outlook_rating": (good_matchups / total_starters) * 10 if total_starters > 0 else 0
-            }
-            
-            return matchup_analysis
-            
-        except Exception as e:
-            logger.error(f"Error getting matchup analysis: {str(e)}")
-            return {"error": "Failed to analyze matchups"}
-    
-    def optimize_lineup(self, team_id: str, week: int = None) -> Dict[str, Any]:
-        """Get optimal lineup recommendations"""
-        try:
-            roster_data = self.get_team_roster(team_id)
-            
-            if roster_data.get('error'):
-                return roster_data
-            
-            current_week = week or self._get_current_week()
-            
-            # Analyze all available players
-            player_projections = []
-            
-            for player in roster_data['players']:
-                if player['injury_status'] not in ['INJURY_RESERVE', 'OUT']:
-                    projection = self._get_detailed_projection(player, current_week)
-                    player_projections.append(projection)
-            
-            # Optimize lineup based on projections
-            optimal_lineup = self._create_optimal_lineup(player_projections)
-            current_lineup = self._get_current_lineup(roster_data['players'])
-            
-            return {
-                "week": current_week,
-                "team_id": team_id,
-                "current_lineup": current_lineup,
-                "optimal_lineup": optimal_lineup,
-                "projected_improvement": optimal_lineup['total_points'] - current_lineup['total_points'],
-                "recommendations": self._generate_lineup_recommendations(current_lineup, optimal_lineup)
-            }
-            
-        except Exception as e:
-            logger.error(f"Error optimizing lineup: {str(e)}")
-            return {"error": "Failed to optimize lineup"}
-    
     def get_injury_report(self, team_id: str = None) -> List[Dict[str, Any]]:
-        """Get injury status for team players or all players"""
+        """Get injury report for team or league"""
         try:
             if team_id:
-                roster_data = self.get_team_roster(team_id)
-                if roster_data.get('error'):
-                    return [roster_data]
-                
-                injured_players = []
-                for player in roster_data['players']:
-                    if player['injury_status'] not in ['Healthy', 'ACTIVE']:
-                        injured_players.append({
-                            "name": player['name'],
-                            "position": player['position'],
-                            "team": player['team'],
-                            "injury_status": player['injury_status'],
-                            "roster_slot": player['slot'],
-                            "impact_level": self._assess_injury_impact(player)
-                        })
-                
-                return injured_players
+                return self._get_team_injury_report(team_id)
             else:
-                # Get league-wide injury report (top impactful injuries)
                 return self._get_league_injury_report()
-                
         except Exception as e:
             logger.error(f"Error getting injury report: {str(e)}")
             return [{"error": "Failed to get injury report"}]
     
+    def _get_team_injury_report(self, team_id: str) -> List[Dict[str, Any]]:
+        """Get injury report for specific team"""
+        roster_data = self.get_team_roster(team_id)
+        
+        if roster_data.get('error'):
+            return [roster_data]
+        
+        injuries = []
+        
+        for player in roster_data['players']:
+            injury_status = player.get('injury_status', 'UNKNOWN')
+            
+            if injury_status not in ['ACTIVE', 'UNKNOWN']:
+                injuries.append({
+                    "player": player['name'],
+                    "position": player['position'],
+                    "injury_status": injury_status,
+                    "slot": player.get('slot', 'N/A'),
+                    "impact": self._assess_injury_impact(player)
+                })
+        
+        if not injuries:
+            return [{"message": f"No injury concerns for team {team_id}"}]
+        
+        return injuries
+    
     # Helper methods
+    def _get_current_week(self) -> int:
+        """Get current NFL week from context"""
+        return int(self.current_context.get('week', 1))
     
     def _get_roster_counts(self, players: List[Dict]) -> Dict[str, int]:
-        """Get roster position counts"""
-        counts = {"QB": 0, "RB": 0, "WR": 0, "TE": 0, "K": 0, "DST": 0}
-        
+        """Count players by position"""
+        counts = {}
         for player in players:
-            position = player.get('position', '')
-            if position in counts:
-                counts[position] += 1
-        
+            pos = player['position']
+            counts[pos] = counts.get(pos, 0) + 1
         return counts
     
-    def _get_recent_performance(self, current_stats: Dict) -> Dict[str, Any]:
-        """Analyze recent performance trends"""
-        weeks = list(current_stats.keys())
-        if len(weeks) < 2:
-            return {"trend": "insufficient_data"}
+    def _get_recent_performance(self, weekly_stats: Dict) -> Dict[str, Any]:
+        """Calculate recent performance metrics from weekly_stats"""
+        if not weekly_stats:
+            return {"average_points": 0, "games_played": 0, "trend": "N/A"}
         
-        recent_weeks = sorted(weeks, key=int)[-3:]  # Last 3 weeks
-        recent_points = []
+        # Get last 4 weeks
+        weeks = sorted([int(w) for w in weekly_stats.keys() if str(w).isdigit()])[-4:]
         
-        for week in recent_weeks:
-            week_data = current_stats.get(week, {})
-            points = float(week_data.get('fantasy_points', 0))  # Convert to float
-            recent_points.append(points)
+        if not weeks:
+            return {"average_points": 0, "games_played": 0, "trend": "N/A"}
         
-        if len(recent_points) >= 2:
-            trend = "improving" if recent_points[-1] > recent_points[0] else "declining"
+        points = [float(weekly_stats[str(w)].get('fantasy_points', 0)) for w in weeks]
+        avg_points = round(sum(points) / len(points), 2)
+        
+        # Simple trend analysis
+        if len(points) >= 2:
+            if points[-1] > points[-2]:
+                trend = "UP"
+            elif points[-1] < points[-2]:
+                trend = "DOWN"
+            else:
+                trend = "STABLE"
         else:
-            trend = "stable"
+            trend = "N/A"
         
         return {
+            "average_points": avg_points,
+            "games_played": len(weeks),
             "trend": trend,
-            "recent_average": sum(recent_points) / len(recent_points) if recent_points else 0,
-            "last_three_weeks": recent_points
+            "recent_scores": points
         }
     
-    def _analyze_season_outlook(self, projections: Dict, historical: Dict) -> Dict[str, Any]:
-        """Analyze player's season outlook"""
-        projected_points = float(projections.get('MISC_FPTS', 0))  # Convert to float
+    def _analyze_season_outlook(self, projections: Dict, historical: Dict) -> str:
+        """Analyze season outlook based on projections and history"""
+        if not projections:
+            return "Limited projection data available"
         
-        # Compare to last year if available
-        last_year_points = 0
-        if '2024' in historical:
-            last_year_points = float(historical['2024'].get('season_totals', {}).get('MISC_FPTS', 0))  # Convert to float
+        season_projection = projections.get('MISC_FPTS', 0)
         
-        outlook = "unknown"
-        if projected_points > last_year_points * 1.1:
-            outlook = "improving"
-        elif projected_points < last_year_points * 0.9:
-            outlook = "declining"
+        if season_projection > 250:
+            return "Elite fantasy performer - Top-tier weekly starter"
+        elif season_projection > 180:
+            return "Strong fantasy asset - Reliable weekly option"
+        elif season_projection > 120:
+            return "Solid contributor - Matchup-dependent starter"
+        elif season_projection > 60:
+            return "Depth piece - Useful for bye weeks and injuries"
         else:
-            outlook = "stable"
-        
-        return {
-            "outlook": outlook,
-            "projected_points": projected_points,
-            "last_year_points": last_year_points
-        }
+            return "Limited fantasy value - Deep league option only"
     
     def _analyze_team_needs(self, roster_data: Dict) -> List[str]:
         """Analyze team positional needs"""
@@ -387,254 +388,56 @@ class FantasyFootballTools:
             return []
         
         needs = []
-        position_depth = {"QB": 0, "RB": 0, "WR": 0, "TE": 0}
+        roster_counts = roster_data.get('roster_counts', {})
         
-        for player in roster_data.get('players', []):
-            pos = player.get('position', '')
-            if pos in position_depth and player.get('injury_status') != 'INJURY_RESERVE':
-                position_depth[pos] += 1
-        
-        # Identify needs based on depth
-        if position_depth['RB'] < 4:
+        # Check positional depth
+        if roster_counts.get('RB', 0) < 3:
             needs.append('RB')
-        if position_depth['WR'] < 5:
+        if roster_counts.get('WR', 0) < 4:
             needs.append('WR')
-        if position_depth['TE'] < 2:
-            needs.append('TE')
-        if position_depth['QB'] < 2:
+        if roster_counts.get('QB', 0) < 2:
             needs.append('QB')
+        if roster_counts.get('TE', 0) < 2:
+            needs.append('TE')
         
         return needs
     
-    def _calculate_recommendation_score(self, waiver_player: Dict, player_stats: Dict, team_needs: List[str], current_week: int = None) -> float:
+    def _calculate_recommendation_score(
+        self, 
+        player: Dict, 
+        player_stats: Dict, 
+        team_needs: List[str], 
+        current_week: int
+    ) -> float:
         """Calculate recommendation score for waiver player"""
-        score = 0
+        score = 0.0
         
-        # Base score from projections
-        projected_points = self._get_weekly_projection(player_stats, current_week)
-        logger.info(f"Projected points: {projected_points}")
-        #projected_points = float(player_stats.get('projections', {}).get('MISC_FPTS', 0))  # Convert to float
-        score += projected_points / 20  # Normalize
-        logger.info(f"Updated score: {score}")
-        # Bonus for team needs
-        if waiver_player['position'] in team_needs:
-            score += 2
-        logger.info(f"Updated score: {score}")
-        # Penalty for high ownership
-        #ownership_penalty = float(waiver_player['percent_owned']) / 10  # Convert to float
-        #score -= ownership_penalty
+        # Base score from projection
+        projection = self._get_weekly_projection(player_stats, current_week)
+        score += projection * 2  # Weight projections heavily
         
-        # Injury status consideration
-        if waiver_player.get('injury_status') in ['QUESTIONABLE', 'DOUBTFUL']:
-            score -= 1
-            logger.info(f"Updated score: {score}")
-        elif waiver_player.get('injury_status') == 'OUT':
-            score -= 3
-            logger.info(f"Updated score: {score}")
-        print(f"Player: {waiver_player['player_name']} score = {score}")
-        return max(0, score)
-    
-    def _get_current_week(self) -> int:
-        """Get current NFL week from context"""
-        if self.current_context and 'week' in self.current_context:
-            try:
-                return int(self.current_context['week'])
-            except (ValueError, TypeError):
-                pass
-        return 1  # Fallback
-    
-    def _get_week_projection(self, player_stats: Dict, week: int) -> float:
-        """Get player projection for specific week"""
-        projections = player_stats.get('projections', {})
-        weekly_proj = projections.get('weekly', {}).get(str(week))
+        # Ownership bonus (lower ownership = higher score)
+        ownership = player.get('percent_owned', 50)
+        if ownership < 25:
+            score += 20
+        elif ownership < 50:
+            score += 10
         
-        if weekly_proj:
-            return float(weekly_proj.get('fantasy_points', 0))  # Convert to float
+        # Position need bonus
+        if player['position'] in team_needs:
+            score += 15
         
-        # Fallback to season average
-        season_proj = float(projections.get('MISC_FPTS', 0))  # Convert to float
-        return season_proj / 17 if season_proj > 0 else 0
-    
-    def _get_season_average(self, player_stats: Dict) -> float:
-        """Get player's season average fantasy points"""
-        current_stats = player_stats.get('current_season_stats', {})
+        # Injury penalty
+        injury_status = player.get('injury_status', 'ACTIVE')
+        if injury_status not in ['ACTIVE', 'UNKNOWN']:
+            score -= 30
         
-        if not current_stats:
-            return 0
-        
-        total_points = sum(float(week.get('fantasy_points', 0)) for week in current_stats.values())  # Convert to float
-        games_played = len(current_stats)
-        
-        return total_points / games_played if games_played > 0 else 0
-    
-    def _get_recent_trend(self, player_stats: Dict) -> str:
-        """Get player's recent performance trend"""
-        current_stats = player_stats.get('current_season_stats', {})
-        
-        if len(current_stats) < 2:
-            return "insufficient_data"
-        
-        weeks = sorted(current_stats.keys(), key=int)
-        recent_weeks = weeks[-2:]
-        
-        if len(recent_weeks) == 2:
-            week1_points = float(current_stats[recent_weeks[0]].get('fantasy_points', 0))  # Convert to float
-            week2_points = float(current_stats[recent_weeks[1]].get('fantasy_points', 0))  # Convert to float
-            
-            if week2_points > week1_points * 1.1:
-                return "trending_up"
-            elif week2_points < week1_points * 0.9:
-                return "trending_down"
-            else:
-                return "stable"
-        
-        return "stable"
-    
-    def _generate_start_sit_recommendation(self, player1_stats: Dict, player2_stats: Dict, week: int) -> Dict[str, Any]:
-        """Generate start/sit recommendation between two players"""
-        player1_proj = float(self._get_week_projection(player1_stats, week))  # Convert to float
-        player2_proj = float(self._get_week_projection(player2_stats, week))  # Convert to float
-        
-        if player1_proj > player2_proj:
-            recommended_player = player1_stats['player_info']['name']
-            confidence = min(((player1_proj - player2_proj) / max(player1_proj, 1)) * 100, 95)
-        else:
-            recommended_player = player2_stats['player_info']['name']
-            confidence = min(((player2_proj - player1_proj) / max(player2_proj, 1)) * 100, 95)
-        
-        return {
-            "recommended_player": recommended_player,
-            "confidence_level": round(confidence, 1),
-            "reasoning": f"Based on Week {week} projections and recent performance trends"
-        }
-    
-    def _analyze_player_matchup(self, player: Dict, week: int) -> Dict[str, Any]:
-        """Analyze individual player matchup"""
-        # This would typically involve opponent analysis, but simplified for now
-        return {
-            "player_name": player['name'],
-            "position": player['position'],
-            "opponent": "TBD",  # Would need schedule data
-            "matchup_rating": 7,  # Simplified rating 1-10
-            "key_factors": ["Opponent strength", "Recent performance", "Weather conditions"]
-        }
-    
-    def _get_detailed_projection(self, player: Dict, week: int) -> Dict[str, Any]:
-        """Get detailed projection for a player"""
-        player_stats = self.db.get_player_stats(player['player_id'])
-        
-        if not player_stats:
-            return {
-                "player": player,
-                "projected_points": 0,
-                "confidence": 0
-            }
-        
-        projected_points = self._get_week_projection(player_stats, week)
-        
-        return {
-            "player": player,
-            "projected_points": projected_points,
-            "confidence": 85,  # Simplified confidence score
-            "position": player['position'],
-            "eligible_slots": self._get_eligible_slots(player['position'])
-        }
-    
-    def _get_eligible_slots(self, position: str) -> List[str]:
-        """Get eligible roster slots for position"""
-        slot_mapping = {
-            "QB": ["QB", "OP"],
-            "RB": ["RB1", "RB2", "FLEX", "OP"],
-            "WR": ["WR1", "WR2", "FLEX", "OP"],
-            "TE": ["TE", "FLEX", "OP"],
-            "K": ["K"],
-            "DST": ["DST"]
-        }
-        return slot_mapping.get(position, [])
-    
-    def _create_optimal_lineup(self, player_projections: List[Dict]) -> Dict[str, Any]:
-        """Create optimal lineup from available players"""
-        # Simplified lineup optimization
-        lineup_slots = {
-            "QB": 1, "RB1": 1, "RB2": 1, "WR1": 1, "WR2": 1, 
-            "TE": 1, "FLEX": 1, "K": 1, "DST": 1, "OP": 1
-        }
-        
-        optimal_lineup = {}
-        used_players = set()
-        total_points = 0
-        
-        # Sort players by projected points
-        sorted_players = sorted(player_projections, key=lambda x: x['projected_points'], reverse=True)
-        
-        # Fill required positions first
-        for slot in ["QB", "RB1", "RB2", "WR1", "WR2", "TE", "K", "DST"]:
-            for player_proj in sorted_players:
-                player = player_proj['player']
-                if (player['player_id'] not in used_players and 
-                    slot in player_proj['eligible_slots']):
-                    optimal_lineup[slot] = player
-                    used_players.add(player['player_id'])
-                    total_points += player_proj['projected_points']
-                    break
-        
-        # Fill FLEX and OP positions
-        flex_eligible = ["RB", "WR", "TE"]
-        for slot in ["FLEX", "OP"]:
-            for player_proj in sorted_players:
-                player = player_proj['player']
-                if (player['player_id'] not in used_players and 
-                    (player['position'] in flex_eligible or slot == "OP")):
-                    optimal_lineup[slot] = player
-                    used_players.add(player['player_id'])
-                    total_points += player_proj['projected_points']
-                    break
-        
-        return {
-            "lineup": optimal_lineup,
-            "total_points": round(total_points, 2)
-        }
-    
-    def _get_current_lineup(self, players: List[Dict]) -> Dict[str, Any]:
-        """Get current starting lineup"""
-        current_lineup = {}
-        total_points = 0
-        
-        for player in players:
-            if player['status'] == 'starter':
-                slot = player['slot']
-                current_lineup[slot] = player
-                
-                # Get projected points for current player
-                player_stats = self.db.get_player_stats(player['player_id'])
-                if player_stats:
-                    projected_points = self._get_week_projection(player_stats, self._get_current_week())
-                    total_points += projected_points
-        
-        return {
-            "lineup": current_lineup,
-            "total_points": round(total_points, 2)
-        }
-    
-    def _generate_lineup_recommendations(self, current: Dict, optimal: Dict) -> List[str]:
-        """Generate lineup change recommendations"""
-        recommendations = []
-        
-        current_players = {slot: player['name'] for slot, player in current['lineup'].items()}
-        optimal_players = {slot: player['name'] for slot, player in optimal['lineup'].items()}
-        
-        for slot in current_players:
-            if slot in optimal_players and current_players[slot] != optimal_players[slot]:
-                recommendations.append(
-                    f"Consider starting {optimal_players[slot]} over {current_players[slot]} at {slot}"
-                )
-        
-        return recommendations
+        return round(score, 2)
     
     def _assess_injury_impact(self, player: Dict) -> str:
         """Assess the fantasy impact of a player's injury"""
         position = player['position']
-        slot = player['slot']
+        slot = player.get('slot', '')
         
         if slot in ['QB', 'RB1', 'RB2', 'WR1', 'WR2', 'TE']:
             return "HIGH"
@@ -645,8 +448,6 @@ class FantasyFootballTools:
     
     def _get_league_injury_report(self) -> List[Dict[str, Any]]:
         """Get league-wide injury report for high-impact players"""
-        # This would scan all players for injuries
-        # Simplified implementation
         return [
             {
                 "message": "League-wide injury report not implemented yet",
@@ -668,14 +469,14 @@ def initialize_fantasy_tools(db_client):
 
 @tool
 def analyze_player_performance(player_name: str, season: int = 2025) -> Dict[str, Any]:
-    """Analyze a player's performance and statistics for the season"""
+    """Analyze a player's performance and statistics for the season using unified table data"""
     if fantasy_tools_instance is None:
         return {"error": "Fantasy tools not initialized"}
     return fantasy_tools_instance.get_player_stats(player_name, season)
 
 @tool
 def compare_roster_players(player1: str, player2: str, week: int = None) -> Dict[str, Any]:
-    """Compare two players for start/sit decisions"""
+    """Compare two players for start/sit decisions using unified table data"""
     if fantasy_tools_instance is None:
         return {"error": "Fantasy tools not initialized"}
     return fantasy_tools_instance.compare_players(player1, player2, week)
@@ -688,8 +489,12 @@ def analyze_injury_impact(team_id: str = None) -> List[Dict[str, Any]]:
     return fantasy_tools_instance.get_injury_report(team_id)
 
 @tool
-def analyze_waiver_opportunities_with_projections(position: str = None, team_id: str = None, context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-    """Get waiver wire recommendations with detailed projections"""
+def analyze_waiver_opportunities_with_projections(
+    position: str = None, 
+    team_id: str = None, 
+    context: Dict[str, Any] = None
+) -> List[Dict[str, Any]]:
+    """Get waiver wire recommendations with detailed projections from unified table"""
     if fantasy_tools_instance is None:
         return [{"error": "Fantasy tools not initialized"}]
     
@@ -698,9 +503,10 @@ def analyze_waiver_opportunities_with_projections(position: str = None, team_id:
         fantasy_tools_instance.update_context(context)
     
     return fantasy_tools_instance.get_waiver_recommendations(position, team_id)
+
 @tool
 def get_position_waiver_targets(position: str, context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-    """Get top waiver wire targets for a specific position"""
+    """Get top waiver wire targets for a specific position from unified table"""
     if fantasy_tools_instance is None:
         return [{"error": "Fantasy tools not initialized"}]
     

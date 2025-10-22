@@ -1,6 +1,7 @@
 """
 DynamoDB Client for Fantasy Football Data
 Handles all database operations
+UPDATED for fantasy-football-players-updated table with seasons.{year}.* structure
 """
 
 import json
@@ -21,18 +22,16 @@ class DynamoDBClient:
         self.dynamodb = boto3.resource('dynamodb')
         
         # Environment variables for table names
-        self.players_table_name = os.environ.get('FANTASY_PLAYERS_TABLE', 'fantasy-football-players')
+        self.players_table_name = os.environ.get('FANTASY_PLAYERS_TABLE', 'fantasy-football-players-updated')
         self.roster_table_name = os.environ.get('FANTASY_ROSTER_TABLE', 'fantasy-football-team-roster')
-        self.waiver_table_name = os.environ.get('FANTASY_WAIVER_TABLE', 'fantasy-football-agent-2025-waiver-table')
         self.chat_history_table_name = os.environ.get('CHAT_HISTORY_TABLE', 'fantasy-football-chat-history')
         
         # Table references
         self.players_table = self.dynamodb.Table(self.players_table_name)
         self.roster_table = self.dynamodb.Table(self.roster_table_name)
-        self.waiver_table = self.dynamodb.Table(self.waiver_table_name)
         self.chat_history_table = self.dynamodb.Table(self.chat_history_table_name)
         
-        logger.info(f"DynamoDBClient initialized with tables: {self.players_table_name}, {self.roster_table_name}, {self.waiver_table_name}, {self.chat_history_table_name}")
+        logger.info(f"DynamoDBClient initialized with tables: {self.players_table_name}, {self.roster_table_name}, {self.chat_history_table_name}")
         
     def _get_current_week(self, context: Optional[Dict[str, Any]] = None) -> int:
         """Helper to get current NFL week from context or default"""
@@ -61,12 +60,13 @@ class DynamoDBClient:
             return None
     
     def get_player_stats(self, player_id: str) -> Optional[Dict[str, Any]]:
+        """Get player statistics and projections from unified table with NEW structure"""
         logger.info(f"Original player_id is {player_id}")
-        """Get player statistics and projections"""
         try:
             if "D/ST" in player_id:
                 logger.info(f"Found DST in player_id {player_id}")
                 player_id = convert_nfl_defense_name(player_id)
+            
             response = self.players_table.get_item(
                 Key={'player_id': player_id}
             )
@@ -93,61 +93,82 @@ class DynamoDBClient:
             logger.error(f"Error searching players by name {player_name}: {str(e)}")
             return []
     
-    def get_waiver_wire_players(self, position: Optional[str] = None, min_ownership: float = 0, max_ownership: float = 50, 
-                          limit: Optional[int] = None, sort_by_projection: bool = True, context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        """Get waiver wire players with optional position filter - returns ALL matching players unless limit specified"""
+    def get_waiver_wire_players(
+        self, 
+        position: Optional[str] = None, 
+        min_ownership: float = 0, 
+        max_ownership: float = 50, 
+        limit: Optional[int] = None, 
+        sort_by_projection: bool = True, 
+        context: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Get waiver wire players from unified table with NEW structure
+        
+        Uses seasons.2025.* for ownership, injury, and projections
+        """
         try:
             all_items = []
             last_evaluated_key = None
             
-            # Base parameters for query/scan
-            base_params = {
-                "FilterExpression": Attr('percent_owned').between(min_ownership, max_ownership),
-                "ProjectionExpression": "player_season, player_name, #pos, team, injury_status, percent_owned, weekly_projections",
-                "ExpressionAttributeNames": {"#pos": "position"}
-            }
+            # Get current week for projection sorting
+            current_week = self._get_current_week(context)
+            season_year = "2025"  # Could be made dynamic
+            
+            # Base filter: ownership range AND healthy status
+            base_filter = (
+                Attr(f'seasons.{season_year}.percent_owned').between(min_ownership, max_ownership) &
+                Attr(f'seasons.{season_year}.injury_status').eq('ACTIVE')
+            )
+            
+            # Add position filter if specified
+            if position:
+                normalized_pos = normalize_position(position)
+                if normalized_pos == "DST":
+                    normalized_pos = "D/ST"
+                base_filter = base_filter & Attr('position').eq(normalized_pos)
+            
+            logger.info(f"Scanning unified table for waiver players (position: {position or 'all'}, ownership: {min_ownership}-{max_ownership}%)")
             
             while True:
-                if position:
-                    # FAST PATH: Use GSI query when position is specified
-                    normalized_pos = normalize_position(position)
-                    if normalized_pos == "DST":  # Temporary fix for position not matching
-                        normalized_pos = "D/ST"
-                    logger.info(f"Using GSI query for position: {normalized_pos}")
+                scan_params = {
+                    "FilterExpression": base_filter,
+                    "ProjectionExpression": "player_id, player_name, #pos, seasons",
+                    "ExpressionAttributeNames": {"#pos": "position"}
+                }
+                
+                if last_evaluated_key:
+                    scan_params["ExclusiveStartKey"] = last_evaluated_key
+                
+                response = self.players_table.scan(**scan_params)
+                
+                # Process items to extract relevant data from seasons structure
+                batch_items = []
+                for item in response.get('Items', []):
+                    seasons = item.get('seasons', {})
+                    season_2025 = seasons.get(season_year, {})
                     
-                    query_params = {
-                        **base_params,
-                        "IndexName": 'position-index',
-                        "KeyConditionExpression": Key('position').eq(normalized_pos)
+                    # Extract data from NEW structure
+                    processed_item = {
+                        'player_id': item.get('player_id'),
+                        'player_name': item.get('player_name'),
+                        'position': item.get('position'),
+                        'team': season_2025.get('team', ''),
+                        'injury_status': season_2025.get('injury_status', 'UNKNOWN'),
+                        'percent_owned': float(season_2025.get('percent_owned', 0)),
+                        'weekly_projections': season_2025.get('weekly_projections', {})
                     }
                     
-                    if last_evaluated_key:
-                        query_params["ExclusiveStartKey"] = last_evaluated_key
-                        
-                    response = self.waiver_table.query(**query_params)
-                else:
-                    # SLOWER PATH: Scan when no position specified
-                    logger.info("Using table scan (no position filter)")
-                    
-                    scan_params = base_params.copy()
-                    if last_evaluated_key:
-                        scan_params["ExclusiveStartKey"] = last_evaluated_key
-                        
-                    response = self.waiver_table.scan(**scan_params)
+                    batch_items.append(processed_item)
                 
-                # Add items from this batch
-                batch_items = response.get('Items', [])
                 all_items.extend(batch_items)
-                
                 logger.info(f"Batch retrieved {len(batch_items)} items. Total so far: {len(all_items)}")
                 
                 # Check if we have more data to fetch
                 last_evaluated_key = response.get('LastEvaluatedKey')
                 if not last_evaluated_key:
                     break
-                    
+                
                 # Optional: If limit is specified and we have enough items, break early
-                # (though we'll still need to sort first if sort_by_projection is True)
                 if limit and not sort_by_projection and len(all_items) >= limit:
                     break
             
@@ -155,9 +176,8 @@ class DynamoDBClient:
             
             # Sort by current week projection if requested
             if sort_by_projection and all_items:
-                current_week = self._get_current_week(context)
                 all_items.sort(
-                    key=lambda x: x.get('weekly_projections', {}).get(str(current_week), 0),
+                    key=lambda x: float(x.get('weekly_projections', {}).get(str(current_week), 0)),
                     reverse=True
                 )
             
@@ -166,15 +186,16 @@ class DynamoDBClient:
                 result = all_items[:limit]
             else:
                 result = all_items
-                
-            logger.info(f"Returning {len(result)} waiver wire players (position: {position or 'all'}, ownership: {min_ownership}-{max_ownership}%)")
-            logger.info(f"Waiver Players: {result}")
+            
+            logger.info(f"Returning {len(result)} waiver wire players from unified table")
             return result
             
         except Exception as e:
-            logger.error(f"Error getting waiver wire players: {str(e)}")
+            logger.error(f"Error getting waiver wire players from unified table: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return []
-        
+    
     def get_all_team_rosters(self) -> List[Dict[str, Any]]:
         """Get all team rosters (for league analysis)"""
         try:
@@ -232,13 +253,12 @@ class DynamoDBClient:
             return []
     
     def get_players_by_team(self, nfl_team: str) -> List[Dict[str, Any]]:
-        """Get all players from a specific NFL team"""
+        """Get all players from a specific NFL team using NEW structure"""
         try:
-            # This would require a GSI on the players table by team
-            # For now, use scan (consider optimizing with proper indexing)
+            season_year = "2025"
+            # Scan for players where seasons.2025.team matches
             response = self.players_table.scan(
-                FilterExpression="contains(player_id, :team)",
-                ExpressionAttributeValues={':team': nfl_team}
+                FilterExpression=Attr(f'seasons.{season_year}.team').eq(nfl_team)
             )
             items = response.get('Items', [])
             logger.info(f"Found {len(items)} players for NFL team: {nfl_team}")
@@ -248,27 +268,39 @@ class DynamoDBClient:
             return []
     
     def get_top_performers(self, position: str, season: int = 2025, week: Optional[int] = None) -> List[Dict[str, Any]]:
-        """Get top performing players by position"""
+        """Get top performing players by position using NEW structure"""
         try:
-            # Scan for players by position and sort by fantasy points
+            season_str = str(season)
+            
+            # Scan for players by position
             response = self.players_table.scan(
-                FilterExpression="position = :pos",
-                ExpressionAttributeValues={':pos': position}
+                FilterExpression=Attr('position').eq(position)
             )
             
             players = response.get('Items', [])
             
-            # Sort by fantasy points (current season)
+            # Sort by fantasy points using NEW structure
             if week:
-                # Sort by specific week performance
+                # Sort by specific week performance from seasons.{year}.weekly_stats.{week}
                 players.sort(
-                    key=lambda x: x.get('current_season_stats', {}).get(str(season), {}).get(str(week), {}).get('fantasy_points', 0),
+                    key=lambda x: float(
+                        x.get('seasons', {})
+                        .get(season_str, {})
+                        .get('weekly_stats', {})
+                        .get(str(week), {})
+                        .get('fantasy_points', 0)
+                    ),
                     reverse=True
                 )
             else:
-                # Sort by season average or projections
+                # Sort by season projections from seasons.{year}.season_projections
                 players.sort(
-                    key=lambda x: x.get('projections', {}).get(str(season), {}).get('MISC_FPTS', 0),
+                    key=lambda x: float(
+                        x.get('seasons', {})
+                        .get(season_str, {})
+                        .get('season_projections', {})
+                        .get('MISC_FPTS', 0)
+                    ),
                     reverse=True
                 )
             

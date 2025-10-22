@@ -46,9 +46,17 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "dynamodb:BatchWriteItem",
           "dynamodb:UpdateItem",
           "dynamodb:GetItem",
-          "dynamodb:Batch*"
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:DeleteItem"
         ]
-        Resource = "${aws_dynamodb_table.fantasy_football_players.arn}"
+        Resource = [
+          "${aws_dynamodb_table.waiver_table.arn}",
+          "${aws_dynamodb_table.waiver_table.arn}/index/*",
+          "${aws_dynamodb_table.fantasy_football_team_roster.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}/index/*"
+        ]
       }
     ]
   })
@@ -117,7 +125,7 @@ resource "aws_lambda_function" "fantasy_stats_scraper_with_layer" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE_NAME = aws_dynamodb_table.fantasy_football_players.name
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.fantasy_football_player_data.name
     }
   }
 

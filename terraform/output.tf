@@ -9,13 +9,9 @@ output "lambda_function_name" {
   value       = aws_lambda_function.draft_agent.function_name
 }
 
-output "test_command" {
-  description = "Test command for the Strands agent"
-  value       = <<-EOT
-    curl -X POST "https://${aws_api_gateway_rest_api.main.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.demo.stage_name}/agent" \
-         -H "Content-Type: application/json" \
-         -d '{"prompt": "Return the weather for Chicago Illinois"}'
-  EOT
+output "knowledge_base_bucket" {
+  description = "KB Bucket"
+  value = aws_s3_bucket.knowledge_base.id
 }
 
 output "website_endpoint" {

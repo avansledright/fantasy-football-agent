@@ -24,7 +24,7 @@ except Exception as e:
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ.get('DYNAMODB_TABLE_NAME', 'fantasy-football-players')
+table_name = os.environ.get('DYNAMODB_TABLE_NAME', 'fantasy-football-players-updated')
 table = dynamodb.Table(table_name)
 
 # Current season
@@ -62,8 +62,8 @@ def lambda_handler(event, context):
             if week_status == 'completed':
                 logger.info(f"Processing {position} stats for week {current_week} ({week_status})...")
                 players_data = scrape_fantasypros_stats(position, current_week)
-                logger.info(f"Sample Data after stat scrape: {players_data[1]}")
                 if players_data:
+                    logger.info(f"Sample Data after stat scrape: {players_data[0]}")
                     update_player_stats_in_consolidated_table(players_data, current_week)
                     total_players_processed += len(players_data)
                     logger.info(f"Processed {len(players_data)} {position} players")
@@ -72,22 +72,37 @@ def lambda_handler(event, context):
             else:
                 logger.info(f"Skipping stats for {position} - week {current_week} is {week_status}")
 
-            # Scrape projections if week is current or upcoming
+            # Scrape projections logic:
+            # - If week is upcoming/in_progress: scrape projections for current week
+            # - If week is completed: scrape projections for NEXT week
             if week_status in ['upcoming', 'in_progress']:
-                logger.info(f"Getting projection data for {position} week {current_week} ({week_status})...")
-                proj_data = scrape_fantasypros_projections(position, current_week)
+                projection_week = current_week
+                logger.info(f"Getting projection data for {position} week {projection_week} ({week_status})...")
+                proj_data = scrape_fantasypros_projections(position, projection_week)
                 
                 if proj_data:
-                    update_player_projections_in_table(proj_data, current_week)
+                    update_player_projections_in_table(proj_data, projection_week)
                     total_projections_processed += len(proj_data)
                     logger.info(f"Processed {len(proj_data)} {position} projections")
                 else:
                     logger.warning(f"No projections found for {position}")
+            elif week_status == 'completed' and current_week < 18:
+                # Week just finished, get projections for next week
+                projection_week = current_week + 1
+                logger.info(f"Week {current_week} completed - getting projection data for {position} week {projection_week}...")
+                proj_data = scrape_fantasypros_projections(position, projection_week)
+                
+                if proj_data:
+                    update_player_projections_in_table(proj_data, projection_week)
+                    total_projections_processed += len(proj_data)
+                    logger.info(f"Processed {len(proj_data)} {position} projections for upcoming week")
+                else:
+                    logger.warning(f"No projections found for {position} week {projection_week}")
             else:
                 logger.info(f"Skipping projections for {position} - week {current_week} is {week_status}")
 
         logger.info(f"Successfully processed {total_players_processed} total players")
-        logger.info(f"Successfully proccessed {total_projections_processed} total projections")
+        logger.info(f"Successfully processed {total_projections_processed} total projections")
         return {
             'statusCode': 200,
             'body': json.dumps({
@@ -373,24 +388,15 @@ def scrape_fantasypros_projections(position: str, week: int) -> List[Dict]:
                     # team_text might be full team name or 2-4 letter code; try to extract code
                     m = re.match(r'^([A-Z]{2,4})$', team_text)
                     if m:
-                        team_code = m.group(1)
+                        parsed['team'] = m.group(1)
                     else:
-                        # fallback: take last token if it's an uppercase abbr
-                        toks = team_text.split()
-                        if toks and re.match(r'^[A-Z]{2,4}$', toks[-1]):
-                            team_code = toks[-1]
-                        else:
-                            team_code = team_text  # last resort: use the raw team_text
-                    # override parsed team and strip trailing code from player_name if present
-                    parsed['team'] = team_code
-                    if parsed['player_name'].endswith(' ' + team_code):
-                        parsed['player_name'] = parsed['player_name'][:-(len(team_code) + 1)]
+                        # try parsing for embedded code
+                        m2 = re.search(r'([A-Z]{2,4})', team_text)
+                        if m2:
+                            parsed['team'] = m2.group(1)
 
-                # For DST, ensure same naming convention as stats scraper
+                # DST special handling: the player_name should be the team abbreviation
                 if position == "DST":
-                    logger.info(f"PARSED: {parsed}")
-                    parsed['player_name'] = parsed['player_name'].replace(" DST", "")
-                    logger.info(f"Found DST parsed name == {parsed['player_name']}")
                     if parsed.get('team') and parsed['team'] != "UNK":
                         parsed['player_name'] = f"{parsed['team']}"
 
@@ -591,97 +597,87 @@ def get_opponent_from_row(cells, team: str) -> str:
 
 def update_player_stats_in_consolidated_table(players_data: List[Dict], week: int):
     """
-    Update player stats in the consolidated fantasy-football-players table.
-    Each player's current_season_stats gets updated with the new week's data.
+    Update player stats in the consolidated table using UPDATE operations.
+    Writes to seasons.{year}.weekly_stats.{week} to match new schema.
     """
     try:
-        logger.info(f"*** UPDATING CURRENT_SEASON_STATS for week {week} with {len(players_data)} players ***")
+        logger.info(f"*** UPDATING STATS for week {week} with {len(players_data)} players ***")
         if players_data:
             logger.info(f"First player sample: {players_data[0]}")
 
-        batch_size = 25
+        season_key = str(CURRENT_SEASON)
+        week_key = str(week)
+        
+        success_count = 0
+        error_count = 0
 
-        for i in range(0, len(players_data), batch_size):
-            batch = players_data[i:i + batch_size]
+        for player_data in players_data:
+            try:
+                if player_data['position'] == "DST":
+                    player_data['player_name'] = nfl_teams[player_data['player_name']]
+                    logger.info(f"Found DST. New player name = {player_data['player_name']}")
+                
+                player_name = player_data['player_name']
+                position = player_data['position']
+                player_id = f"{player_name}#{position}"
+                
+                logger.debug(f"Updating stats for {player_id}: {player_data['fantasy_points']} points")
+                
+                # Build update expression for nested path
+                update_expression = "SET #player_name = if_not_exists(#player_name, :player_name), "
+                update_expression += "#position = if_not_exists(#position, :position), "
+                update_expression += "#updated_at = :updated_at, "
+                update_expression += "#seasons.#season.#weekly_stats.#week = :week_data"
+                
+                expression_attribute_names = {
+                    '#player_name': 'player_name',
+                    '#position': 'position',
+                    '#updated_at': 'updated_at',
+                    '#seasons': 'seasons',
+                    '#season': season_key,
+                    '#weekly_stats': 'weekly_stats',
+                    '#week': week_key
+                }
+                
+                expression_attribute_values = {
+                    ':player_name': player_name,
+                    ':position': position,
+                    ':updated_at': player_data['updated_at'],
+                    ':week_data': {
+                        'fantasy_points': player_data['fantasy_points'],
+                        'opponent': player_data['opponent'],
+                        'team': player_data['team'],
+                        'updated_at': player_data['updated_at']
+                    }
+                }
+                
+                # Execute update
+                table.update_item(
+                    Key={'player_id': player_id},
+                    UpdateExpression=update_expression,
+                    ExpressionAttributeNames=expression_attribute_names,
+                    ExpressionAttributeValues=expression_attribute_values
+                )
+                
+                success_count += 1
+                logger.debug(f"Successfully updated stats for {player_id}")
+                
+            except Exception as e:
+                logger.error(f"Error updating stats for {player_data.get('player_name', 'unknown')}: {str(e)}")
+                error_count += 1
+                continue
 
-            with table.batch_writer() as batch_writer:
-                for player_data in batch:
-                    if player_data['position'] == "DST":
-                        player_data['player_name'] = nfl_teams[player_data['player_name']]
-                        logger.info(f"Found DST. New player name = {player_data['player_name']}")
-                    player_name = player_data['player_name']
-                    position = player_data['position']
-                    player_id = f"{player_name}#{position}"
-                    
-                    logger.debug(f"Processing stats update for {player_id}: {player_data['fantasy_points']} points")
-                    
-                    # Check if player exists in consolidated table
-                    try:
-                        response = table.get_item(Key={'player_id': player_id})
-                        
-                        if 'Item' in response:
-                            # Update existing player
-                            existing_item = response['Item']
-                            
-                            # Initialize current_season_stats if not present
-                            if 'current_season_stats' not in existing_item:
-                                existing_item['current_season_stats'] = {}
-                            
-                            # Initialize 2025 season if not present
-                            if str(CURRENT_SEASON) not in existing_item['current_season_stats']:
-                                existing_item['current_season_stats'][str(CURRENT_SEASON)] = {}
-                            
-                            # Update the specific week's stats
-                            existing_item['current_season_stats'][str(CURRENT_SEASON)][str(week)] = {
-                                'fantasy_points': player_data['fantasy_points'],
-                                'opponent': player_data['opponent'],
-                                'team': player_data['team'],
-                                'updated_at': player_data['updated_at']
-                            }
-                            
-                            # Write updated item back to table
-                            batch_writer.put_item(Item=existing_item)
-                            logger.debug(f"Updated existing player: {player_id} week {week}")
-                            
-                        else:
-                            # Create new player entry
-                            new_item = {
-                                'player_id': player_id,
-                                'player_name': player_name,
-                                'position': position,
-                                'historical_seasons': {},
-                                'projections': {},
-                                'current_season_stats': {
-                                    str(CURRENT_SEASON): {
-                                        str(week): {
-                                            'fantasy_points': player_data['fantasy_points'],
-                                            'opponent': player_data['opponent'],
-                                            'team': player_data['team'],
-                                            'updated_at': player_data['updated_at']
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            batch_writer.put_item(Item=new_item)
-                            logger.debug(f"Created new player: {player_id} week {week}")
-                            
-                    except Exception as e:
-                        logger.error(f"Error processing player {player_id}: {str(e)}")
-                        continue
-
-            logger.info(f"Processed batch of {len(batch)} players for week {week}")
+        logger.info(f"Stats update complete: {success_count} successful, {error_count} errors")
 
     except Exception as e:
-        logger.error(f"Error updating consolidated table: {str(e)}", exc_info=True)
+        logger.error(f"Error in update_player_stats_in_consolidated_table: {str(e)}", exc_info=True)
         raise
 
 
 def update_player_projections_in_table(players_data: List[Dict], week: int):
     """
-    Update player projections in the consolidated table.
-    Stores weekly projections under: projections[<season>]['weekly'][<week>].
-    Simple, safe: get -> mutate -> put.
+    Update player projections in the consolidated table using UPDATE operations.
+    Writes to seasons.{year}.weekly_projections.{week} to match new schema.
     """
     try:
         logger.info(f"*** UPDATING PROJECTIONS for week {week} with {len(players_data)} players ***")
@@ -690,9 +686,12 @@ def update_player_projections_in_table(players_data: List[Dict], week: int):
 
         season_key = str(CURRENT_SEASON)
         week_key = str(week)
+        
+        success_count = 0
+        error_count = 0
 
-        with table.batch_writer() as batch:
-            for player in players_data:
+        for player in players_data:
+            try:
                 player_id = f"{player['player_name']}#{player['position']}"
 
                 # Ensure fantasy_points is Decimal
@@ -703,65 +702,48 @@ def update_player_projections_in_table(players_data: List[Dict], week: int):
                 except Exception:
                     fpts = Decimal('0')
 
-                week_val = {
-                    'fantasy_points': fpts,
-                    'updated_at': player.get('updated_at', datetime.now().isoformat())
+                logger.debug(f"Updating projection for {player_id}: {fpts} points")
+                
+                # Build update expression for nested path
+                update_expression = "SET #player_name = if_not_exists(#player_name, :player_name), "
+                update_expression += "#position = if_not_exists(#position, :position), "
+                update_expression += "#updated_at = :updated_at, "
+                update_expression += "#seasons.#season.#weekly_projections.#week = :projection"
+                
+                expression_attribute_names = {
+                    '#player_name': 'player_name',
+                    '#position': 'position',
+                    '#updated_at': 'updated_at',
+                    '#seasons': 'seasons',
+                    '#season': season_key,
+                    '#weekly_projections': 'weekly_projections',
+                    '#week': week_key
                 }
+                
+                expression_attribute_values = {
+                    ':player_name': player['player_name'],
+                    ':position': player['position'],
+                    ':updated_at': player.get('updated_at', datetime.now().isoformat()),
+                    ':projection': fpts
+                }
+                
+                # Execute update
+                table.update_item(
+                    Key={'player_id': player_id},
+                    UpdateExpression=update_expression,
+                    ExpressionAttributeNames=expression_attribute_names,
+                    ExpressionAttributeValues=expression_attribute_values
+                )
+                
+                success_count += 1
+                logger.debug(f"Successfully updated projection for {player_id}")
 
-                try:
-                    resp = table.get_item(Key={'player_id': player_id})
-                    logger.debug(f"Updating projections for {player_id}: {fpts} points")
-                    
-                    if 'Item' in resp:
-                        item = resp['Item']
+            except Exception as e:
+                logger.error(f"Error updating projection for {player.get('player_name', 'unknown')}: {e}", exc_info=True)
+                error_count += 1
+                continue
 
-                        # make sure projections exists
-                        if 'projections' not in item or not isinstance(item['projections'], dict):
-                            item['projections'] = {}
-
-                        # make sure this season exists
-                        if season_key not in item['projections'] or not isinstance(item['projections'][season_key], dict):
-                            # preserve old value if it was not a dict
-                            prev_val = item['projections'].get(season_key)
-                            if prev_val and not isinstance(prev_val, dict):
-                                item['projections'][season_key] = {'season_totals': prev_val}
-                            else:
-                                item['projections'][season_key] = {}
-
-                        # make sure weekly exists
-                        if 'weekly' not in item['projections'][season_key]:
-                            item['projections'][season_key]['weekly'] = {}
-
-                        # set this week's projection
-                        item['projections'][season_key]['weekly'][week_key] = week_val
-                        
-                        try:
-                            batch.put_item(Item=item)
-                        except ClientError as e:
-                            logger.error(f"Failed to put updated item for {player_id}: {e}")
-
-                    else:
-                        # new item
-                        new_item = {
-                            'player_id': player_id,
-                            'player_name': player['player_name'],
-                            'position': player['position'],
-                            'historical_seasons': {},
-                            'current_season_stats': {},
-                            'projections': {
-                                season_key: {
-                                    'weekly': {
-                                        week_key: week_val
-                                    }
-                                }
-                            }
-                        }
-                        batch.put_item(Item=new_item)
-
-                except Exception as e:
-                    logger.error(f"Error updating projections for {player_id}: {e}", exc_info=True)
-
-        logger.info(f"Processed projections for {len(players_data)} players, week {week}")
+        logger.info(f"Projections update complete: {success_count} successful, {error_count} errors")
 
     except Exception as e:
         logger.error(f"Error in update_player_projections_in_table: {e}", exc_info=True)

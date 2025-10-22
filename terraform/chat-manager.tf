@@ -22,7 +22,7 @@ resource "aws_lambda_function" "chat_manager" {
   variables = {
     AGENT_NAME = var.agent_name
     CHAT_HISTORY_TABLE = aws_dynamodb_table.chat_history.name
-    FANTASY_PLAYERS_TABLE=aws_dynamodb_table.fantasy_football_players.name
+    FANTASY_PLAYERS_TABLE=aws_dynamodb_table.fantasy_football_player_data.name
     FANTASY_ROSTER_TABLE=aws_dynamodb_table.fantasy_football_team_roster.name
     FANTASY_WAIVER_TABLE=aws_dynamodb_table.waiver_table.name
     BEDROCK_MODEL_ID="us.anthropic.claude-sonnet-4-20250514-v1:0"
@@ -89,7 +89,8 @@ resource "aws_iam_role_policy" "lambda_policy_chat" {
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
-          "bedrock:*"
+          "bedrock:*",
+          "aws-marketplace:ViewSubscriptions"
         ]
         Resource = "*"
       },
@@ -111,6 +112,8 @@ resource "aws_iam_role_policy" "lambda_policy_chat" {
           "${aws_dynamodb_table.waiver_table.arn}/*",
           "${aws_dynamodb_table.fantasy_football_players.arn}",
           "${aws_dynamodb_table.fantasy_football_players.arn}/*",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}",
+          "${aws_dynamodb_table.fantasy_football_player_data.arn}/index/*"
         ]
       }
     ]
