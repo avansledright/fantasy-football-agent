@@ -73,7 +73,7 @@ resource "aws_lambda_function" "coach" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.12"
   timeout          = 900
-  memory_size      = 512
+  memory_size      = 1024  # Increased from 512 MB - heavy AI workload with batch DynamoDB operations
   architectures    = ["arm64"]
   filename         = data.archive_file.coach_lambda_zip.output_path
   source_code_hash = data.archive_file.coach_lambda_zip.output_base64sha256

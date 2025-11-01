@@ -64,6 +64,7 @@ resource "aws_lambda_function" "roster_management" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.12"
   timeout       = 30
+  memory_size   = 256  # Explicit allocation - prevents cold start issues with Python 3.12 + boto3
 
   source_code_hash = data.archive_file.roster_management_zip.output_base64sha256
 

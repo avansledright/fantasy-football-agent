@@ -263,28 +263,48 @@ def analyze_player_performance(player_name: str, weeks_back: int = 4) -> Dict[st
         "analysis": f"{player_name}: Recent avg {recent_avg}, 2024 avg {history_2024['recent4_avg']}, projected {projections_2025.get('MISC_FPTS', 0)}, {injury_ownership['injury_status']}"
     }
 
-@tool  
+@tool
 def compare_roster_players(player_names: List[str], metric: str = "recent") -> Dict[str, Any]:
     """Compare multiple players across different performance metrics."""
     if not player_names:
         return {"error": "No players provided"}
-    
-    comparisons = []
-    
+
+    # Batch load all players at once instead of individual lookups
+    player_id_candidates = []
+    name_to_candidates = {}
+
     for name in player_names:
-        player_data = get_player_by_name(name)
-        
+        candidates = generate_player_id_candidates(name)
+        player_id_candidates.extend(candidates)
+        name_to_candidates[name] = candidates
+
+    # Single batch fetch for all players
+    all_player_data = get_players_batch(player_id_candidates)
+
+    comparisons = []
+
+    for name in player_names:
+        # Find matching player data from batch results
+        player_data = None
+        for candidate_id in name_to_candidates[name]:
+            if candidate_id in all_player_data:
+                stored_name = all_player_data[candidate_id].get("player_name", "")
+                if (stored_name.lower() == name.lower() or
+                    normalize_player_name(stored_name) == normalize_player_name(name)):
+                    player_data = all_player_data[candidate_id]
+                    break
+
         if not player_data:
             comparisons.append({
                 "player_name": name,
                 "error": "Player not found"
             })
             continue
-        
+
         history_2024 = extract_2024_history(player_data)
         projections_2025 = extract_2025_projections(player_data)
         current_2025 = extract_current_stats(player_data)
-        
+
         if metric == "recent":
             recent_weeks = current_2025["weeks"][-4:] if current_2025["weeks"] else []
             score = round(sum(w["fantasy_points"] for w in recent_weeks) / len(recent_weeks), 2) if recent_weeks else 0
@@ -294,17 +314,17 @@ def compare_roster_players(player_names: List[str], metric: str = "recent") -> D
             score = projections_2025.get("MISC_FPTS", 0)
         else:
             score = 0
-        
+
         comparisons.append({
             "player_name": name,
             "position": player_data.get("position"),
             "score": score,
             "metric": metric
         })
-    
+
     # Sort by score
     comparisons.sort(key=lambda x: x.get("score", 0), reverse=True)
-    
+
     return {
         "metric": metric,
         "comparisons": comparisons,

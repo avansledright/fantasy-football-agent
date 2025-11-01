@@ -106,6 +106,19 @@ resource "aws_dynamodb_table" "fantasy_football_player_data" {
     type = "S"
   }
 
+  attribute {
+    name = "position"
+    type = "S"
+  }
+
+  # GSI for efficient position-based queries (waiver wire searches)
+  # Converts full table scans to targeted position queries
+  global_secondary_index {
+    name            = "position-index"
+    hash_key        = "position"
+    projection_type = "ALL"
+  }
+
   point_in_time_recovery {
     enabled = true
   }

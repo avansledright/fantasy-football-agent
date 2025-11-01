@@ -66,7 +66,7 @@ class DynamoDBClient:
             if "D/ST" in player_id:
                 logger.info(f"Found DST in player_id {player_id}")
                 player_id = convert_nfl_defense_name(player_id)
-            
+
             response = self.players_table.get_item(
                 Key={'player_id': player_id}
             )
@@ -77,6 +77,60 @@ class DynamoDBClient:
         except Exception as e:
             logger.error(f"Error getting player stats for {player_id}: {str(e)}")
             return None
+
+    def batch_get_player_stats(self, player_ids: List[str]) -> Dict[str, Dict[str, Any]]:
+        """Efficiently load multiple players using batch_get_item.
+
+        Returns a dict mapping player_id -> player_data
+        """
+        if not player_ids:
+            return {}
+
+        all_data = {}
+
+        try:
+            # Process in batches of 100 (DynamoDB limit)
+            for i in range(0, len(player_ids), 100):
+                batch_ids = player_ids[i:i+100]
+
+                # Convert DST names
+                converted_ids = []
+                id_mapping = {}  # Map converted -> original
+                for pid in batch_ids:
+                    converted = convert_nfl_defense_name(pid) if "D/ST" in pid else pid
+                    converted_ids.append(converted)
+                    id_mapping[converted] = pid
+
+                request_items = {
+                    self.players_table_name: {
+                        'Keys': [{'player_id': pid} for pid in converted_ids]
+                    }
+                }
+
+                response = self.dynamodb.batch_get_item(RequestItems=request_items)
+
+                for item in response.get('Responses', {}).get(self.players_table_name, []):
+                    player_id = item.get('player_id')
+                    if player_id:
+                        # Map back to original ID if it was converted
+                        original_id = id_mapping.get(player_id, player_id)
+                        all_data[original_id] = item
+
+                # Handle unprocessed keys
+                while 'UnprocessedKeys' in response and response['UnprocessedKeys']:
+                    response = self.dynamodb.batch_get_item(RequestItems=response['UnprocessedKeys'])
+                    for item in response.get('Responses', {}).get(self.players_table_name, []):
+                        player_id = item.get('player_id')
+                        if player_id:
+                            original_id = id_mapping.get(player_id, player_id)
+                            all_data[original_id] = item
+
+            logger.info(f"Batch loaded {len(all_data)} players from {len(player_ids)} IDs")
+            return all_data
+
+        except Exception as e:
+            logger.error(f"Error batch loading player stats: {str(e)}")
+            return {}
     
     def search_players_by_name(self, player_name: str) -> List[Dict[str, Any]]:
         """Search for players by name (partial match)"""

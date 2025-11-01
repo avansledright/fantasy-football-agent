@@ -85,7 +85,7 @@ resource "aws_cloudwatch_log_group" "stats_scarper_lambda_zip" {
 resource "aws_cloudwatch_event_rule" "tuesday_noon_trigger" {
   name                = "${var.lambda_function_name}-tuesday-trigger"
   description         = "Trigger fantasy stats collection every Tuesday at noon ET"
-  schedule_expression = "cron(0 15 ? * TUE *)" # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
+  schedule_expression = "cron(0 15 ? * * *)" # 17:00 UTC = 12:00 PM ET (accounting for EST/EDT)
 
   tags = {
     Project     = "fantasy-football"

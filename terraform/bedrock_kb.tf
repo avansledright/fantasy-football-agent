@@ -30,11 +30,12 @@ resource "aws_iam_policy" "bedrock_kb_policy" {
         Action = [
           "s3:GetObject",
           "s3:ListBucket",
-          "s3vectors:QueryVectors"
+          "s3vectors:*"
         ]
         Resource = [
           aws_s3_bucket.knowledge_base.arn,
-          "${aws_s3_bucket.knowledge_base.arn}/*"
+          "${aws_s3_bucket.knowledge_base.arn}/*",
+          "arn:aws:s3vectors:*:*:bucket/*/index/*"
         ]
       },
       {
@@ -48,9 +49,9 @@ resource "aws_iam_policy" "bedrock_kb_policy" {
       },
       {
         Effect = "Allow"
-        Action = "bedrock:InvokeModel"
+        Action = "bedrock:*"
         Resource = [
-          "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v1"
+          "arn:aws:bedrock:${var.aws_region}::foundation-model/*"
         ]
       }
     ]

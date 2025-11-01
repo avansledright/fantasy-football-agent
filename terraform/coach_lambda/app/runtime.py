@@ -76,8 +76,10 @@ Your task: Optimize the lineup for week {week} using:
 8. For waiver suggestions be sure to analyze their past performance against their opponents
 9. If a waiver suggestion is projected less than 5 points they should not be considered for acquisition
 10. For the OP position. Be sure to give a detailed explanation as to your selection. Typically this is a place to gain a competitive edge given that it can be any of QB/RB/WR/TE positions. 
-11. If a player is on a BYE week they cannot be considered for the starting lineup
+11. If a player is on a BYE week they cannot be considered for the starting lineup. They should NEVER be presented in the final lineup and immediately replaced with another player of the same position.
 12. INJURY AWARENESS - Players with injury status from seasons.2025.injury_status are automatically adjusted in scoring
+13. The final roster presented from players that are currently on the team. Do not include waiver pickups in the final prsented roster as they might not be available.
+14. You should always present some waiver options if you see a need. Just do not put them into the final roster. List them in the Critical Waiver Wire Targets section. 
 
 FOR DEFENSE:
 Because week to week matchups are always exploitable, identify the best defensive matchups for the week. Return them as part of your explanations. Highlight it in another heading section and include the teams that could be good picks from waivers.
@@ -102,7 +104,7 @@ For the "explanations" values be sure to format it exactly like {EXAMPLE_OUTPUT}
 
     bedrock_model = BedrockModel(
         model_id=os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-sonnet-4-20250514-v1:0"),
-        max_tokens=5000,
+        max_tokens=10000,
         temperature=0.0,
         stream=False
     )

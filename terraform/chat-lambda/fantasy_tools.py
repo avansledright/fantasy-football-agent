@@ -67,21 +67,25 @@ class FantasyFootballTools:
         """Get detailed team roster information"""
         try:
             roster_data = self.db.get_team_roster(team_id)
-            
+
             if not roster_data:
                 return {"error": f"Team {team_id} not found"}
-            
+
+            # Batch load all player stats at once instead of individual lookups
+            player_ids = [player['player_id'] for player in roster_data.get('players', [])]
+            all_player_stats = self.db.batch_get_player_stats(player_ids)
+
             # Enhance roster data with player stats
             enhanced_players = []
-            
+
             for player in roster_data.get('players', []):
-                player_stats = self.db.get_player_stats(player['player_id'])
-                
+                player_stats = all_player_stats.get(player['player_id'])
+
                 if player_stats:
                     # Extract from NEW structure
                     seasons = player_stats.get('seasons', {})
                     season_2025 = seasons.get(self.season_year, {})
-                    
+
                     enhanced_player = {
                         **player,
                         'stats': season_2025.get('weekly_stats', {}),
@@ -90,9 +94,9 @@ class FantasyFootballTools:
                     }
                 else:
                     enhanced_player = player
-                
+
                 enhanced_players.append(enhanced_player)
-            
+
             return {
                 "team_info": {
                     "team_id": roster_data['team_id'],
@@ -104,7 +108,7 @@ class FantasyFootballTools:
                 "players": enhanced_players,
                 "roster_counts": self._get_roster_counts(enhanced_players)
             }
-            
+
         except Exception as e:
             logger.error(f"Error getting team roster: {str(e)}")
             return {"error": "Failed to retrieve team roster"}

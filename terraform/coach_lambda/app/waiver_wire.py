@@ -7,7 +7,7 @@ UPDATED for seasons.{year}.* structure
 import os
 from typing import Dict, Any, List, Optional, Set
 import boto3
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Attr, Key
 from strands import tool
 from app.utils import normalize_position, get_injury_multiplier
 from app.player_data import get_players_batch, extract_2025_projections, extract_2024_history, extract_2025_weekly_projections, extract_injury_and_ownership
@@ -138,17 +138,16 @@ def get_available_waiver_players(
         rostered_players = get_all_rostered_players(use_cache=True)
     
     try:
-        # Scan unified table for players with this position
-        filter_expr = Attr("position").eq(normalize_position(position))
-        
-        scan_kwargs = {
-            "FilterExpression": filter_expr,
+        # Query unified table using position-index GSI for efficient lookups
+        query_kwargs = {
+            "IndexName": "position-index",
+            "KeyConditionExpression": Key("position").eq(normalize_position(position)),
             "ProjectionExpression": "player_id, player_name, #pos, seasons",
             "ExpressionAttributeNames": {"#pos": "position"}
         }
-        
+
         available_players = []
-        resp = table.scan(**scan_kwargs)
+        resp = table.query(**query_kwargs)
         
         for item in resp.get("Items", []):
             player_name = item.get("player_name", "")
@@ -187,11 +186,11 @@ def get_available_waiver_players(
                 "injury_status": injury_status
             })
         
-        # Continue scanning if needed
+        # Continue querying if needed
         while "LastEvaluatedKey" in resp and len(available_players) < limit * 2:
-            resp = table.scan(
+            resp = table.query(
                 ExclusiveStartKey=resp["LastEvaluatedKey"],
-                **scan_kwargs
+                **query_kwargs
             )
             
             for item in resp.get("Items", []):

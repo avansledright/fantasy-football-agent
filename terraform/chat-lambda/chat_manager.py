@@ -58,6 +58,8 @@ Key Guidelines:
 4. Consider both short-term (weekly) and long-term (season-long) implications
 5. Be honest about uncertainty when projections are unclear
 6. Keep responses focused and practical for fantasy managers
+7. Be sure to analyze current player stats for waiver pickups
+8. A player or team who is on BYE should NEVER be considered for a waiver pickup
 """
 
 class ChatManager:
@@ -70,7 +72,7 @@ class ChatManager:
         # Initialize Bedrock model
         bedrock_model = BedrockModel(
             model_id=os.environ.get("BEDROCK_MODEL_ID", "us.anthropic.claude-sonnet-4-20250514-v1:0"),
-            max_tokens=3000,
+            max_tokens=4000,
             temperature=0.0,
             stream=False
         )
