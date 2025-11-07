@@ -3,13 +3,19 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+# Footballguys team code mappings
 TEAM_MAP = {
-    'ARI': 'ari', 'ATL': 'atl', 'BAL': 'bal', 'BUF': 'buf', 'CAR': 'car', 'CHI': 'chi',
-    'CIN': 'cin', 'CLE': 'cle', 'DAL': 'dal', 'DEN': 'den', 'DET': 'det', 'GB': 'gb',
-    'HOU': 'hou', 'IND': 'ind', 'JAX': 'jax', 'KC': 'kc', 'LAC': 'lac', 'LAR': 'lar',
-    'LV': 'lv', 'MIA': 'mia', 'MIN': 'min', 'NE': 'ne', 'NO': 'no', 'NYG': 'nyg',
-    'NYJ': 'nyj', 'PHI': 'phi', 'PIT': 'pit', 'SEA': 'sea', 'SF': 'sf', 'TB': 'tb',
-    'TEN': 'ten', 'WAS': 'was'
+    'ARI': 'crd', 'ATL': 'atl', 'BAL': 'rav', 'BUF': 'buf', 'CAR': 'car', 'CHI': 'chi',
+    'CIN': 'cin', 'CLE': 'cle', 'DAL': 'dal', 'DEN': 'den', 'DET': 'det', 'GB': 'gnb',
+    'HOU': 'htx', 'IND': 'clt', 'JAX': 'jax', 'KC': 'kan', 'LAC': 'sdg', 'LAR': 'ram',
+    'LV': 'rai', 'MIA': 'mia', 'MIN': 'min', 'NE': 'nwe', 'NO': 'nor', 'NYG': 'nyg',
+    'NYJ': 'nyj', 'PHI': 'phi', 'PIT': 'pit', 'SEA': 'sea', 'SF': 'sfo', 'TB': 'tam',
+    'TEN': 'oti', 'WAS': 'was'
+}
+
+# Ourlads uses different codes for some teams
+OURLADS_TEAM_MAP = {
+    'ARI': 'ARZ',  # Arizona uses ARZ on Ourlads
 }
 
 def lambda_handler(event, context):
@@ -38,7 +44,9 @@ def lambda_handler(event, context):
         return error_response(500, f"Scraping failed: {str(e)}")
 
 def scrape_ourlads(team):
-    url = f"https://www.ourlads.com/nfldepthcharts/depthchart/{team}"
+    # Use special mapping for Ourlads if available, otherwise use team code as-is
+    ourlads_code = OURLADS_TEAM_MAP.get(team, team)
+    url = f"https://www.ourlads.com/nfldepthcharts/depthchart/{ourlads_code}"
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -56,41 +64,60 @@ def scrape_ourlads(team):
     # Normalize position names (PK -> K)
     position_mapping = {'PK': 'K'}
 
-    # Ourlads uses tables - find all table rows
-    tables = soup.find_all('table')
+    # Ourlads uses tables - find all table rows, but ONLY from active roster sections
+    # Find all heading tags (h1, h2, h3) to identify sections
+    all_elements = soup.find_all(['h1', 'h2', 'h3', 'table'])
 
-    for table in tables:
-        rows = table.find_all('tr')
+    current_section = None
 
-        for row in rows:
-            cells = row.find_all('td')
-            if len(cells) >= 3:  # Need at least Pos, No, Player1
-                # First cell is position
-                pos_cell = cells[0].get_text().strip()
+    for element in all_elements:
+        if element.name in ['h1', 'h2', 'h3']:
+            # This is a heading - update current section
+            section_text = element.get_text().strip().lower()
+            if 'offense' in section_text:
+                current_section = 'offense'
+            elif 'defense' in section_text:
+                current_section = 'defense'
+            elif 'special teams' in section_text:
+                current_section = 'special_teams'
+            elif 'practice squad' in section_text or 'reserves' in section_text or 'injured reserve' in section_text:
+                current_section = 'excluded'
+            else:
+                # Unknown section, keep previous section
+                pass
+        elif element.name == 'table' and current_section in ['offense', 'defense', 'special_teams']:
+            # This is a table in an active roster section - process it
+            rows = element.find_all('tr')
 
-                # Only process fantasy positions, skip header rows and non-position rows
-                if pos_cell and len(pos_cell) <= 3 and pos_cell.isalpha() and pos_cell in fantasy_positions:
-                    players = []
+            for row in rows:
+                cells = row.find_all('td')
+                if len(cells) >= 3:  # Need at least Pos, No, Player1
+                    # First cell is position
+                    pos_cell = cells[0].get_text().strip()
 
-                    # Cells 2+ contain players (skip cell 1 which is jersey number)
-                    for idx, cell in enumerate(cells[2:], start=1):
-                        links = cell.find_all('a')
-                        for link in links:
-                            name = link.get_text().strip()
-                            # Remove draft info like "23/1" from name
-                            name = name.split('[')[0].strip()
-                            if name:
-                                players.append({
-                                    "name": name,
-                                    "depth": idx,
-                                    "status": "Starter" if idx == 1 else "Backup"
-                                })
-                                break  # Only take first player per cell
+                    # Only process fantasy positions, skip header rows and non-position rows
+                    if pos_cell and len(pos_cell) <= 3 and pos_cell.isalpha() and pos_cell in fantasy_positions:
+                        players = []
 
-                    if players:
-                        # Normalize position name (PK -> K)
-                        normalized_pos = position_mapping.get(pos_cell, pos_cell)
-                        positions[normalized_pos] = players
+                        # Cells 2+ contain players (skip cell 1 which is jersey number)
+                        for idx, cell in enumerate(cells[2:], start=1):
+                            links = cell.find_all('a')
+                            for link in links:
+                                name = link.get_text().strip()
+                                # Remove draft info like "23/1" from name
+                                name = name.split('[')[0].strip()
+                                if name:
+                                    players.append({
+                                        "name": name,
+                                        "depth": idx,
+                                        "status": "Starter" if idx == 1 else "Backup"
+                                    })
+                                    break  # Only take first player per cell
+
+                        if players:
+                            # Normalize position name (PK -> K)
+                            normalized_pos = position_mapping.get(pos_cell, pos_cell)
+                            positions[normalized_pos] = players
 
     # Add DST placeholder
     if not positions.get('DST'):

@@ -26,6 +26,9 @@ resource "aws_lambda_function" "chat_manager" {
     FANTASY_ROSTER_TABLE=aws_dynamodb_table.fantasy_football_team_roster.name
     FANTASY_WAIVER_TABLE=aws_dynamodb_table.waiver_table.name
     BEDROCK_MODEL_ID="us.anthropic.claude-sonnet-4-20250514-v1:0"
+    API_GATEWAY_ID       = aws_api_gateway_rest_api.main.id
+    API_GATEWAY_REGION   = var.aws_region
+    API_GATEWAY_STAGE    = "demo"
   }
 }
 

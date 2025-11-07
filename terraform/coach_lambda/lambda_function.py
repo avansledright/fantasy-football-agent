@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import traceback
+import re
 from app.runtime import build_agent_with_precomputed_lineup
 from app.types import LambdaResponse
 
@@ -59,9 +60,11 @@ def lambda_handler(event, context):
         try:
             prompt = (
                 f"Optimize the fantasy lineup for week {week}. "
-                f"Use comprehensive unified data analysis and return JSON format."
+                f"Return ONLY valid JSON with lineup, bench, and explanations fields. "
+                f"The explanations field must contain markdown text with ALL required section headers. "
+                f"Follow the example output format EXACTLY."
             )
-            
+
             result = agent(prompt)
             logger.info("Agent completed lineup optimization")
             

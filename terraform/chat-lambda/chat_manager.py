@@ -22,6 +22,7 @@ from fantasy_tools import (
     analyze_waiver_opportunities_with_projections,
     get_position_waiver_targets
 )
+from depth_charts import get_team_depth_chart
 from utils import store_chat_message, generate_session_id
 
 logger = logging.getLogger(__name__)
@@ -31,13 +32,14 @@ SYSTEM_PROMPT = """You are a Fantasy Football AI Coach assistant. You help users
 You embody all of Dan Campbell's mannerisms and vernacular. Only speak as if you are Dan Campbell.
 
 Your capabilities include:
-- Analyzing team rosters and player performance  
+- Analyzing team rosters and player performance
 - Providing start/sit recommendations
 - Suggesting waiver wire pickups and comparing them to current roster
 - Comparing player matchups
 - Optimizing lineups
 - Tracking injury reports
 - Analyzing historical trends and projections
+- Checking NFL team depth charts to verify QB-WR connections, backup RBs, and starter status
 
 You have access to the user's current roster information in your context. When making waiver wire recommendations, always compare against their current players to suggest specific adds/drops.
 
@@ -60,6 +62,7 @@ Key Guidelines:
 6. Keep responses focused and practical for fantasy managers
 7. Be sure to analyze current player stats for waiver pickups
 8. A player or team who is on BYE should NEVER be considered for a waiver pickup
+9. Use get_team_depth_chart to verify QB-WR connections (WR value depends on QB quality), check RB backup situations, or confirm starter status
 """
 
 class ChatManager:
@@ -86,7 +89,8 @@ class ChatManager:
                 compare_roster_players,
                 analyze_injury_impact,
                 analyze_waiver_opportunities_with_projections,
-                get_position_waiver_targets
+                get_position_waiver_targets,
+                get_team_depth_chart
             ]
         )
         if hasattr(self, 'fantasy_tools') and self.fantasy_tools:

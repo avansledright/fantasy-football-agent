@@ -138,45 +138,55 @@ Roster requirements:
   * Must compare actual projections: QB2 vs next best RB/WR
 
 ═══════════════════════════════════════════════════════════════
-OUTPUT FORMAT (REQUIRED JSON STRUCTURE)
+OUTPUT FORMAT - CRITICAL: FOLLOW THIS EXACTLY
 ═══════════════════════════════════════════════════════════════
 
-Return EXACTLY this JSON structure:
+You MUST return ONLY valid JSON with this EXACT structure (no additional fields):
 
 {{
   "lineup": [
     {{"slot":"QB","player":"Josh Allen","team":"BUF","position":"QB","projected":22.4,"adjusted":23.1}},
     {{"slot":"RB","player":"Christian McCaffrey","team":"SF","position":"RB","projected":19.8,"adjusted":19.8}},
-    ...all {len(lineup_slots)} positions filled
+    ...MUST include all {len(lineup_slots)} positions
   ],
   "bench": [
-    {{"player":"Injured Player","position":"RB","projected":0.0,"adjusted":0.0,"reason":"Out - injury"}},
-    ...all bench players
+    {{"player":"Player Name","team":"TEAM","position":"POS","projected":10.0,"adjusted":10.0,"reason":"Bench reason"}}
   ],
-  "waiver_targets": [
-    {{"player":"Tank Bigsby","team":"JAX","position":"RB","projected":12.3,"ownership":15,"reasoning":"Injury replacement"}},
-    {{"player":"Dontayvion Wicks","team":"GB","position":"WR","projected":11.8,"ownership":22,"reasoning":"Target share"}}
-  ],
-  "analysis": {{
-    "summary": "Brief 1-2 sentence overall assessment",
-    "strengths": ["Strong QB play", "RB depth solid"],
-    "weaknesses": ["WR injuries", "Bye week gaps"],
-    "key_moves": ["Prioritize RB waiver adds", "Consider DST streaming"]
-  }},
-  "explanations": "MARKDOWN TEXT FOLLOWING FORMAT BELOW"
+  "explanations": "MARKDOWN TEXT - MUST FOLLOW FORMAT BELOW EXACTLY"
 }}
 
-**Explanations Field Format** (markdown text):
+**CRITICAL: The "explanations" field MUST contain markdown text with these EXACT section headers:**
+
 {EXAMPLE_OUTPUT}
 
-CRITICAL: Include ALL sections in explanations:
-1. **Starting Lineup Strategy** - Brief reasoning for each starter (MUST explain OP slot choice: why QB2 over RB or vice versa with projection comparison)
-2. **CRITICAL WAIVER WIRE TARGETS** - Top 2-3 adds with projections and reasoning
-3. **INJURY CONCERNS** - Players to monitor
-4. **MATCHUP ANALYSIS** - Favorable/unfavorable matchups
-5. **BEST DEFENSE MATCHUPS** - Streaming options
-6. **WAIVER PRIORITY** - Numbered add/drop recommendations
-7. Final analysis summary
+**MANDATORY SECTION HEADERS (use these EXACT strings):**
+1. **Starting Lineup Strategy:** (header line exactly as shown)
+2. **CRITICAL WAIVER WIRE TARGETS:** (header line exactly as shown)
+3. **INJURY CONCERNS:** (header line exactly as shown)
+4. **MATCHUP ANALYSIS:** (header line exactly as shown - use **Favorable:** and **Concerning:** subsections)
+5. **BEST DEFENSE MATCHUPS:** (header line exactly as shown)
+6. **WAIVER PRIORITY:** (header line exactly as shown - numbered list)
+
+**FORMATTING RULES:**
+- Use **Favorable:** NOT "Unfavorable" in MATCHUP ANALYSIS section
+- Use **Concerning:** for negative matchups
+- Always include EVERY section even if you write "None at this time"
+- MUST explain OP slot decision in Starting Lineup Strategy
+- Numbered lists for waiver priority (1. 2. 3.)
+- Bullet points with - for lineup strategy and matchups
+
+**OUTPUT VALIDATION CHECKLIST:**
+✓ Valid JSON starting with {{ and ending with }}
+✓ Exactly 3 top-level fields: lineup, bench, explanations
+✓ All {len(lineup_slots)} lineup slots filled
+✓ explanations is a STRING (not object) containing markdown
+✓ All 6 section headers present: Starting Lineup Strategy, CRITICAL WAIVER WIRE TARGETS, INJURY CONCERNS, MATCHUP ANALYSIS, BEST DEFENSE MATCHUPS, WAIVER PRIORITY
+✓ MATCHUP ANALYSIS uses **Favorable:** and **Concerning:** (NOT Unfavorable)
+
+**RESPONSE FORMAT:**
+Start your response with {{ and end with }}
+Do NOT wrap JSON in code blocks or add any text before/after the JSON
+Return ONLY the JSON object
 
 Be DECISIVE, DATA-DRIVEN, and STRATEGIC.
 """

@@ -17,7 +17,7 @@ EXAMPLE_OUTPUT = """**LINEUP OPTIMIZATION FOR WEEK {week}**
 
 **MATCHUP ANALYSIS:**
 - **Favorable:** Bills DST vs Panthers (backup QB), Hill vs Raiders (31st pass defense)
-- **Unfavorable:** Moore vs Bills (elite secondary)
+- **Concerning:** Moore vs Bills (elite secondary)
 
 **BEST DEFENSE MATCHUPS:**
 1. **Cleveland Browns (vs Cardinals):** 10+ projected points. Kyler struggles vs pressure.
