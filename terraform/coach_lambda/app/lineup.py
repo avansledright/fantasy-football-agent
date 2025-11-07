@@ -139,33 +139,6 @@ def optimize_lineup(
         }
     }
 
-@tool
-def choose_optimal_lineup(
-    lineup_slots: List[str],
-    roster: Any,
-    projections: Any,
-) -> Dict[str, Any]:
-    """Choose optimal lineup with streamlined logic using NEW structure."""
-    
-    # Parse inputs
-    if isinstance(roster, str):
-        roster = json.loads(roster)
-    if isinstance(projections, str):
-        projections = json.loads(projections)
-    
-    roster_players = roster.get("players", [])
-    
-    # Load comprehensive data from unified table (NEW structure)
-    unified_data = load_roster_player_data(roster_players)
-    
-    # Build candidates with enhanced scoring
-    candidates = build_candidates(roster_players, projections, unified_data)
-    
-    # Optimize lineup
-    result = optimize_lineup(lineup_slots, candidates)
-    
-    return result
-
 def optimize_lineup_direct(
     lineup_slots: List[str],
     roster_players: List[Dict[str, Any]],

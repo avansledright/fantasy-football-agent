@@ -89,6 +89,9 @@ resource "aws_lambda_function" "coach" {
       DEFAULT_TEAM_ID      = "7"
       SCORING              = "PPR"
       LINEUP_SLOTS         = "QB,RB,RB,WR,WR,TE,FLEX,OP,K,DST"
+      API_GATEWAY_ID       = aws_api_gateway_rest_api.main.id
+      API_GATEWAY_REGION   = var.aws_region
+      API_GATEWAY_STAGE    = "demo"
     }
   }
 

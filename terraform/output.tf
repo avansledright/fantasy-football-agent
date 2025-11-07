@@ -21,3 +21,8 @@ output "website_endpoint" {
 output "bucket_name" {
   value = aws_s3_bucket.fantasy_football_web.bucket
 }
+
+output "depth_chart_api_url" {
+  description = "Depth Chart API endpoint"
+  value       = "${aws_api_gateway_stage.demo.invoke_url}/depth-chart"
+}

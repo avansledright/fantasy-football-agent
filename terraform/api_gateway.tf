@@ -458,7 +458,12 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_method.chat_post.id,
       aws_api_gateway_integration.chat_post.id,
       aws_api_gateway_method.chat_options.id,
-      aws_api_gateway_integration.chat_options.id
+      aws_api_gateway_integration.chat_options.id,
+      aws_api_gateway_resource.depth_chart.id,
+      aws_api_gateway_method.depth_chart_get.id,
+      aws_api_gateway_integration.depth_chart_lambda.id,
+      aws_api_gateway_method.depth_chart_options.id,
+      aws_api_gateway_integration.depth_chart_options.id
     ]))
   }
 

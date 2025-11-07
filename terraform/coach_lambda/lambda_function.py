@@ -3,7 +3,7 @@ import json
 import os
 import logging
 import traceback
-from app.runtime import build_agent, build_agent_ultra_fast, build_agent_with_precomputed_lineup
+from app.runtime import build_agent_with_precomputed_lineup
 from app.types import LambdaResponse
 
 # Configure logging
