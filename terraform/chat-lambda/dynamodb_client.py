@@ -132,19 +132,84 @@ class DynamoDBClient:
             logger.error(f"Error batch loading player stats: {str(e)}")
             return {}
     
+    def _normalize_player_name(self, player_name: str) -> str:
+        """Normalize player name from 'LastName, FirstName' to 'FirstName LastName' format"""
+        # Check if name is in "LastName, FirstName" format
+        if ',' in player_name:
+            parts = player_name.split(',')
+            if len(parts) == 2:
+                last_name = parts[0].strip()
+                first_name = parts[1].strip()
+                normalized = f"{first_name} {last_name}"
+                logger.info(f"Normalized name from '{player_name}' to '{normalized}'")
+                return normalized
+        return player_name
+
     def search_players_by_name(self, player_name: str) -> List[Dict[str, Any]]:
-        """Search for players by name (partial match)"""
+        """Search for players by name (partial match)
+
+        Handles both 'FirstName LastName' and 'LastName, FirstName' formats
+        Supports DynamoDB pagination to search all items
+        Uses case-insensitive matching
+        """
         try:
-            # Use scan with filter for name search (consider using GSI for better performance)
-            response = self.players_table.scan(
-                FilterExpression="contains(player_name, :name)",
-                ExpressionAttributeValues={':name': player_name},
-            )
-            items = response.get('Items', [])
-            logger.info(f"Found {len(items)} players matching name: {player_name}")
-            return items
+            # Normalize the name format (convert "LastName, FirstName" to "FirstName LastName")
+            normalized_name = self._normalize_player_name(player_name)
+            normalized_lower = normalized_name.lower().strip()
+            logger.info(f"Searching for player: {player_name} (normalized: {normalized_name}, lowercase: {normalized_lower})")
+
+            # Handle DynamoDB pagination to search all items
+            # Use DynamoDB filter first, then do case-insensitive matching in Python
+            all_items = []
+            last_evaluated_key = None
+            scan_count = 0
+            max_scans = 100  # Allow more scans to search entire table if needed
+
+            # Split name into parts for more flexible searching
+            name_parts = normalized_lower.split()
+            logger.info(f"Searching for name parts: {name_parts}")
+
+            while scan_count < max_scans:
+                scan_params = {
+                    # Use FilterExpression to reduce data transfer (case-sensitive pre-filter)
+                    "FilterExpression": "contains(player_name, :name)",
+                    "ExpressionAttributeValues": {':name': normalized_name}
+                }
+
+                if last_evaluated_key:
+                    scan_params["ExclusiveStartKey"] = last_evaluated_key
+
+                response = self.players_table.scan(**scan_params)
+                batch_items = response.get('Items', [])
+
+                # Additionally filter case-insensitively in Python to handle case variations
+                for item in batch_items:
+                    item_name = item.get('player_name', '').lower().strip()
+                    # Check if all name parts are in the item name
+                    if all(part in item_name for part in name_parts):
+                        all_items.append(item)
+
+                scan_count += 1
+                scanned_count = len(batch_items)
+                logger.info(f"Scan #{scan_count}: Filtered {scanned_count} items from DynamoDB, found {len(all_items)} matches total")
+
+                # If we found matches, we can stop early
+                if all_items:
+                    logger.info(f"Found {len(all_items)} matches, stopping scan")
+                    break
+
+                # Check if there are more pages
+                last_evaluated_key = response.get('LastEvaluatedKey')
+                if not last_evaluated_key:
+                    logger.info(f"No more pages to scan")
+                    break
+
+            logger.info(f"Found {len(all_items)} players matching name: {player_name} (searched as: {normalized_name}) after {scan_count} scans")
+            return all_items
         except Exception as e:
             logger.error(f"Error searching players by name {player_name}: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def get_waiver_wire_players(

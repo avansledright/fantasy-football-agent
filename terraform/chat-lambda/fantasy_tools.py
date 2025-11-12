@@ -120,19 +120,22 @@ class FantasyFootballTools:
             if "DST" in player_name:
                 logger.info(f"Found defense: {player_name}")
                 player_name = player_name.replace("#DST", "")
-            
+
+            # Normalize name format (handles "LastName, FirstName" -> "FirstName LastName")
+            normalized_name = self.db._normalize_player_name(player_name)
+
             players = self.db.search_players_by_name(player_name)
-            
+
             if not players:
                 return {"error": f"Player {player_name} not found"}
-            
-            # Get the best match (exact name match preferred)
+
+            # Get the best match (exact name match preferred, using normalized name)
             player = None
             for p in players:
-                if p['player_name'].lower() == player_name.lower():
+                if p['player_name'].lower() == normalized_name.lower():
                     player = p
                     break
-            
+
             if not player:
                 player = players[0]  # Use first match if no exact match
             
