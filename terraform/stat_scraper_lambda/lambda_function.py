@@ -9,7 +9,7 @@ import re
 from decimal import Decimal, InvalidOperation
 import os
 from typing import Dict, List, Optional
-from utils import nfl_teams
+from utils import nfl_teams, espn_team_slugs
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -56,6 +56,15 @@ def lambda_handler(event, context):
         positions = ['QB', 'RB', 'WR', 'TE', 'K', 'DST']
         total_players_processed = 0
         total_projections_processed = 0
+        total_injuries_updated = 0
+
+        # --- NEW: ESPN Injury Status Updates (use espn_player_id from Dynamo) ---
+        try:
+            count = update_injury_status_from_espn()
+            total_injuries_updated += count
+            logger.info(f"Updated injury status for {count} players from ESPN API")
+        except Exception as e:
+            logger.error(f"Error updating injuries from ESPN: {e}", exc_info=True)
 
         for position in positions:
             # Scrape stats only if week is completed (games finished)
@@ -103,6 +112,8 @@ def lambda_handler(event, context):
 
         logger.info(f"Successfully processed {total_players_processed} total players")
         logger.info(f"Successfully processed {total_projections_processed} total projections")
+        logger.info(f"Successfully updated {total_injuries_updated} injury statuses")
+
         return {
             'statusCode': 200,
             'body': json.dumps({
@@ -111,7 +122,8 @@ def lambda_handler(event, context):
                 'week_status': week_status,
                 'season': CURRENT_SEASON,
                 'stats_processed': total_players_processed,
-                'projections_processed': total_projections_processed
+                'projections_processed': total_projections_processed,
+                'injuries_updated': total_injuries_updated
             })
         }
 
@@ -176,6 +188,204 @@ def get_current_nfl_week() -> int:
 
     # Cap at week 18 (regular season)
     return min(week, 18)
+
+
+# -------------------------
+# ESPN INJURY FETCHERS
+# -------------------------
+def search_espn_player_id(player_name: str, position: str, team: str = None) -> Optional[int]:
+    """Search for a player's ESPN ID using team roster API."""
+    try:
+        # Remove Jr., Sr., etc. from name for better matching
+        clean_name = re.sub(r'\s+(Jr\.?|Sr\.?|III?|IV?)$', '', player_name, flags=re.IGNORECASE).strip()
+
+        # If no team provided, we can't search rosters
+        if not team or team.upper() not in espn_team_slugs:
+            logger.warning(f"Cannot search for {player_name} - missing or invalid team: {team}")
+            return None
+
+        # Get ESPN team slug
+        team_slug = espn_team_slugs.get(team.upper())
+        if not team_slug:
+            logger.warning(f"No ESPN team slug found for {team}")
+            return None
+
+        # Use ESPN team roster API
+        roster_url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/{team_slug}/roster"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+
+        response = requests.get(roster_url, headers=headers, timeout=15)
+        if response.status_code != 200:
+            logger.warning(f"ESPN roster API returned {response.status_code} for team {team}")
+            return None
+
+        data = response.json()
+        athletes = data.get('athletes', [])
+
+        # Search through all position groups
+        for position_group in athletes:
+            items = position_group.get('items', [])
+            for athlete in items:
+                athlete_name = athlete.get('displayName', '')
+                athlete_position = athlete.get('position', {}).get('abbreviation', '')
+                athlete_id = athlete.get('id')
+
+                # Match by name (case-insensitive, flexible matching)
+                if athlete_name and athlete_id:
+                    clean_athlete_name = re.sub(r'\s+(Jr\.?|Sr\.?|III?|IV?)$', '', athlete_name, flags=re.IGNORECASE).strip()
+
+                    # Check if names match and position matches
+                    if clean_name.lower() in clean_athlete_name.lower() and athlete_position == position:
+                        logger.info(f"Found ESPN ID {athlete_id} for {player_name} ({position}) on team {team}")
+                        return int(athlete_id)
+
+        logger.warning(f"No ESPN ID found for {player_name} ({position}) on team {team}")
+        return None
+
+    except Exception as e:
+        logger.warning(f"Error searching for ESPN ID for {player_name}: {e}")
+        return None
+
+
+def get_espn_injury_status(espn_player_id: int) -> str:
+    """Fetch a player's injury status from ESPN API."""
+    try:
+        url = f"https://site.web.api.espn.com/apis/common/v3/sports/football/nfl/athletes/{espn_player_id}"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers, timeout=15)
+        if response.status_code != 200:
+            logger.warning(f"ESPN API returned {response.status_code} for player {espn_player_id}")
+            return "UNKNOWN"
+
+        data = response.json()
+        athlete = data.get('athlete', {})
+
+        # Check injuries array for actual injury status
+        injuries = athlete.get('injuries', [])
+        if injuries and len(injuries) > 0:
+            # Get the most recent injury (first in array)
+            injury = injuries[0]
+
+            # First try fantasyStatus (most reliable for fantasy purposes)
+            fantasy_status = injury.get('details', {}).get('fantasyStatus', {}).get('description', '')
+            if fantasy_status:
+                # Normalize to our standard values: Healthy, Questionable, Doubtful, Out, IR
+                status_upper = fantasy_status.upper()
+                if status_upper in ['OUT', 'O']:
+                    return 'Out'
+                elif status_upper in ['QUESTIONABLE', 'Q']:
+                    return 'Questionable'
+                elif status_upper in ['DOUBTFUL', 'D']:
+                    return 'Doubtful'
+                elif status_upper in ['IR', 'INJURED RESERVE']:
+                    return 'IR'
+                else:
+                    return fantasy_status
+
+            # Fallback to injury.status field
+            injury_status = injury.get('status', '')
+            if injury_status:
+                return injury_status
+
+        # No injuries found - player is healthy
+        return 'Healthy'
+
+    except Exception as e:
+        logger.warning(f"Failed to fetch ESPN injury for {espn_player_id}: {e}")
+        return 'UNKNOWN'
+
+
+def update_injury_status_from_espn() -> int:
+    """
+    Iterate through DynamoDB players and update injury statuses using ESPN API.
+    For players without espn_player_id, attempts to search for it and store it.
+    """
+    success_count = 0
+    season_key = str(CURRENT_SEASON)
+
+    scan_kwargs = {
+        'ProjectionExpression': 'player_id, espn_player_id, player_name, #pos, #seasons.#season.team',
+        'ExpressionAttributeNames': {
+            '#pos': 'position',
+            '#seasons': 'seasons',
+            '#season': season_key
+        }
+    }
+    done = False
+    start_key = None
+
+    while not done:
+        if start_key:
+            scan_kwargs['ExclusiveStartKey'] = start_key
+        response = table.scan(**scan_kwargs)
+        items = response.get('Items', [])
+
+        for item in items:
+            player_id = item.get('player_id')
+            espn_id = item.get('espn_player_id')
+            player_name = item.get('player_name')
+            position = item.get('position')
+
+            # Extract team from nested structure
+            team = None
+            seasons = item.get('seasons', {})
+            if seasons and season_key in seasons:
+                team = seasons[season_key].get('team')
+
+            if not player_id or not player_name or not position:
+                continue
+
+            # If no ESPN ID, try to search for it using team roster
+            if not espn_id:
+                logger.info(f"Missing ESPN ID for {player_name} ({position}), team: {team}, attempting search...")
+                espn_id = search_espn_player_id(player_name, position, team)
+
+                if espn_id:
+                    # Store the ESPN ID in DynamoDB for future use
+                    try:
+                        table.update_item(
+                            Key={'player_id': player_id},
+                            UpdateExpression="SET espn_player_id = :espn_id",
+                            ExpressionAttributeValues={
+                                ':espn_id': espn_id
+                            }
+                        )
+                        logger.info(f"Stored ESPN ID {espn_id} for {player_name}")
+                    except ClientError as ce:
+                        logger.warning(f"Failed to store ESPN ID for {player_id}: {ce}")
+                else:
+                    logger.debug(f"Could not find ESPN ID for {player_name}, skipping injury update")
+                    continue
+
+            # Now fetch and update injury status
+            status = get_espn_injury_status(espn_id)
+            if not status or status == 'UNKNOWN':
+                continue
+
+            try:
+                table.update_item(
+                    Key={'player_id': player_id},
+                    UpdateExpression="SET #seasons.#season.#injury_status = :status, #updated_at = :updated_at",
+                    ExpressionAttributeNames={
+                        '#seasons': 'seasons',
+                        '#season': season_key,
+                        '#injury_status': 'injury_status',
+                        '#updated_at': 'updated_at'
+                    },
+                    ExpressionAttributeValues={
+                        ':status': status,
+                        ':updated_at': datetime.now().isoformat()
+                    }
+                )
+                logger.info(f"Updated injury status for {player_name} to {status}")
+                success_count += 1
+            except ClientError as ce:
+                logger.warning(f"Failed to update injury status for {player_id}: {ce}")
+
+        start_key = response.get('LastEvaluatedKey', None)
+        done = start_key is None
+
+    return success_count
 
 
 def scrape_fantasypros_stats(position: str, week: int) -> List[Dict]:
