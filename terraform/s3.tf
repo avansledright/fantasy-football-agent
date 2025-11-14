@@ -67,6 +67,14 @@ resource "aws_s3_object" "index_html" {
   etag         = filemd5("${path.module}/web-files/index.html")
 }
 
+resource "aws_s3_object" "index2_html" {
+  bucket       = aws_s3_bucket.fantasy_football_web.id
+  key          = "index2.html"
+  source       = "${path.module}/web-files/index2.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.module}/web-files/index2.html")
+}
+
 resource "aws_s3_object" "styles_css" {
   bucket       = aws_s3_bucket.fantasy_football_web.id
   key          = "styles.css"
@@ -84,6 +92,15 @@ resource "aws_s3_object" "app_js" {
   etag         = md5(local.templated_app_js)
 }
 
+# Upload templated unified-coach.js file
+resource "aws_s3_object" "unified_coach_js" {
+  bucket       = aws_s3_bucket.fantasy_football_web.id
+  key          = "unified-coach.js"
+  content      = local.templated_unified_coach_js
+  content_type = "application/javascript"
+  etag         = md5(local.templated_unified_coach_js)
+}
+
 resource "aws_s3_object" "js_files" {
   for_each = fileset("${path.module}/web-files", "*.js")
   
@@ -98,16 +115,20 @@ resource "aws_s3_object" "js_files" {
 resource "null_resource" "invalidate_cloudfront" {
   depends_on = [
     aws_s3_object.index_html,
+    aws_s3_object.index2_html,
     aws_s3_object.styles_css,
     aws_s3_object.app_js,
+    aws_s3_object.unified_coach_js,
     aws_s3_object.js_files
   ]
 
   triggers = {
-    index_etag = aws_s3_object.index_html.etag
-    css_etag   = aws_s3_object.styles_css.etag
-    js_etag    = aws_s3_object.app_js.etag
-    js_files   = join(",", [for obj in aws_s3_object.js_files : obj.etag])
+    index_etag         = aws_s3_object.index_html.etag
+    index2_etag        = aws_s3_object.index2_html.etag
+    css_etag           = aws_s3_object.styles_css.etag
+    js_etag            = aws_s3_object.app_js.etag
+    unified_coach_etag = aws_s3_object.unified_coach_js.etag
+    js_files           = join(",", [for obj in aws_s3_object.js_files : obj.etag])
   }
 
   provisioner "local-exec" {

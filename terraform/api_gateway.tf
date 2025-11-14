@@ -434,9 +434,11 @@ resource "aws_lambda_permission" "api_gateway_invoke_chat" {
 resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
 
-  # Updated triggers to include new resources
+  # Deployment triggers - includes API config AND Lambda code hashes
+  # This ensures redeployment when either API structure or Lambda code changes
   triggers = {
     redeployment = sha1(jsonencode([
+      # API Gateway resources
       aws_api_gateway_resource.agent.id,
       aws_api_gateway_method.agent_post.id,
       aws_api_gateway_integration.lambda_integration.id,
@@ -463,7 +465,14 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_method.depth_chart_get.id,
       aws_api_gateway_integration.depth_chart_lambda.id,
       aws_api_gateway_method.depth_chart_options.id,
-      aws_api_gateway_integration.depth_chart_options.id
+      aws_api_gateway_integration.depth_chart_options.id,
+      # Lambda function source code hashes - triggers redeployment on code changes
+      # Note: unified_coach excluded to avoid circular dependency
+      aws_lambda_function.draft_agent.source_code_hash,
+      aws_lambda_function.coach.source_code_hash,
+      aws_lambda_function.roster_management.source_code_hash,
+      aws_lambda_function.chat_manager.source_code_hash,
+      aws_lambda_function.depth_chart_api.source_code_hash
     ]))
   }
 
